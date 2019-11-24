@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		80940A0B238A583300137EB1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80940A0A238A583300137EB1 /* main.cpp */; };
+		80940A0E238A598E00137EB1 /* lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80940A0C238A598E00137EB1 /* lexer.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +26,8 @@
 /* Begin PBXFileReference section */
 		80940A02238A581300137EB1 /* kas */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = kas; sourceTree = BUILT_PRODUCTS_DIR; };
 		80940A0A238A583300137EB1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		80940A0C238A598E00137EB1 /* lexer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lexer.cpp; sourceTree = "<group>"; };
+		80940A0D238A598E00137EB1 /* lexer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = lexer.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +53,7 @@
 			isa = PBXGroup;
 			children = (
 				80940A0A238A583300137EB1 /* main.cpp */,
+				80940A0F238A59BD00137EB1 /* kdl */,
 			);
 			name = kas;
 			path = ../kas;
@@ -61,6 +65,15 @@
 				80940A02238A581300137EB1 /* kas */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		80940A0F238A59BD00137EB1 /* kdl */ = {
+			isa = PBXGroup;
+			children = (
+				80940A0D238A598E00137EB1 /* lexer.hpp */,
+				80940A0C238A598E00137EB1 /* lexer.cpp */,
+			);
+			path = kdl;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -119,6 +132,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				80940A0E238A598E00137EB1 /* lexer.cpp in Sources */,
 				80940A0B238A583300137EB1 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -193,6 +207,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-I../kas";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -246,6 +261,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_CFLAGS = "-I../kas";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};

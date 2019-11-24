@@ -20,13 +20,12 @@
 * SOFTWARE.
 */
 
-#include <iostream>
 #include "kdl/lexer.hpp"
 
-// MARK: - Entry Point
+// MARK: - Token
 
-int main(int argc, const char **argv)
+kdl::lexer::token::token(const int line, const int offset, const std::string text, token::type type)
+    : m_line(line), m_offset(offset), m_text(text), m_type(type)
 {
-    std::cout << "Kestrel Assembler - kas" << std::endl;
-    return 0;
+    
 }
