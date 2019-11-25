@@ -61,6 +61,27 @@ public:
          */
         token(const int line, const int offset, const std::string text, token::type type);
         
+        /**
+         * Returns the line number of the original source file in which the token
+         * originated from.
+         */
+        int line() const;
+        
+        /**
+         * Returns the offset in the line where the token started from.
+         */
+        int offset() const;
+        
+        /**
+         * Returns the textual representation of the token.
+         */
+        std::string text() const;
+        
+        /**
+         * Test if the type of the token matches the specified type.
+         */
+        bool is_a(token::type type) const;
+        
     private:
         int m_line;
         int m_offset;

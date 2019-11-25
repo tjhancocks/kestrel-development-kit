@@ -24,8 +24,32 @@
 
 // MARK: - Token
 
-kdl::lexer::token::token(const int line, const int offset, const std::string text, token::type type)
+kdl::lexer::token::token(const int line, const int offset, const std::string text, kdl::lexer::token::type type)
     : m_line(line), m_offset(offset), m_text(text), m_type(type)
 {
     
+}
+
+// MARK: - Token Accessors
+
+int kdl::lexer::token::line() const
+{
+    return m_line;
+}
+
+int kdl::lexer::token::offset() const
+{
+    return m_offset;
+}
+
+std::string kdl::lexer::token::text() const
+{
+    return m_text;
+}
+
+// MARK: - Token Operations
+
+bool kdl::lexer::token::is_a(kdl::lexer::token::type type) const
+{
+    return (m_type == type);
 }
