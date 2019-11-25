@@ -22,6 +22,8 @@
 
 #include <string>
 #include <vector>
+#include <type_traits>
+#include <memory>
 
 #if !defined(KDL_LEXER)
 #define KDL_LEXER
@@ -100,6 +102,53 @@ public:
      * Construct a new lexical analyser using the source code provided.
      */
     lexer(const std::string& source);
+    
+    /**
+     * Perform the lexical analysis.
+     *
+     * This method is responsible for kicking off the main lexical analysis task
+     * and running it. It progressively steps through the source, extracting tokens
+     * as its finds them.
+     *
+     * It does no direct semantic checking, but does throw exceptions when it is
+     * unable to infer types, or doesn't recognise symbols.
+     */
+    void analyze();
+    
+    /**
+     * Test if there is any more characters in source to parse.
+     */
+    bool available(long offset = 0, std::string::size_type size = 1) const;
+    
+    /**
+     * Advance the lexer forward by the specified number of characters.
+     *
+     * \note It is safe to advance forward beyond the end of the source with this method,
+     * as no content needs to be accessed.
+     */
+    void advance(long offset = 1);
+    
+    /**
+     * Peek a string/character from the source.
+     *
+     * This peek happens at the specified offset for the specified number of characters.
+     * A check is performed to see if the peek is valid. If it is not an exception
+     * will be raised.
+     *
+     * This operation does not advance the internal pointer to the source.
+     */
+    std::string peek(long offset = 0, std::string::size_type size = 1) const;
+    
+    /**
+     * Read a string/character from the source.
+     *
+     * This read happens at the specified offset for the specified number of characters.
+     * A check is performed to see if the read is valid. If it is not an exception
+     * will be raised.
+     *
+     * This operation does advance the internal pointer to the source.
+     */
+    std::string read(long offset = 0, std::string::size_type size = 1);
     
 private:
     std::string::size_type m_pos;

@@ -21,6 +21,7 @@
 */
 
 #include "kdl/lexer.hpp"
+#include <stdexcept>
 
 // MARK: - Token
 
@@ -66,4 +67,47 @@ kdl::lexer::lexer(const std::string& content)
     : m_source(content), m_pos(0), m_length(content.length())
 {
     
+}
+
+// MARK: - Lexical Analysis
+
+void kdl::lexer::analyze()
+{
+    while (available()) {
+        
+        advance();
+    }
+}
+
+// MARK: - Lexer Accessors
+
+bool kdl::lexer::available(long offset, std::string::size_type size) const
+{
+    auto start = m_pos + offset;
+    auto end = start + size;
+    return (end < m_length);
+}
+
+
+// MARK: - Lexer Operations
+
+void kdl::lexer::advance(long offset)
+{
+    m_pos += offset;
+}
+
+std::string kdl::lexer::peek(long offset, std::string::size_type size) const
+{
+    if (!available(offset, size)) {
+        throw std::runtime_error("Failed to peek source.");
+    }
+    
+    return m_source.substr(m_pos + offset, size);
+}
+
+std::string kdl::lexer::read(long offset, std::string::size_type size)
+{
+    auto s = peek(offset, size);
+    advance(offset + size);
+    return s;
 }
