@@ -21,6 +21,7 @@
 */
 
 #include <string>
+#include <vector>
 
 #if !defined(KDL_LEXER)
 #define KDL_LEXER
@@ -57,6 +58,11 @@ public:
         
     public:
         /**
+         * Construct a NULL token.
+         */
+        token();
+        
+        /**
          * Construct a new token.
          */
         token(const int line, const int offset, const std::string text, token::type type);
@@ -89,7 +95,17 @@ public:
         token::type m_type;
     };
     
+public:
+    /**
+     * Construct a new lexical analyser using the source code provided.
+     */
+    lexer(const std::string& source);
     
+private:
+    std::string::size_type m_pos;
+    std::string::size_type m_length;
+    std::string m_source;
+    std::vector<token> m_tokens;
 };
 
 };

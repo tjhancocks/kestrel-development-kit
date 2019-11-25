@@ -24,6 +24,12 @@
 
 // MARK: - Token
 
+kdl::lexer::token::token()
+    : m_line(0), m_offset(0), m_text("-"), m_type(unknown)
+{
+    
+}
+
 kdl::lexer::token::token(const int line, const int offset, const std::string text, kdl::lexer::token::type type)
     : m_line(line), m_offset(offset), m_text(text), m_type(type)
 {
@@ -52,4 +58,12 @@ std::string kdl::lexer::token::text() const
 bool kdl::lexer::token::is_a(kdl::lexer::token::type type) const
 {
     return (m_type == type);
+}
+
+// MARK: - Lexer Constructor
+
+kdl::lexer::lexer(const std::string& content)
+    : m_source(content), m_pos(0), m_length(content.length())
+{
+    
 }
