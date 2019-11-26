@@ -134,6 +134,15 @@ void kdl::lexer::analyze()
                 m_tokens.push_back(kdl::lexer::token(m_line, 0, number_text, token::type::integer));
             }
         }
+        else if (test_if(identifier_set::contains)) {
+            // We're looking at an identifier. Extract the identifier and determine if it is a keyword.
+            consume_while(identifier_set::contains);
+            auto text = m_slice;
+            
+            // TODO: Check for keywords
+            
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, text, token::type::identifier));
+        }
         
         // Symbols
         else if (test_if(match<'{'>::yes)) {
