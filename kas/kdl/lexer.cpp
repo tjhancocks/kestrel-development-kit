@@ -22,6 +22,7 @@
 
 #include "kdl/lexer.hpp"
 #include <stdexcept>
+#include <algorithm>
 
 // MARK: - Token
 
