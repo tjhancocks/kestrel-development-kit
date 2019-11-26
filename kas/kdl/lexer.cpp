@@ -76,7 +76,47 @@ void kdl::lexer::analyze()
 {
     while (available()) {
         
-        advance();
+        // Check if we're looking at a new line character. If we are then simply consume it, and
+        // increment the current line number.
+        if (test_if(match<'\n'>::yes)) {
+            advance();
+            m_line++;
+            continue;
+        }
+        
+        // Consume any leading (nonbreaking) whitespace.
+        consume_while(set<' ', '\t'>::contains);
+        
+        // Check for a comment. If we're looking at a comment then we need to consume the entire
+        // line. We need to advance past the character at the end of the match.
+        if (test_if(match<';'>::yes)) {
+            consume_while(match<'\n'>::no);
+        }
+        else if (test_if(match<'@'>::yes)) {
+            // We're looking at a directive.
+            // Directive's are defined in the form of `@name`, an '@' followed by an identifier.
+            advance();
+            consume_while(identifier_set::contains);
+            
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, m_slice, token::type::directive));
+        }
+        else if (test_if(match<'"'>::yes)) {
+            // We're looking at a string literal.
+            // The string continues until a corresponding '"' is found.
+            advance();
+            consume_while(match<'"'>::no);
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, m_slice, token::type::string));
+            advance();
+        }
+        else if (test_if(match<'{'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::lbrace));
+        }
+        else if (test_if(match<'}'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::rbrace));
+        }
+        else {
+            throw std::runtime_error("Unrecognised character '" + peek() + "' encountered.");
+        }
     }
 }
 
@@ -131,13 +171,19 @@ bool kdl::lexer::consume_while(std::function<bool(const std::string)> testFn)
 }
 
 template <char c>
-bool kdl::match<c>::function(const std::string __Chk)
+bool kdl::match<c>::yes(const std::string __Chk)
 {
     return __Chk == std::string(1, c);
 }
 
+template <char c>
+bool kdl::match<c>::no(const std::string __Chk)
+{
+    return !yes(__Chk);
+}
+
 template <char lc, char uc>
-bool kdl::in_range<lc, uc>::function(const std::string __Chk)
+bool kdl::range<lc, uc>::contains(const std::string __Chk)
 {
     for (auto __ch : __Chk) {
         if (__ch < lc || __ch > uc) {
@@ -147,14 +193,14 @@ bool kdl::in_range<lc, uc>::function(const std::string __Chk)
     return true;
 }
 
-template <char c>
-bool kdl::not_match<c>::function(const std::string __Chk)
+template <char lc, char uc>
+bool kdl::range<lc, uc>::not_contains(const std::string __Chk)
 {
-    return !kdl::match<c>::function(__Chk);
+    return !contains(__Chk);
 }
 
 template<char tC, char... ttC>
-bool kdl::set<tC, ttC...>::function(const std::string __Chk)
+bool kdl::set<tC, ttC...>::contains(const std::string __Chk)
 {
     std::vector<char> v = {tC, ttC...};
     
@@ -164,5 +210,22 @@ bool kdl::set<tC, ttC...>::function(const std::string __Chk)
         }
     }
     
+    return true;
+}
+
+template<char tC, char... ttC>
+bool kdl::set<tC, ttC...>::not_contains(const std::string __Chk)
+{
+    return !contains(__Chk);
+}
+
+bool kdl::identifier_set::contains(const std::string __Chk)
+{
+    for (auto __ch : __Chk) {
+        auto condition = (__ch >= 'A' && __ch <= 'Z') || (__ch >= 'a' && __ch <= 'z') || __ch == '_';
+        if (!condition) {
+            return false;
+        }
+    }
     return true;
 }

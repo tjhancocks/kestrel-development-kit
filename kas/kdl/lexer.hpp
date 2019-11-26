@@ -55,7 +55,7 @@ public:
             unknown, identifier, resource_id, string, integer, percentage,
             lbrace, rbrace, lparen, rparen, langle, rangle, lbracket, rbracket,
             plus, minus, star, slash, pipe, ampersand, equals, colon, semicolon,
-            dot, comma, caret
+            dot, comma, caret, directive
         };
         
     public:
@@ -164,6 +164,7 @@ public:
     bool consume_while(std::function<bool(const std::string)> testFn);
     
 private:
+    int m_line;
     std::string::size_type m_pos;
     std::string::size_type m_length;
     std::string m_source;
@@ -181,22 +182,20 @@ private:
  * characters, not entire strings.
  *
  * \example
- *  test_if(match<'='>::function)
+ *  test_if(match<'='>::yes)
  */
 template <char c>
 struct match {
-    static bool function(const std::string);
+    static bool yes(const std::string);
+    static bool no(const std::string);
 };
 
 template <char lC, char uC>
-struct in_range {
-    static bool function(const std::string);
+struct range {
+    static bool contains(const std::string);
+    static bool not_contains(const std::string);
 };
 
-template <char c>
-struct not_match {
-    static bool function(const std::string);
-};
 
 /**
  * Template function for testing if all characters of a chunk exist within a specified set
@@ -206,12 +205,21 @@ struct not_match {
  * function to be tested against the value given.
  *
  * \example
- *  test_if(set<' ', '\t'>::function)
+ *  test_if(set<' ', '\t'>::contains)
  */
 template<char tC, char... ttC>
 struct set {
-    static bool function(const std::string);
+    static bool contains(const std::string);
+    static bool not_contains(const std::string);
 };
+
+/**
+ * Specialised test function for testing identifier characters.
+ */
+struct identifier_set {
+    static bool contains(const std::string);
+};
+
 
 };
 
