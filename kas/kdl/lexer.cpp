@@ -112,6 +112,13 @@ void kdl::lexer::analyze()
             m_tokens.push_back(kdl::lexer::token(m_line, 0, m_slice, token::type::string));
             advance();
         }
+        else if (test_if(match<'#'>::yes)) {
+            // We're looking at the beginning of a resource id literal.
+            // These take the form of #128, #129, etc.
+            advance();
+            consume_while(number_set::contains);
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, m_slice, token::type::resource_id));
+        }
         
         // Symbols
         else if (test_if(match<'{'>::yes)) {
@@ -282,6 +289,17 @@ bool kdl::identifier_set::contains(const std::string __Chk)
 {
     for (auto __ch : __Chk) {
         auto condition = (__ch >= 'A' && __ch <= 'Z') || (__ch >= 'a' && __ch <= 'z') || __ch == '_';
+        if (!condition) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool kdl::number_set::contains(const std::string __Chk)
+{
+    for (auto __ch : __Chk) {
+        auto condition = (__ch >= '0' && __ch <= '9') || __ch == '_' || __ch == ',';
         if (!condition) {
             return false;
         }

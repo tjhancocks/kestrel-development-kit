@@ -220,6 +220,13 @@ struct identifier_set {
     static bool contains(const std::string);
 };
 
+/**
+ * Specialised test function for testing number characters.
+ */
+struct number_set {
+    static bool contains(const std::string);
+};
+
 
 };
 
