@@ -155,11 +155,20 @@ public:
      */
     bool test_if(std::function<bool(const std::string)> testFn, long offset = 0, std::string::size_type size = 1) const;
     
+    /**
+     * Keep consuming characters whilst the test function evaluates true.
+     *
+     * Upon completion the `m_slice` member will have been updated. If the function failed
+     * then m_slice will be empty, otherwise it will contain the matched content.
+     */
+    bool consume_while(std::function<bool(const std::string)> testFn);
+    
 private:
     std::string::size_type m_pos;
     std::string::size_type m_length;
     std::string m_source;
     std::vector<token> m_tokens;
+    std::string m_slice;
 };
 
 // MARK: - Test Functions

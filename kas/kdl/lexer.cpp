@@ -120,6 +120,15 @@ bool kdl::lexer::test_if(std::function<bool(const std::string)> testFn, long off
     return testFn(chunk);
 }
 
+bool kdl::lexer::consume_while(std::function<bool(const std::string)> testFn)
+{
+    m_slice = "";
+    while (testFn(peek())) {
+        m_slice += read();
+    }
+    return !m_slice.empty();
+}
+
 template <char c>
 bool kdl::match<c>::function(const std::string __Chk)
 {
