@@ -112,8 +112,10 @@ public:
      *
      * It does no direct semantic checking, but does throw exceptions when it is
      * unable to infer types, or doesn't recognise symbols.
+     *
+     * \return A token stream of all tokens found.
      */
-    void analyze();
+    std::vector<kdl::lexer::token> analyze();
     
     /**
      * Test if there is any more characters in source to parse.

@@ -72,7 +72,7 @@ kdl::lexer::lexer(const std::string& content)
 
 // MARK: - Lexical Analysis
 
-void kdl::lexer::analyze()
+std::vector<kdl::lexer::token> kdl::lexer::analyze()
 {
     while (available()) {
         
@@ -208,6 +208,8 @@ void kdl::lexer::analyze()
             throw std::runtime_error("Unrecognised character '" + peek() + "' encountered.");
         }
     }
+    
+    return m_tokens;
 }
 
 // MARK: - Lexer Accessors
