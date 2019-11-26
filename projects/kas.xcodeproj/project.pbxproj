@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		80678E05238D89DB00AE94AE /* sema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678E03238D89DB00AE94AE /* sema.cpp */; };
 		80940A0B238A583300137EB1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80940A0A238A583300137EB1 /* main.cpp */; };
 		80940A0E238A598E00137EB1 /* lexer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80940A0C238A598E00137EB1 /* lexer.cpp */; };
 /* End PBXBuildFile section */
@@ -24,6 +25,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		80678E03238D89DB00AE94AE /* sema.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sema.cpp; sourceTree = "<group>"; };
+		80678E04238D89DB00AE94AE /* sema.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = sema.hpp; sourceTree = "<group>"; };
 		80940A02238A581300137EB1 /* kas */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = kas; sourceTree = BUILT_PRODUCTS_DIR; };
 		80940A0A238A583300137EB1 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		80940A0C238A598E00137EB1 /* lexer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = lexer.cpp; sourceTree = "<group>"; };
@@ -72,6 +75,8 @@
 			children = (
 				80940A0D238A598E00137EB1 /* lexer.hpp */,
 				80940A0C238A598E00137EB1 /* lexer.cpp */,
+				80678E04238D89DB00AE94AE /* sema.hpp */,
+				80678E03238D89DB00AE94AE /* sema.cpp */,
 			);
 			path = kdl;
 			sourceTree = "<group>";
@@ -134,6 +139,7 @@
 			files = (
 				80940A0E238A598E00137EB1 /* lexer.cpp in Sources */,
 				80940A0B238A583300137EB1 /* main.cpp in Sources */,
+				80678E05238D89DB00AE94AE /* sema.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
