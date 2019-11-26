@@ -119,6 +119,21 @@ void kdl::lexer::analyze()
             consume_while(number_set::contains);
             m_tokens.push_back(kdl::lexer::token(m_line, 0, m_slice, token::type::resource_id));
         }
+        else if (test_if(number_set::contains)) {
+            // We're looking at a number, slice it out of the source, and then check the following
+            // character.
+            consume_while(number_set::contains);
+            auto number_text = m_slice;
+            
+            if (test_if(match<'%'>::yes)) {
+                // This is a percentage.
+                advance();
+                m_tokens.push_back(kdl::lexer::token(m_line, 0, number_text, token::type::percentage));
+            }
+            else {
+                m_tokens.push_back(kdl::lexer::token(m_line, 0, number_text, token::type::integer));
+            }
+        }
         
         // Symbols
         else if (test_if(match<'{'>::yes)) {
