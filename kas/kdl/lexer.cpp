@@ -142,3 +142,17 @@ bool kdl::not_match<c>::function(const std::string __Chk)
 {
     return !kdl::match<c>::function(__Chk);
 }
+
+template<char tC, char... ttC>
+bool kdl::set<tC, ttC...>::function(const std::string __Chk)
+{
+    std::vector<char> v = {tC, ttC...};
+    
+    for (auto __ch : __Chk) {
+        if (std::find(v.begin(), v.end(), __ch) == v.end()) {
+            return false;
+        }
+    }
+    
+    return true;
+}

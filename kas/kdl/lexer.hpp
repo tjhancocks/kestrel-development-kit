@@ -164,6 +164,16 @@ private:
 
 // MARK: - Test Functions
 
+/**
+ * Template function for testing if a chunk matches the specified character.
+ *
+ * The `test_if` function of the kdl::lexer will pass a std::string reference to the template
+ * function to be tested against the value given. This is only capable of testing single
+ * characters, not entire strings.
+ *
+ * \example
+ *  test_if(match<'='>::function)
+ */
 template <char c>
 struct match {
     static bool function(const std::string);
@@ -176,6 +186,21 @@ struct in_range {
 
 template <char c>
 struct not_match {
+    static bool function(const std::string);
+};
+
+/**
+ * Template function for testing if all characters of a chunk exist within a specified set
+ * of characters.
+ *
+ * The `test_if` function of the kdl::lexer will pass a std::string reference to the template
+ * function to be tested against the value given.
+ *
+ * \example
+ *  test_if(set<' ', '\t'>::function)
+ */
+template<char tC, char... ttC>
+struct set {
     static bool function(const std::string);
 };
 
