@@ -150,11 +150,33 @@ public:
      */
     std::string read(long offset = 0, std::string::size_type size = 1);
     
+    /**
+     * Test if the content pointed to can be validated by the provided function.
+     */
+    bool test_if(std::function<bool(const std::string)> testFn, long offset = 0, std::string::size_type size = 1) const;
+    
 private:
     std::string::size_type m_pos;
     std::string::size_type m_length;
     std::string m_source;
     std::vector<token> m_tokens;
+};
+
+// MARK: - Test Functions
+
+template <char c>
+struct match {
+    static bool function(const std::string);
+};
+
+template <char lC, char uC>
+struct in_range {
+    static bool function(const std::string);
+};
+
+template <char c>
+struct not_match {
+    static bool function(const std::string);
 };
 
 };

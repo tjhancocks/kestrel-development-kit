@@ -85,7 +85,7 @@ bool kdl::lexer::available(long offset, std::string::size_type size) const
 {
     auto start = m_pos + offset;
     auto end = start + size;
-    return (end < m_length);
+    return (end <= m_length);
 }
 
 
@@ -110,4 +110,35 @@ std::string kdl::lexer::read(long offset, std::string::size_type size)
     auto s = peek(offset, size);
     advance(offset + size);
     return s;
+}
+
+// MARK: - Test / Validation
+
+bool kdl::lexer::test_if(std::function<bool(const std::string)> testFn, long offset, std::string::size_type size) const
+{
+    auto chunk = peek(offset, size);
+    return testFn(chunk);
+}
+
+template <char c>
+bool kdl::match<c>::function(const std::string __Chk)
+{
+    return __Chk == std::string(1, c);
+}
+
+template <char lc, char uc>
+bool kdl::in_range<lc, uc>::function(const std::string __Chk)
+{
+    for (auto __ch : __Chk) {
+        if (__ch < lc || __ch > uc) {
+            return false;
+        }
+    }
+    return true;
+}
+
+template <char c>
+bool kdl::not_match<c>::function(const std::string __Chk)
+{
+    return !kdl::match<c>::function(__Chk);
 }
