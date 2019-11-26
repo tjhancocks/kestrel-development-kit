@@ -65,7 +65,7 @@ bool kdl::lexer::token::is_a(kdl::lexer::token::type type) const
 // MARK: - Lexer Constructor
 
 kdl::lexer::lexer(const std::string& content)
-    : m_source(content), m_pos(0), m_length(content.length())
+    : m_source(content + "\n"), m_pos(0), m_length(content.length() + 1)
 {
     
 }
