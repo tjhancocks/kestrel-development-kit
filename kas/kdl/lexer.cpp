@@ -92,6 +92,8 @@ void kdl::lexer::analyze()
         if (test_if(match<';'>::yes)) {
             consume_while(match<'\n'>::no);
         }
+        
+        // Constructs
         else if (test_if(match<'@'>::yes)) {
             // We're looking at a directive.
             // Directive's are defined in the form of `@name`, an '@' followed by an identifier.
@@ -100,6 +102,8 @@ void kdl::lexer::analyze()
             
             m_tokens.push_back(kdl::lexer::token(m_line, 0, m_slice, token::type::directive));
         }
+        
+        // Literals
         else if (test_if(match<'"'>::yes)) {
             // We're looking at a string literal.
             // The string continues until a corresponding '"' is found.
@@ -108,12 +112,67 @@ void kdl::lexer::analyze()
             m_tokens.push_back(kdl::lexer::token(m_line, 0, m_slice, token::type::string));
             advance();
         }
+        
+        // Symbols
         else if (test_if(match<'{'>::yes)) {
             m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::lbrace));
         }
         else if (test_if(match<'}'>::yes)) {
             m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::rbrace));
         }
+        else if (test_if(match<'['>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::lbracket));
+        }
+        else if (test_if(match<']'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::rbracket));
+        }
+        else if (test_if(match<'('>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::lparen));
+        }
+        else if (test_if(match<')'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::rparen));
+        }
+        else if (test_if(match<'<'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::langle));
+        }
+        else if (test_if(match<'>'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::rangle));
+        }
+        else if (test_if(match<'='>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::equals));
+        }
+        else if (test_if(match<'+'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::plus));
+        }
+        else if (test_if(match<'-'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::minus));
+        }
+        else if (test_if(match<'*'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::star));
+        }
+        else if (test_if(match<'/'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::slash));
+        }
+        else if (test_if(match<':'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::colon));
+        }
+        else if (test_if(match<','>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::comma));
+        }
+        else if (test_if(match<'.'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::dot));
+        }
+        else if (test_if(match<'&'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::ampersand));
+        }
+        else if (test_if(match<'|'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::pipe));
+        }
+        else if (test_if(match<'^'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::caret));
+        }
+        
+        // Error States
         else {
             throw std::runtime_error("Unrecognised character '" + peek() + "' encountered.");
         }
