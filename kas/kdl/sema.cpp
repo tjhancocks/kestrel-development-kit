@@ -22,6 +22,7 @@
 
 #include "kdl/sema.hpp"
 #include <iostream>
+#include "kdl/sema/directive.hpp"
 
 // MARK: - Constructor
 
@@ -41,27 +42,8 @@ void kdl::sema::run()
     
     while (!finished()) {
         
-        if (expect(condition(kdl::lexer::token::type::directive).truthy(), condition(kdl::lexer::token::type::lbrace).truthy())) {
-            // We're looking at a directive - determine which directive, and advance past the directive and l-brace.
-            auto directive = peek().text();
-            advance(2);
-            
-            if (directive == "out") {
-                // Consume tokens until a r-brace is encountered.
-                auto tokens = consume(condition(kdl::lexer::token::type::rbrace).falsey());
-                for (auto tk: tokens) {
-                    std::cout << tk.text() << std::endl;
-                }
-            }
-            else {
-                throw std::runtime_error("Unrecognised directive encountered '" + directive + "'");
-            }
-            
-            // Validate that we're looking at a r-brace.
-            if (!expect(condition(kdl::lexer::token::type::rbrace).truthy())) {
-                throw std::runtime_error("Unexpected token encounted after directive.");
-            }
-            advance();
+        if (kdl::directive::test(this)) {
+            kdl::directive::parse(this);
         }
         
     }
