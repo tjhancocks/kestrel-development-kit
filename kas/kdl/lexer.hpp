@@ -104,6 +104,11 @@ public:
     lexer(const std::string& source);
     
     /**
+     * Create a new lexer, using the contents of the specified file as the source.
+     */
+    static kdl::lexer open_file(const std::string path);
+    
+    /**
      * Perform the lexical analysis.
      *
      * This method is responsible for kicking off the main lexical analysis task

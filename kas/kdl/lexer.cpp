@@ -23,6 +23,9 @@
 #include "kdl/lexer.hpp"
 #include <stdexcept>
 #include <algorithm>
+#include <fstream>
+#include <streambuf>
+#include <iostream>
 
 // MARK: - Token
 
@@ -68,6 +71,21 @@ kdl::lexer::lexer(const std::string& content)
     : m_source(content + "\n"), m_pos(0), m_length(content.length() + 1)
 {
     
+}
+
+kdl::lexer kdl::lexer::open_file(const std::string path)
+{
+    std::ifstream f(path);
+    std::string str;
+
+    f.seekg(0, std::ios::end);
+    str.reserve(f.tellg());
+    f.seekg(0, std::ios::beg);
+
+    str.assign((std::istreambuf_iterator<char>(f)),
+                std::istreambuf_iterator<char>());
+    
+    return kdl::lexer(str);
 }
 
 // MARK: - Lexical Analysis
