@@ -23,6 +23,7 @@
 #include "kdl/sema.hpp"
 #include <iostream>
 #include "kdl/sema/directive.hpp"
+#include "kdl/sema/declaration.hpp"
 
 // MARK: - Constructor
 
@@ -43,6 +44,9 @@ void kdl::sema::run()
     while (!finished()) {
         if (kdl::directive::test(this)) {
             kdl::directive::parse(this);
+        }
+        else if (kdl::declaration::test(this)) {
+            kdl::declaration::parse(this);
         }
         else {
             throw std::runtime_error("Unexpected token encountered.");

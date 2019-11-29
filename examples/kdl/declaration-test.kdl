@@ -1,0 +1,23 @@
+; This is a test KDL document.
+; KDL is the Kestrel Definition Language.
+
+; This test will cause the assembler to output the message, "Hello World",
+; to the console.
+
+@out {
+	"Testing declaration syntax for KDL"
+}
+
+declare SpriteAnimation {
+	
+	new (id = #700, name = "Stars") {
+		sprites = file("stars.tga")
+		size = 10 10
+	}
+
+	new (id = #128, name = "Test") {
+		sprites = file("test.tga")
+		size = 100 100
+	}
+
+}
