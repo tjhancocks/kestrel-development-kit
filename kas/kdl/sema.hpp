@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <string>
+#include <initializer_list>
 #include "kdl/lexer.hpp"
 
 #if !defined(KDL_SEMA)
@@ -108,8 +109,7 @@ public:
     /**
      * Validate the expection of a sequence of tokens.
      */
-    template <typename ...T>
-    bool expect(kdl::condition::truthy_function f, T...fArgs) const;
+    bool expect(std::initializer_list<kdl::condition::truthy_function> f) const;
     
 private:
     long m_ptr { 0 };

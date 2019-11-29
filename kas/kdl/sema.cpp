@@ -41,11 +41,12 @@ void kdl::sema::run()
     m_ptr = 0;
     
     while (!finished()) {
-        
         if (kdl::directive::test(this)) {
             kdl::directive::parse(this);
         }
-        
+        else {
+            throw std::runtime_error("Unexpected token encountered.");
+        }
     }
 }
 
@@ -99,13 +100,11 @@ bool kdl::sema::expect(kdl::condition::truthy_function f) const
     return !finished() && f(peek());
 }
 
-template <typename ...T>
-bool kdl::sema::expect(kdl::condition::truthy_function f, T... fArgs) const
+bool kdl::sema::expect(std::initializer_list<kdl::condition::truthy_function> list) const
 {
     auto ptr = 0;
-    std::vector<kdl::condition::truthy_function> v = { f, fArgs... };
-    for (decltype(v)::iterator i = v.begin(); i != v.end() && !finished(ptr); ++i, ++ptr) {
-        if ((*i)(peek(ptr)) == false) {
+    for (auto f : list) {
+        if (f(peek(ptr++)) == false) {
             return false;
         }
     }
