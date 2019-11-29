@@ -38,5 +38,17 @@ bool kdl::declaration::test(kdl::sema *sema)
 
 void kdl::declaration::parse(kdl::sema *sema)
 {
+    // Ensure directive.
+    if (sema->expect(condition(kdl::lexer::token::type::identifier, "declare").falsey())) {
+        throw std::runtime_error("Unexpected token encountered while parsing declaration.");
+    }
+    sema->advance();
     
+    // Directive structure: declare StructureName { <args> }
+    auto structure_name = sema->read().text();
+    
+    if (sema->expect(condition(kdl::lexer::token::type::lbrace).falsey())) {
+        throw std::runtime_error("Expected '{' whilst starting declaration.");
+    }
+    sema->advance();
 }
