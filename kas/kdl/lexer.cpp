@@ -94,6 +94,9 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
 {
     while (available()) {
         
+        // Consume any leading (nonbreaking) whitespace.
+        consume_while(set<' ', '\t'>::contains);
+        
         // Check if we're looking at a new line character. If we are then simply consume it, and
         // increment the current line number.
         if (test_if(match<'\n'>::yes)) {
@@ -101,9 +104,6 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
             m_line++;
             continue;
         }
-        
-        // Consume any leading (nonbreaking) whitespace.
-        consume_while(set<' ', '\t'>::contains);
         
         // Check for a comment. If we're looking at a comment then we need to consume the entire
         // line. We need to advance past the character at the end of the match.
