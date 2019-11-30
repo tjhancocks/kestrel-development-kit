@@ -343,7 +343,7 @@ bool kdl::identifier_set::contains(const std::string __Chk)
 bool kdl::number_set::contains(const std::string __Chk)
 {
     for (auto __ch : __Chk) {
-        auto condition = (__ch >= '0' && __ch <= '9') || __ch == '_' || __ch == ',';
+        auto condition = (__ch >= '0' && __ch <= '9');
         if (!condition) {
             return false;
         }
