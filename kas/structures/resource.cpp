@@ -29,3 +29,11 @@ kdk::resource::resource(const int64_t id, const std::string name)
 {
     
 }
+
+// MARK: - Field
+
+kdk::resource::field::field(const std::string name, std::vector<std::tuple<std::string, value_type>> values)
+    : m_name(name), m_values(values)
+{
+    
+}

@@ -21,7 +21,8 @@
 */
 
 #include <string>
-
+#include <vector>
+#include <tuple>
 
 #if !defined(KDK_RESOURCE)
 #define KDK_RESOURCE
@@ -37,6 +38,42 @@ namespace kdk
  */
 class resource
 {
+public:
+    
+    /**
+     * The resource field denotes a key-value pair of sorts. Fields can represent
+     * a few different types of value, which are stored as textual values along with
+     * a value type.
+     */
+    struct field
+    {
+    public:
+        
+        /**
+         * The type of a value encoded in the field.
+         */
+        enum value_type
+        {
+            identifier,
+            resource_id,
+            integer,
+            string,
+            percentage,
+            file_reference,
+        };
+        
+    public:
+        /**
+         * Construct a new resource field with the specified name, values and encodings.
+         */
+        field(const std::string name, std::vector<std::tuple<std::string, value_type>> values);
+        
+    private:
+        std::string m_name;
+        std::vector<std::tuple<std::string, value_type>> m_values;
+    };
+    
+    
 public:
     /**
      * Construct a new target with the specified output path.
