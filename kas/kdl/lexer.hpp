@@ -55,7 +55,7 @@ public:
             unknown, identifier, resource_id, string, integer, percentage,
             lbrace, rbrace, lparen, rparen, langle, rangle, lbracket, rbracket,
             plus, minus, star, slash, pipe, ampersand, equals, colon, dot, comma,
-            caret, directive
+            caret, directive, semi_colon
         };
         
     public:

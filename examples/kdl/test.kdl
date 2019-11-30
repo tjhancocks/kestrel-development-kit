@@ -1,7 +1,7 @@
-; This is a test KDL document.
-; KDL is the Kestrel Definition Language.
+` This is a test KDL document.
+` KDL is the Kestrel Definition Language.
 
-; This test will cause the assembler to output the message, "Hello World",
-; to the console.
+` This test will cause the assembler to output the message, "Hello World",
+` to the console.
 
 @out { "Hello, World" }

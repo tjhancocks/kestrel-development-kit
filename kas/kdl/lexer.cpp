@@ -107,7 +107,7 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
         
         // Check for a comment. If we're looking at a comment then we need to consume the entire
         // line. We need to advance past the character at the end of the match.
-        if (test_if(match<';'>::yes)) {
+        if (test_if(match<'`'>::yes)) {
             consume_while(match<'\n'>::no);
         }
         
@@ -163,6 +163,9 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
         }
         
         // Symbols
+        else if (test_if(match<';'>::yes)) {
+            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::semi_colon));
+        }
         else if (test_if(match<'{'>::yes)) {
             m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::lbrace));
         }
