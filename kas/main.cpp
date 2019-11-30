@@ -20,13 +20,67 @@
 * SOFTWARE.
 */
 
+#include <string>
 #include <iostream>
+#include <algorithm>
 #include "kdl/lexer.hpp"
+#include "kdl/sema.hpp"
+
+// MARK: - Command Line Helpers
+
+bool option_exists(const char **begin, const char **end, const std::string& option)
+{
+    return std::find(begin, end, option) != end;
+}
+
+const char *get_option(const char **begin, const char **end, const std::string& option)
+{
+    const char **i = std::find(begin, end, option);
+    if (i != end && ++i != end) {
+        return *i;
+    }
+    return nullptr;
+}
 
 // MARK: - Entry Point
 
 int main(int argc, const char **argv)
 {
-    std::cout << "Kestrel Assembler - kas" << std::endl;
+    
+    // Check if any arguments have been supplied.
+    if (option_exists(argv, argv + argc, "--help") || option_exists(argv, argv + argc, "-h")) {
+        std::cout   << "The Kestrel Assembler -- Version 0.1" << std::endl
+                    << "    kas [options] -f input_file" << std::endl << std::endl
+                    << "Options" << std::endl
+                    << "  -f,               The KDL source file to assemble." << std::endl
+                    << "  -o                The destination KDAT file for the assembled data file to be written to." << std::endl
+                    << "  -h, --help        Display this help message." << std::endl;
+        return 0;
+    }
+    
+    std::string input_file { "" };
+    if (option_exists(argv, argv + argc, "-f")) {
+        input_file = get_option(argv, argv + argc, "-f");
+    }
+    
+    std::string output_file { "kestrel-plugin.kdat" };
+    if (option_exists(argv, argv + argc, "-o")) {
+        output_file = get_option(argv, argv + argc, "-f");
+    }
+    
+    
+    if (argc <= 1 || input_file.empty()) {
+        std::cout << "kas: \x1b[31merror: \x1b[0mno input file" << std::endl;
+        return 1;
+    }   
+    
+    // Perform the workflow (lexical analysis, semantic analysis...)
+    auto lexer = kdl::lexer::open_file(input_file);
+    auto sema = kdl::sema(kdk::target(output_file), lexer.analyze());
+    sema.run();
+    
+    // The semantic analysis should have resulted in a completed target structure, which
+    // can now be assembled.
+    
     return 0;
 }
