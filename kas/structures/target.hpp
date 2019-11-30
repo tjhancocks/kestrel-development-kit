@@ -20,37 +20,43 @@
 * SOFTWARE.
 */
 
+#include <string>
+#include <vector>
 #include "structures/resource.hpp"
 
-// MARK: - Constructor
 
-kdk::resource::resource(const std::string type, const int64_t id, const std::string name)
-    : m_type(type), m_id(id), m_name(name)
+#if !defined(KDK_TARGET)
+#define KDK_TARGET
+
+namespace kdk
 {
+
+/**
+ * Represents the output target that is the result of the assembling process.
+ * The target contains information about how it should be saved, what
+ * resources it contains, etc.
+ *
+ * The target is the ultimate location of all resources, and the reference point
+ * for looking up resources.
+ */
+class target
+{
+public:
+    /**
+     * Construct a new target with the specified output path.
+     */
+    target(std::string path);
     
-}
-
-// MARK: - Field
-
-kdk::resource::field::field(const std::string name, std::vector<std::tuple<std::string, value_type>> values)
-    : m_name(name), m_values(values)
-{
+    /**
+     * Add resources to the target.
+     */
+    void add_resources(const std::vector<kdk::resource> resources);
     
-}
+private:
+    std::string m_path;
+    std::vector<kdk::resource> m_resources;
+};
 
-std::string kdk::resource::field::name() const
-{
-    return m_name;
-}
+};
 
-std::vector<std::tuple<std::string, kdk::resource::field::value_type>> kdk::resource::field::values() const
-{
-    return m_values;
-}
-
-// MARK: - Mutators
-
-void kdk::resource::add_field(const kdk::resource::field& field)
-{
-    m_fields.push_back(field);
-}
+#endif

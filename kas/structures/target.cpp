@@ -20,37 +20,19 @@
 * SOFTWARE.
 */
 
-#include "structures/resource.hpp"
+#include "structures/target.hpp"
 
 // MARK: - Constructor
 
-kdk::resource::resource(const std::string type, const int64_t id, const std::string name)
-    : m_type(type), m_id(id), m_name(name)
+kdk::target::target(std::string path)
+    : m_path(path)
 {
     
 }
 
-// MARK: - Field
+// MARK: - Resource Management
 
-kdk::resource::field::field(const std::string name, std::vector<std::tuple<std::string, value_type>> values)
-    : m_name(name), m_values(values)
+void kdk::target::add_resources(const std::vector<kdk::resource> resources)
 {
-    
-}
-
-std::string kdk::resource::field::name() const
-{
-    return m_name;
-}
-
-std::vector<std::tuple<std::string, kdk::resource::field::value_type>> kdk::resource::field::values() const
-{
-    return m_values;
-}
-
-// MARK: - Mutators
-
-void kdk::resource::add_field(const kdk::resource::field& field)
-{
-    m_fields.push_back(field);
+    m_resources.insert(std::end(m_resources), std::begin(resources), std::end(resources));
 }

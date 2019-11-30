@@ -24,6 +24,7 @@
 #include <string>
 #include "kdl/lexer.hpp"
 #include "kdl/sema.hpp"
+#include "structures/resource.hpp"
 
 #if !defined(KDL_DECLARATION)
 #define KDL_DECLARATION
@@ -56,7 +57,7 @@ public:
     static void parse(kdl::sema *sema);
     
 private:
-    static void parse_instance(kdl::sema *sema);
+    static kdk::resource parse_instance(kdl::sema *sema, const std::string type);
 };
 
 };

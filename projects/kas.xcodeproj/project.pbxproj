@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		80678E05238D89DB00AE94AE /* sema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678E03238D89DB00AE94AE /* sema.cpp */; };
 		80678E9923902ADF00AE94AE /* directive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678E9723902ADF00AE94AE /* directive.cpp */; };
+		80678EA12390D2E000AE94AE /* target.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678E9F2390D2E000AE94AE /* target.cpp */; };
 		80678EA42390D42600AE94AE /* declaration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678EA22390D42600AE94AE /* declaration.cpp */; };
 		80678EAA2392456B00AE94AE /* resource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678EA82392456B00AE94AE /* resource.cpp */; };
 		80940A0B238A583300137EB1 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80940A0A238A583300137EB1 /* main.cpp */; };
@@ -32,6 +33,8 @@
 		80678E04238D89DB00AE94AE /* sema.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = sema.hpp; sourceTree = "<group>"; };
 		80678E9723902ADF00AE94AE /* directive.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = directive.cpp; sourceTree = "<group>"; };
 		80678E9823902ADF00AE94AE /* directive.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = directive.hpp; sourceTree = "<group>"; };
+		80678E9F2390D2E000AE94AE /* target.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = target.cpp; sourceTree = "<group>"; };
+		80678EA02390D2E000AE94AE /* target.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = target.hpp; sourceTree = "<group>"; };
 		80678EA22390D42600AE94AE /* declaration.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = declaration.cpp; sourceTree = "<group>"; };
 		80678EA32390D42600AE94AE /* declaration.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = declaration.hpp; sourceTree = "<group>"; };
 		80678EA82392456B00AE94AE /* resource.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = resource.cpp; sourceTree = "<group>"; };
@@ -67,10 +70,20 @@
 		80678E9A2390310400AE94AE /* structures */ = {
 			isa = PBXGroup;
 			children = (
+				80678EA02390D2E000AE94AE /* target.hpp */,
+				80678E9F2390D2E000AE94AE /* target.cpp */,
 				80678EA92392456B00AE94AE /* resource.hpp */,
 				80678EA82392456B00AE94AE /* resource.cpp */,
+				80678E9E2390D1A400AE94AE /* datatypes */,
 			);
 			path = structures;
+			sourceTree = "<group>";
+		};
+		80678E9E2390D1A400AE94AE /* datatypes */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = datatypes;
 			sourceTree = "<group>";
 		};
 		809409F5238A4D7700137EB1 = {
@@ -174,6 +187,7 @@
 				80940A0B238A583300137EB1 /* main.cpp in Sources */,
 				80678E05238D89DB00AE94AE /* sema.cpp in Sources */,
 				80678EA42390D42600AE94AE /* declaration.cpp in Sources */,
+				80678EA12390D2E000AE94AE /* target.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -88,7 +88,7 @@ public:
     /**
      * Construct a new target with the specified output path.
      */
-    resource(const int64_t id, const std::string name);
+    resource(const std::string type, const int64_t id, const std::string name);
     
     /**
      * Add a new field to the end of the resource.
@@ -97,6 +97,7 @@ public:
     
 private:
     int64_t m_id { 0 };
+    std::string m_type { "" };
     std::string m_name { "" };
     std::vector<resource::field> m_fields;
 };

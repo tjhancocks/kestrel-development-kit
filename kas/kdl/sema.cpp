@@ -33,6 +33,13 @@ kdl::sema::sema(const std::vector<kdl::lexer::token> tokens)
     
 }
 
+// MARK: - Accessors
+
+kdk::target& kdl::sema::target()
+{
+    return m_target;
+}
+
 // MARK: - Semantic Analysis
 
 void kdl::sema::run()
@@ -52,6 +59,8 @@ void kdl::sema::run()
             throw std::runtime_error("Unexpected token encountered.");
         }
     }
+    
+    std::cout << "Finished semantic analysis" << std::endl;
 }
 
 // MARK: - Stream
@@ -117,7 +126,8 @@ bool kdl::sema::expect(std::initializer_list<kdl::condition::truthy_function> li
 bool kdl::sema::ensure(std::initializer_list<kdl::condition::truthy_function> list)
 {
     for (auto f : list) {
-        if (f(read()) == false) {
+        auto tk = read();
+        if (f(tk) == false) {
             throw std::runtime_error("Could not ensure the correctness of a token.");
         }
     }

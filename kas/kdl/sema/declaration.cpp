@@ -46,6 +46,7 @@ void kdl::declaration::parse(kdl::sema *sema)
     
     // Declaration structure: declare StructureName { <args> }
     auto structure_name = sema->read().text();
+    std::vector<kdk::resource> m_instances;
     
     sema->ensure({
         condition(lexer::token::type::lbrace).truthy()
@@ -58,7 +59,7 @@ void kdl::declaration::parse(kdl::sema *sema)
         // An instance of resource is denoted by the "new" keyword.
         
         if (sema->expect({ condition(lexer::token::type::identifier, "new").truthy() })) {
-            parse_instance(sema);
+            m_instances.push_back(parse_instance(sema, structure_name));
         }
         
     }
@@ -66,9 +67,12 @@ void kdl::declaration::parse(kdl::sema *sema)
     sema->ensure({
         condition(lexer::token::type::rbrace).truthy()
     });
+    
+    // Prepare to add the structure type and all instances into the target.
+    sema->target().add_resources(m_instances);
 }
 
-void kdl::declaration::parse_instance(kdl::sema *sema)
+kdk::resource kdl::declaration::parse_instance(kdl::sema *sema, const std::string type)
 {
     sema->ensure({
         condition(lexer::token::type::identifier, "new").truthy(),
@@ -118,7 +122,7 @@ void kdl::declaration::parse_instance(kdl::sema *sema)
     }
     
     // Construct the base resource object in preparation for adding fields and values to it.
-    kdk::resource resource { resource_id, resource_name };
+    kdk::resource resource { type, resource_id, resource_name };
     
     // All fields are contained with in a block ( { ... } ). Ensure we have an opening brace, and then keep
     // parsing until the corresponding closing brace is found.
@@ -211,4 +215,6 @@ void kdl::declaration::parse_instance(kdl::sema *sema)
     sema->ensure({
         condition(lexer::token::type::rbrace).truthy()
     });
+    
+    return resource;
 }

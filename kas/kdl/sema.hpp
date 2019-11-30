@@ -24,6 +24,7 @@
 #include <string>
 #include <initializer_list>
 #include "kdl/lexer.hpp"
+#include "structures/target.hpp"
 
 #if !defined(KDL_SEMA)
 #define KDL_SEMA
@@ -117,10 +118,15 @@ public:
      */
      bool ensure(std::initializer_list<kdl::condition::truthy_function> f);
     
+    /**
+     * Returns a reference to the current target.
+     */
+    kdk::target& target();
     
 private:
     long m_ptr { 0 };
     std::vector<kdl::lexer::token> m_tokens;
+    kdk::target m_target { "" };
 };
 
 
