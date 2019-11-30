@@ -54,6 +54,9 @@ public:
      * declaration token will result in an error.
      */
     static void parse(kdl::sema *sema);
+    
+private:
+    static void parse_instance(kdl::sema *sema);
 };
 
 };

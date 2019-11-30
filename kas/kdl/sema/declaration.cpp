@@ -29,26 +29,88 @@
 bool kdl::declaration::test(kdl::sema *sema)
 {
     return sema->expect({
-        kdl::condition(kdl::lexer::token::type::identifier, "declare").truthy(),
-        kdl::condition(kdl::lexer::token::type::identifier).truthy(),
-        kdl::condition(kdl::lexer::token::type::lbrace).truthy()
+        kdl::condition(lexer::token::type::identifier, "declare").truthy(),
+        kdl::condition(lexer::token::type::identifier).truthy(),
+        kdl::condition(lexer::token::type::lbrace).truthy()
     });
 }
 
 
 void kdl::declaration::parse(kdl::sema *sema)
 {
-    // Ensure directive.
-    if (sema->expect(condition(kdl::lexer::token::type::identifier, "declare").falsey())) {
-        throw std::runtime_error("Unexpected token encountered while parsing declaration.");
-    }
-    sema->advance();
+    // Ensure declaration.
+    sema->ensure({
+        condition(lexer::token::type::identifier, "declare").truthy()
+    });
     
-    // Directive structure: declare StructureName { <args> }
+    // Declaration structure: declare StructureName { <args> }
     auto structure_name = sema->read().text();
     
-    if (sema->expect(condition(kdl::lexer::token::type::lbrace).falsey())) {
-        throw std::runtime_error("Expected '{' whilst starting declaration.");
+    sema->ensure({
+        condition(lexer::token::type::lbrace).truthy()
+    });
+    
+    // The general structure of declarations is consistant between StructureTypes.
+    // This should allow us to parse out a set of resource instances
+    while (sema->expect({ condition(lexer::token::type::rbrace).falsey() })) {
+        
+        // An instance of resource is denoted by the "new" keyword.
+        
+        if (sema->expect({ condition(lexer::token::type::identifier, "new").truthy() })) {
+            parse_instance(sema);
+        }
+        
     }
-    sema->advance();
+}
+
+void kdl::declaration::parse_instance(kdl::sema *sema)
+{
+    sema->ensure({
+        condition(lexer::token::type::identifier, "new").truthy(),
+        condition(lexer::token::type::lparen).truthy()
+    });
+    
+    int64_t resource_id { 0 };
+    std::string resource_name { "" };
+    
+    // We need to parse attributes until we hit a closing parentheses.
+    while (sema->expect(condition(lexer::token::type::rparen).falsey())) {
+        
+        if (sema->expect({ condition(lexer::token::type::identifier).falsey(), condition(lexer::token::type::equals).falsey() })) {
+            throw std::runtime_error("Malformed resource attribute encountered.");
+        }
+        auto attribute = sema->read().text();
+        sema->advance();
+        
+        if (attribute == "id") {
+            // We're expecting a resource id now.
+            if (sema->expect({ condition(lexer::token::type::resource_id).falsey() })) {
+                throw std::runtime_error("The id attribute must be assigned a resource id literal.");
+            }
+            resource_id = std::stoi(sema->read().text());
+        }
+        else if (attribute == "name") {
+            // We're expecting a string now.
+            if (sema->expect({ condition(lexer::token::type::string).falsey() })) {
+                throw std::runtime_error("The name attribute must be assigned a string literal.");
+            }
+            resource_name = sema->read().text();
+        }
+        else {
+            // Unrecognised attribute.
+            throw std::runtime_error("Unrecognised resource attribute '" + attribute + "' encountered.");
+        }
+        
+        // Check for a comma. If no comma exists, then we require the presence of a rparen.
+        if (sema->expect({ condition(lexer::token::type::comma).truthy() })) {
+            sema->advance();
+            continue;
+        }
+        
+        std::cout << "New resource #" << std::to_string(resource_id) << " '" << resource_name << "'" << std::endl;
+        
+        sema->ensure({ condition(lexer::token::type::rparen).truthy() });
+        break;
+        
+    }
 }
