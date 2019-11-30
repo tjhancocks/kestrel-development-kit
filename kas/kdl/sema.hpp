@@ -111,6 +111,13 @@ public:
      */
     bool expect(std::initializer_list<kdl::condition::truthy_function> f) const;
     
+    /**
+     * Ensure the next sequence of tokens matches exactly what is specified.
+     * Each token is advanced past.
+     */
+     bool ensure(std::initializer_list<kdl::condition::truthy_function> f);
+    
+    
 private:
     long m_ptr { 0 };
     std::vector<kdl::lexer::token> m_tokens;

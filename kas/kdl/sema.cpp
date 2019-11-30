@@ -96,7 +96,6 @@ std::vector<kdl::lexer::token> kdl::sema::consume(kdl::condition::falsey_functio
     return v;
 }
 
-
 // MARK: - Conditions / Expectations
 
 bool kdl::sema::expect(kdl::condition::truthy_function f) const
@@ -110,6 +109,16 @@ bool kdl::sema::expect(std::initializer_list<kdl::condition::truthy_function> li
     for (auto f : list) {
         if (f(peek(ptr++)) == false) {
             return false;
+        }
+    }
+    return true;
+}
+
+bool kdl::sema::ensure(std::initializer_list<kdl::condition::truthy_function> list)
+{
+    for (auto f : list) {
+        if (f(read()) == false) {
+            throw std::runtime_error("Could not ensure the correctness of a token.");
         }
     }
     return true;
