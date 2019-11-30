@@ -62,6 +62,10 @@ void kdl::declaration::parse(kdl::sema *sema)
         }
         
     }
+    
+    sema->ensure({
+        condition(lexer::token::type::rbrace).truthy()
+    });
 }
 
 void kdl::declaration::parse_instance(kdl::sema *sema)
@@ -148,30 +152,47 @@ void kdl::declaration::parse_instance(kdl::sema *sema)
         auto field_name = sema->read().text();
         
         sema->ensure({
-            condition(lexer::token::type::equals).truthy(),
-            condition(lexer::token::type::semi_colon).falsey()
+            condition(lexer::token::type::equals).truthy()
         });
+        
+        std::vector<std::tuple<std::string, kdk::resource::field::value_type>> values { 0 };
         
         while ( sema->expect({ condition(lexer::token::type::semi_colon).falsey() }) ) {
             
             // Validate the value token.
             if ( sema->expect({ condition(lexer::token::type::string).truthy() }) ) {
                 // String value...
+                values.push_back( std::make_tuple(sema->read().text(), kdk::resource::field::value_type::string) );
             }
             else if ( sema->expect({ condition(lexer::token::type::integer).truthy() }) ) {
                 // Integer value...
+                values.push_back( std::make_tuple(sema->read().text(), kdk::resource::field::value_type::integer) );
             }
             else if ( sema->expect({ condition(lexer::token::type::percentage).truthy() }) ) {
                 // Percentage value...
+                values.push_back( std::make_tuple(sema->read().text(), kdk::resource::field::value_type::percentage) );
             }
             else if ( sema->expect({ condition(lexer::token::type::resource_id).truthy() }) ) {
                 // Resource ID value...
+                values.push_back( std::make_tuple(sema->read().text(), kdk::resource::field::value_type::resource_id) );
             }
             else if ( sema->expect({ condition(lexer::token::type::identifier, "file").truthy() }) ) {
                 // File reference value...
+                sema->ensure({
+                    condition(lexer::token::type::identifier, "file").truthy(),
+                    condition(lexer::token::type::lparen).truthy()
+                });
+                
+                if (sema->expect({ condition(lexer::token::type::string).falsey(), condition(lexer::token::type::rparen).falsey() })) {
+                    throw std::runtime_error("Malformed file reference found.");
+                }
+                
+                values.push_back( std::make_tuple(sema->read().text(), kdk::resource::field::value_type::file_reference) );
+                sema->advance();
             }
             else if ( sema->expect({ condition(lexer::token::type::identifier).truthy() }) ) {
                 // Identifier reference...
+                values.push_back( std::make_tuple(sema->read().text(), kdk::resource::field::value_type::identifier) );
             }
             else {
                 throw std::runtime_error("Unexpected value type encountered.");
@@ -179,5 +200,15 @@ void kdl::declaration::parse_instance(kdl::sema *sema)
             
         }
         
+        sema->ensure({
+            condition(lexer::token::type::semi_colon).truthy()
+        });
+        
+        kdk::resource::field field { field_name, values };
+        resource.add_field(field);
     }
+    
+    sema->ensure({
+        condition(lexer::token::type::rbrace).truthy()
+    });
 }

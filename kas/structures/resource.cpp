@@ -37,3 +37,20 @@ kdk::resource::field::field(const std::string name, std::vector<std::tuple<std::
 {
     
 }
+
+std::string kdk::resource::field::name() const
+{
+    return m_name;
+}
+
+std::vector<std::tuple<std::string, kdk::resource::field::value_type>> kdk::resource::field::values() const
+{
+    return m_values;
+}
+
+// MARK: - Mutators
+
+void kdk::resource::add_field(const kdk::resource::field& field)
+{
+    m_fields.push_back(field);
+}

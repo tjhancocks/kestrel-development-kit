@@ -68,6 +68,16 @@ public:
          */
         field(const std::string name, std::vector<std::tuple<std::string, value_type>> values);
         
+        /**
+         * Returns the name of the field
+         */
+        std::string name() const;
+        
+        /**
+         * Returns the vector containing the values.
+         */
+        std::vector<std::tuple<std::string, resource::field::value_type>> values() const;
+        
     private:
         std::string m_name;
         std::vector<std::tuple<std::string, value_type>> m_values;
@@ -80,10 +90,15 @@ public:
      */
     resource(const int64_t id, const std::string name);
     
+    /**
+     * Add a new field to the end of the resource.
+     */
+    void add_field(const resource::field& field);
     
 private:
     int64_t m_id { 0 };
     std::string m_name { "" };
+    std::vector<resource::field> m_fields;
 };
 
 };
