@@ -23,6 +23,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "kdl/sema/declaration.hpp"
+#include "structures/resource.hpp"
 
 // MARK: - Parser
 
@@ -107,10 +108,76 @@ void kdl::declaration::parse_instance(kdl::sema *sema)
             continue;
         }
         
-        std::cout << "New resource #" << std::to_string(resource_id) << " '" << resource_name << "'" << std::endl;
-        
         sema->ensure({ condition(lexer::token::type::rparen).truthy() });
         break;
+        
+    }
+    
+    // Construct the base resource object in preparation for adding fields and values to it.
+    kdk::resource resource { resource_id, resource_name };
+    
+    // All fields are contained with in a block ( { ... } ). Ensure we have an opening brace, and then keep
+    // parsing until the corresponding closing brace is found.
+    sema->ensure({
+        condition(lexer::token::type::lbrace).truthy()
+    });
+    
+    while ( sema->expect({ condition(lexer::token::type::rbrace).falsey() }) ) {
+        
+        // Resource fields have the following grammar:
+        //  field_name = value...;
+        //
+        // In this context, each value may be one of a couple of different grammars
+        //
+        //      string
+        //      resource_id
+        //      integer
+        //      percentage
+        //      identifier
+        //      identifier<file> ( string )
+        //
+        // Each of these need to be correctly parsed and encoded into a field structure
+        // and stored in the resource. This part of the parser is not validing the valuetypes
+        // for the fields.
+        // There can be one or more values, and values are consumed until a semi-colon is
+        // found. There _must_ be at least one value provided.
+        
+        if ( sema->expect({ condition(lexer::token::type::identifier).falsey() })) {
+            throw std::runtime_error("Resource field name must be an 'identifier'");
+        }
+        auto field_name = sema->read().text();
+        
+        sema->ensure({
+            condition(lexer::token::type::equals).truthy(),
+            condition(lexer::token::type::semi_colon).falsey()
+        });
+        
+        while ( sema->expect({ condition(lexer::token::type::semi_colon).falsey() }) ) {
+            
+            // Validate the value token.
+            if ( sema->expect({ condition(lexer::token::type::string).truthy() }) ) {
+                // String value...
+            }
+            else if ( sema->expect({ condition(lexer::token::type::integer).truthy() }) ) {
+                // Integer value...
+            }
+            else if ( sema->expect({ condition(lexer::token::type::percentage).truthy() }) ) {
+                // Percentage value...
+            }
+            else if ( sema->expect({ condition(lexer::token::type::resource_id).truthy() }) ) {
+                // Resource ID value...
+            }
+            else if ( sema->expect({ condition(lexer::token::type::identifier, "file").truthy() }) ) {
+                // File reference value...
+            }
+            else if ( sema->expect({ condition(lexer::token::type::identifier).truthy() }) ) {
+                // Identifier reference...
+            }
+            else {
+                throw std::runtime_error("Unexpected value type encountered.");
+            }
+            
+        }
         
     }
 }
