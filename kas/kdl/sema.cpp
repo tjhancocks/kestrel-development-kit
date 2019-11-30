@@ -27,8 +27,8 @@
 
 // MARK: - Constructor
 
-kdl::sema::sema(const std::vector<kdl::lexer::token> tokens)
-    : m_tokens(tokens), m_ptr(0)
+kdl::sema::sema(kdk::target target, const std::vector<kdl::lexer::token> tokens)
+    : m_target(target), m_tokens(tokens), m_ptr(0)
 {
     
 }

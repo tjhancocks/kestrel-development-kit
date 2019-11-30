@@ -68,7 +68,7 @@ public:
     /**
      * Construct a new `kdl::sema` instance using the specified token stream.
      */
-    sema(const std::vector<kdl::lexer::token> tokens);
+    sema(kdk::target target, const std::vector<kdl::lexer::token> tokens);
     
     /**
      * Run/perform semantic analysis on the token stream.
