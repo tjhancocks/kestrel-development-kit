@@ -71,9 +71,11 @@ public:
     void write_word(uint16_t v);
     void write_signed_word(int16_t v);
     
+    void write_pstr(size_t size, const std::string& str);
+    
 private:
     data::endian m_endian;
-    std::vector<char> m_data;
+    std::vector<uint8_t> m_data;
     
     template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
     T swap(T value, data::endian mode) const;

@@ -23,6 +23,7 @@
 #include <iostream>
 #include <fstream>
 #include "rsrc/data.hpp"
+#include "rsrc/macroman.hpp"
 
 // MARK: - Constructor
 
@@ -99,4 +100,13 @@ void rsrc::data::write_word(uint16_t v)
 void rsrc::data::write_signed_word(int16_t v)
 {
     write_integer(v);
+}
+
+void rsrc::data::write_pstr(size_t size, const std::string& str)
+{
+    auto out_str = str;
+    out_str.resize(size, ' ');
+    auto mac_roman = rsrc::mac_roman::from_str(out_str);
+    std::vector<uint8_t> bytes = mac_roman.bytes();
+    m_data.insert(std::end(m_data), std::begin(bytes), std::end(bytes));
 }
