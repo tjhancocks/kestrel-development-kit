@@ -102,6 +102,26 @@ void rsrc::data::write_signed_word(int16_t v)
     write_integer(v);
 }
 
+void rsrc::data::write_long(uint32_t v)
+{
+    write_integer(v);
+}
+
+void rsrc::data::write_signed_long(int32_t v)
+{
+    write_integer(v);
+}
+
+void rsrc::data::write_quad(uint64_t v)
+{
+    write_integer(v);
+}
+
+void rsrc::data::write_signed_quad(int64_t v)
+{
+    write_integer(v);
+}
+
 void rsrc::data::write_pstr(size_t size, const std::string& str)
 {
     auto out_str = str;

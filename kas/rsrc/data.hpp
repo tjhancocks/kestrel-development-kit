@@ -71,6 +71,12 @@ public:
     void write_word(uint16_t v);
     void write_signed_word(int16_t v);
     
+    void write_long(uint32_t v);
+    void write_signed_long(int32_t v);
+    
+    void write_quad(uint64_t v);
+    void write_signed_quad(int64_t v);
+    
     void write_pstr(size_t size, const std::string& str);
     
 private:
