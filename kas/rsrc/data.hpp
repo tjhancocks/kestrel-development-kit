@@ -77,7 +77,8 @@ public:
     void write_quad(uint64_t v);
     void write_signed_quad(int64_t v);
     
-    void write_pstr(size_t size, const std::string& str);
+    void write_pstr(const std::string& str);
+    void write_cstr(const std::string& str, size_t size = 0);
     
 private:
     data::endian m_endian;

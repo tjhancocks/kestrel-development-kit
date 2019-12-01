@@ -122,11 +122,37 @@ void rsrc::data::write_signed_quad(int64_t v)
     write_integer(v);
 }
 
-void rsrc::data::write_pstr(size_t size, const std::string& str)
+void rsrc::data::write_pstr(const std::string& str)
 {
-    auto out_str = str;
-    out_str.resize(size, ' ');
-    auto mac_roman = rsrc::mac_roman::from_str(out_str);
+   
+    auto mac_roman = rsrc::mac_roman::from_str(str);
     std::vector<uint8_t> bytes = mac_roman.bytes();
+    
+    if (bytes.size() > 0xFF) {
+        bytes.resize(0xFF);
+    }
+    auto size = static_cast<uint8_t>(bytes.size());
+    
+    m_data.push_back(static_cast<uint8_t>(size));
+    m_data.insert(std::end(m_data), std::begin(bytes), std::end(bytes));
+}
+
+void rsrc::data::write_cstr(const std::string& str, size_t size)
+{
+    std::vector<uint8_t> bytes;
+    
+    if (size == 0) {
+        // NUL Terminated C-String.
+        auto mac_roman = rsrc::mac_roman::from_str(str);
+        bytes = mac_roman.bytes();
+        bytes.push_back(0);
+    }
+    else {
+        // Fixed length C-String
+        auto mac_roman = rsrc::mac_roman::from_str(str);
+        bytes = mac_roman.bytes();
+        bytes.resize(size, 0x00);
+    }
+    
     m_data.insert(std::end(m_data), std::begin(bytes), std::end(bytes));
 }
