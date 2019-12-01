@@ -56,15 +56,20 @@ public:
     data(data::endian e = big);
     
     /**
+     * Save the contents of the data object to the specified file.
+     */
+    void save(const std::string& path) const;
+    
+    /**
      * Set the endianess of the data object.
      */
     void set_endian(data::endian e);
     
-    /**
-     * Write an integer value in to the data buffer.
-     */
-    template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
-    void write_value(const T& value);
+    void write_byte(uint8_t v);
+    void write_signed_byte(int8_t v);
+    
+    void write_word(uint16_t v);
+    void write_signed_word(int16_t v);
     
 private:
     data::endian m_endian;
@@ -72,6 +77,9 @@ private:
     
     template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
     T swap(T value, data::endian mode) const;
+    
+    template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
+    void write_integer(const T& value);
 };
 
 };

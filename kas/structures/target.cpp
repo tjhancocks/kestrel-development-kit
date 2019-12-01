@@ -36,3 +36,11 @@ void kdk::target::add_resources(const std::vector<kdk::resource> resources)
 {
     m_resources.insert(std::end(m_resources), std::begin(resources), std::end(resources));
 }
+
+// MARK: - Build
+
+void kdk::target::build()
+{
+    m_data.write_word(0x0200);
+    m_data.save(m_path);
+}

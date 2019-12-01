@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include "structures/resource.hpp"
+#include "rsrc/data.hpp"
 
 
 #if !defined(KDK_TARGET)
@@ -52,7 +53,17 @@ public:
      */
     void add_resources(const std::vector<kdk::resource> resources);
     
+    /**
+     * Build the kestrel data file.
+     *
+     * This method will begin the process of validating all of the resources added
+     * to the target, converting them into data objects and assembling the resource
+     * file.
+     */
+    void build();
+    
 private:
+    rsrc::data m_data;
     std::string m_path;
     std::vector<kdk::resource> m_resources;
 };

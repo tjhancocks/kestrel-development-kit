@@ -81,6 +81,7 @@ int main(int argc, const char **argv)
     
     // The semantic analysis should have resulted in a completed target structure, which
     // can now be assembled.
+    sema.target().build();
     
     return 0;
 }

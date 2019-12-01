@@ -20,6 +20,8 @@
 * SOFTWARE.
 */
 
+#include <iostream>
+#include <fstream>
 #include "rsrc/data.hpp"
 
 // MARK: - Constructor
@@ -28,6 +30,16 @@ rsrc::data::data(rsrc::data::endian e)
     : m_endian(e)
 {
     
+}
+
+// MARK: - File Access
+
+void rsrc::data::save(const std::string& path) const
+{
+    std::cout << "Saving data to " << path << std::endl;
+    std::ofstream f(path, std::ios::out | std::ios::binary);
+    f.write((char *)&m_data[0], m_data.size());
+    f.close();
 }
 
 // MARK: - Mutators
@@ -58,13 +70,33 @@ T rsrc::data::swap(T value, rsrc::data::endian mode) const
 // MARK: - Writers
 
 template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type*>
-void rsrc::data::write_value(const T& value)
+void rsrc::data::write_integer(const T& value)
 {
     auto size = sizeof(T);
     auto swapped = swap(value, m_endian);
     
     for (auto i = 0; i < size; ++i) {
         auto b = (size - 1 - i) << 3;
-        m_data.push_back((value >> b) & 0xFF);
+        m_data.push_back((swapped >> b) & 0xFF);
     }
+}
+
+void rsrc::data::write_byte(uint8_t v)
+{
+    write_integer(v);
+}
+
+void rsrc::data::write_signed_byte(int8_t v)
+{
+    write_integer(v);
+}
+
+void rsrc::data::write_word(uint16_t v)
+{
+    write_integer(v);
+}
+
+void rsrc::data::write_signed_word(int16_t v)
+{
+    write_integer(v);
 }
