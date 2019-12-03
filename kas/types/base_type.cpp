@@ -20,8 +20,22 @@
 * SOFTWARE.
 */
 
+#include <fstream>
 #include <tuple>
 #include "types/base_type.hpp"
+
+// MARK: - Helper Functions
+
+namespace std
+{
+
+bool has_suffix(const std::string &str, const std::string &suffix)
+{
+    return str.size() >= suffix.size() &&
+           str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+};
 
 // MARK: - Constructor
 
@@ -78,7 +92,61 @@ int64_t kdk::base_type::resource_id_for(const std::string name, const int value_
     return std::stoll(value);
 }
 
-int64_t kdk::base_type::import_and_resolve_file(const std::string name, const int value_index) const
+int64_t kdk::base_type::integer_for(const std::string name, const int value_index) const
 {
-    return 0;
+    auto f = m_source.field_named(name);
+    if (!f) {
+        return 0;
+    }
+    
+    auto value = std::get<0>(f->values().at(value_index));
+    return std::stoll(value);
+}
+
+std::string kdk::base_type::string_for(const std::string name, const int value_index) const
+{
+    auto f = m_source.field_named(name);
+    if (!f) {
+        return 0;
+    }
+    
+    return std::get<0>(f->values().at(value_index));
+}
+
+std::shared_ptr<rsrc::file::resource> kdk::base_type::import_and_resolve_file(const std::string name, int64_t resource_id, const int value_index) const
+{
+    // Load the contents of the file as binary data.
+    auto path = string_for(name, value_index);
+    std::ifstream file(path, std::ios::binary);
+    if (!file.is_open() || file.fail()) {
+        throw std::runtime_error("Failed to import file: " + path);
+    }
+    
+    // Make sure we don't skip newlines.
+    file.unsetf(std::ios::skipws);
+    
+    // Get the size of the file.
+    file.seekg(0UL, std::ios::end);
+    auto file_size = file.tellg();
+    file.seekg(0UL, std::ios::beg);
+    
+    // Read the contents of the file into the vector.
+    auto data = std::make_shared<std::vector<uint8_t>>(file_size);
+    data->insert(data->begin(), std::istream_iterator<uint8_t>(file), std::istream_iterator<uint8_t>());
+    
+    // Close the file and clean up.
+    file.close();
+    
+    // Determine what the type of data is. For this we'll just used the file extension.
+    if (std::has_suffix(path, ".tga")) {
+        // TäRG Resource
+        return m_rf->add_resource("TäRG", resource_id, "", rsrc::data(data));
+    }
+    else if (std::has_suffix(path, ".png")) {
+        // PïNG Resource
+        return m_rf->add_resource("PïNG", resource_id, "", rsrc::data(data));
+    }
+    
+    // At this point we assume we couldn't determine the type
+    return nullptr;
 }

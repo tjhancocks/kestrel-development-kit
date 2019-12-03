@@ -30,10 +30,16 @@ rsrc::file::file(const std::string path)
     
 }
 
+// MARK: - Convenience
+
+std::shared_ptr<rsrc::file> rsrc::file::create(const std::string path)
+{
+    return std::make_shared<rsrc::file>(path);
+}
 
 // MARK: - Resource Management
 
-void rsrc::file::add_resource(const std::string type, int64_t id, const std::string name, rsrc::data data)
+std::shared_ptr<rsrc::file::resource> rsrc::file::add_resource(const std::string type, int64_t id, const std::string name, rsrc::data data)
 {
     // Get the container
     auto container = get_type_container(type);
@@ -44,6 +50,7 @@ void rsrc::file::add_resource(const std::string type, int64_t id, const std::str
     // Add the resource...
     auto resource = rsrc::file::resource::create(id, name, data);
     container->add_resource(resource);
+    return resource;
 }
 
 std::shared_ptr<rsrc::file::type_container> rsrc::file::get_type_container(const std::string type_code)

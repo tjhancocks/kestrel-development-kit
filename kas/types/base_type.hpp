@@ -63,9 +63,19 @@ public:
     int64_t resource_id_for(const std::string name, const int value = 0) const;
     
     /**
+     * Returns the value of the specified field as an integer.
+     */
+    int64_t integer_for(const std::string name, const int value = 0) const;
+    
+    /**
+     * Returns the value of the specified field as a string.
+     */
+    std::string string_for(const std::string name, const int value_index) const;
+    
+    /**
      * Import and resolve the specified file reference, returning a Resource ID.
      */
-    int64_t import_and_resolve_file(const std::string name, const int value = 0) const;
+    std::shared_ptr<rsrc::file::resource> import_and_resolve_file(const std::string name, int64_t resource_id = 0, const int value = 0) const;
     
     
 private:

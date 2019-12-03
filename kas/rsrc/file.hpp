@@ -133,7 +133,7 @@ public:
     /**
      * Add a new resource to the file.
      */
-    void add_resource(const std::string type_code, int64_t id, const std::string name, rsrc::data data);
+    std::shared_ptr<rsrc::file::resource> add_resource(const std::string type_code, int64_t id, const std::string name, rsrc::data data);
     
     /**
      * Find or create the specified type container.
