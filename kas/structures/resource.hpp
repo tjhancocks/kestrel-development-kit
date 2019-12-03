@@ -91,6 +91,11 @@ public:
     resource(const std::string type, const int64_t id, const std::string name);
     
     /**
+     * Returns the resource structure type.
+     */
+    std::string type() const;
+    
+    /**
      * Add a new field to the end of the resource.
      */
     void add_field(const resource::field& field);

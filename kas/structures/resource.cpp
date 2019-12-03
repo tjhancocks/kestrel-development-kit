@@ -48,6 +48,13 @@ std::vector<std::tuple<std::string, kdk::resource::field::value_type>> kdk::reso
     return m_values;
 }
 
+// MARK: - Accessors
+
+std::string kdk::resource::type() const
+{
+    return m_type;
+}
+
 // MARK: - Mutators
 
 void kdk::resource::add_field(const kdk::resource::field& field)
