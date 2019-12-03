@@ -62,6 +62,16 @@ public:
          */
         static std::shared_ptr<rsrc::file::resource> create(int64_t id, const std::string name, rsrc::data blob);
         
+        /**
+         * Returns the resource id.
+         */
+        int64_t id() const;
+        
+        /**
+         * Returns the resource name.
+         */
+        std::string name() const;
+        
     private:
         int64_t m_id;
         std::string m_name;

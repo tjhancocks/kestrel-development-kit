@@ -75,6 +75,16 @@ std::shared_ptr<rsrc::file::resource> rsrc::file::resource::create(int64_t id, c
     return std::make_shared<rsrc::file::resource>(id, name, blob);
 }
 
+int64_t rsrc::file::resource::id() const
+{
+    return m_id;
+}
+
+std::string rsrc::file::resource::name() const
+{
+    return m_name;
+}
+
 // MARK: - Type Container
 
 rsrc::file::type_container::type_container(const std::string type_code)
