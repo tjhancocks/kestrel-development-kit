@@ -48,6 +48,21 @@ std::vector<std::tuple<std::string, kdk::resource::field::value_type>> kdk::reso
     return m_values;
 }
 
+std::shared_ptr<kdk::resource::field> kdk::resource::field_named(const std::string name, bool required) const
+{
+    for (auto f : m_fields) {
+        if (f.name() == name) {
+            return std::make_shared<kdk::resource::field>(f);
+        }
+    }
+    
+    if (required) {
+        throw std::runtime_error("Resource #" + std::to_string(m_id) + " '" + m_type + "' was missing field '" + name + "'");
+    }
+    
+    return nullptr;
+}
+
 // MARK: - Accessors
 
 std::string kdk::resource::type() const

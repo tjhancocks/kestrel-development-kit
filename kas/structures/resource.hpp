@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include <tuple>
+#include <memory>
 
 #if !defined(KDK_RESOURCE)
 #define KDK_RESOURCE
@@ -99,6 +100,11 @@ public:
      * Add a new field to the end of the resource.
      */
     void add_field(const resource::field& field);
+    
+    /**
+     * Returns the field with the specified name.
+     */
+    std::shared_ptr<resource::field> field_named(const std::string name, bool required = false) const;
     
 private:
     int64_t m_id { 0 };
