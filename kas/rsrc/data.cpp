@@ -33,6 +33,12 @@ rsrc::data::data(rsrc::data::endian e)
     
 }
 
+rsrc::data::data(std::shared_ptr<std::vector<uint8_t>> blob)
+    : m_endian(rsrc::data::endian::big), m_data(*blob)
+{
+    
+}
+
 // MARK: - File Access
 
 void rsrc::data::save(const std::string& path) const

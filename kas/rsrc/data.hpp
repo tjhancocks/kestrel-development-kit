@@ -56,6 +56,11 @@ public:
     data(data::endian e = big);
     
     /**
+     * Create a data object using a raw data blob.
+     */
+    data(std::shared_ptr<std::vector<uint8_t>> blob);
+    
+    /**
      * Save the contents of the data object to the specified file.
      */
     void save(const std::string& path) const;
