@@ -21,6 +21,8 @@
 */
 
 #include "structures/target.hpp"
+#include "rsrc/file.hpp"
+#include "types/sprite_animation.hpp"
 
 // MARK: - Constructor
 
@@ -41,6 +43,16 @@ void kdk::target::add_resources(const std::vector<kdk::resource> resources)
 
 void kdk::target::build()
 {
-    m_data.write_word(0x0200);
-    m_data.save(m_path);
+    auto rf = rsrc::file::create(m_path);
+    
+    for (auto resource : m_resources) {
+        auto type = resource.type();
+        
+        if (type == "SpriteAnimation") {
+            auto data = kdk::sprite_animation(resource, rf).assemble();
+        }
+        
+    }
+    
+    
 }
