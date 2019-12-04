@@ -1,1 +1,6 @@
+# macOS Specifics
 .DS_Store
+
+# Xcode Specifics
+*xcshareddata*
+*xcuserdata*
