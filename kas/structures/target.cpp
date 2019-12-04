@@ -45,14 +45,23 @@ void kdk::target::build()
 {
     auto rf = rsrc::file::create(m_path);
     
+    // Iterate through each of the resources and construct the data for each of them.
+    // Currently this is done by manually testing the type and invoking the appropriate
+    // type assembler. This could be improved by making KDL more extensible.
     for (auto resource : m_resources) {
+        rsrc::data resource_data;
+        std::string type_code;
         auto type = resource.type();
         
         if (type == "SpriteAnimation") {
-            auto data = kdk::sprite_animation(resource, rf).assemble();
+            type_code = "spïn";
+            resource_data = kdk::sprite_animation(resource, rf).assemble();
         }
         
+        rf->add_resource(type_code, resource.id(), resource.name(), resource_data);
     }
     
+    // The resource file should be assembled at this point and just needs writting to disk.
+    return;
     
 }
