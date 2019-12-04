@@ -97,6 +97,16 @@ public:
     std::string type() const;
     
     /**
+     * Returns the id of the resource
+     */
+    int64_t id() const;
+    
+    /**
+     * Returns the name of the resource
+     */
+    std::string name() const;
+    
+    /**
      * Add a new field to the end of the resource.
      */
     void add_field(const resource::field& field);

@@ -65,6 +65,16 @@ std::shared_ptr<kdk::resource::field> kdk::resource::field_named(const std::stri
 
 // MARK: - Accessors
 
+int64_t kdk::resource::id() const
+{
+    return m_id;
+}
+
+std::string kdk::resource::name() const
+{
+    return m_name;
+}
+
 std::string kdk::resource::type() const
 {
     return m_type;
