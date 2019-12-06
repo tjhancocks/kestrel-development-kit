@@ -85,6 +85,11 @@ public:
     void write_pstr(const std::string& str);
     void write_cstr(const std::string& str, size_t size = 0);
     
+    /**
+     * Export the contents of the data to disk.
+     */
+    void export_file(const std::string path) const;
+    
 private:
     data::endian m_endian;
     std::vector<uint8_t> m_data;

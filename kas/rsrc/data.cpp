@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include "rsrc/data.hpp"
 #include "rsrc/macroman.hpp"
 
@@ -161,4 +162,12 @@ void rsrc::data::write_cstr(const std::string& str, size_t size)
     }
     
     m_data.insert(std::end(m_data), std::begin(bytes), std::end(bytes));
+}
+
+// MARK: - File
+
+void rsrc::data::export_file(const std::string path) const
+{
+    std::ofstream file(path, std::ios::out | std::ofstream::binary);
+    std::copy(m_data.begin(), m_data.end(), std::ostreambuf_iterator<char>(file));
 }
