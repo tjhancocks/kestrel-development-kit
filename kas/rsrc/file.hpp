@@ -43,6 +43,15 @@ class file
 public:
     
     /**
+     * The ResourceFork format.
+     */
+    enum format
+    {
+        standard,
+        extended
+    };
+    
+    /**
      * A resource object in the resource file.
      *
      * Resource objects represent actual resource data in the resource file. They
@@ -72,10 +81,26 @@ public:
          */
         std::string name() const;
         
+        /**
+         * Returns the binary data contents of the resource.
+         */
+        rsrc::data blob() const;
+        
+        /**
+         * Set the offset of the resource data within the file it is being written to.
+         */
+        void set_data_offset(uint64_t offset);
+        
+        /**
+         * Get the offset of the resource data with in the file.
+         */
+        uint64_t data_offset() const;
+        
     private:
         int64_t m_id;
         std::string m_name;
         rsrc::data m_blob;
+        uint64_t m_data_offset;
     };
     
     /**
@@ -107,6 +132,11 @@ public:
          * Return the type code of the container.
          */
         std::string type_code() const;
+        
+        /**
+         * Returns a vector containing shared pointers to each of its resources.
+         */
+        std::vector<std::shared_ptr<rsrc::file::resource>> resources() const;
         
     private:
         std::string m_code;
@@ -140,9 +170,21 @@ public:
      */
     std::shared_ptr<rsrc::file::type_container> get_type_container(const std::string type_code);
     
+    /**
+     * Write the Resource File to disk.
+     *
+     * This will write the entire contents of the resource file to disk, replacing
+     * the file currently present.
+     */
+    void write();
+    
 private:
+    file::format m_format { file::format::standard };
     std::string m_path;
     std::vector<std::shared_ptr<rsrc::file::type_container>> m_containers;
+    
+    rsrc::data write_extended();
+    rsrc::data write_standard();
 };
 
 };

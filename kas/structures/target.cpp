@@ -62,6 +62,5 @@ void kdk::target::build()
     }
     
     // The resource file should be assembled at this point and just needs writting to disk.
-    return;
-    
+    rf->write();
 }
