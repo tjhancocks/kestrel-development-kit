@@ -85,7 +85,17 @@ void rsrc::data::write_integer(const T& value)
     
     for (auto i = 0; i < size; ++i) {
         auto b = (size - 1 - i) << 3;
-        m_data.push_back((swapped >> b) & 0xFF);
+        
+        // Two modes for writing. If we're at the very end of data then we need to insert.
+        // If we're not at the end of the data then we can either overwrite the current byte
+        // or insert a new byte.
+        if (m_ptr >= this->size()) {
+            m_data.push_back((swapped >> b) & 0xFF);
+            m_ptr++;
+        }
+        else {
+            m_data[m_ptr++] = (swapped >> b) & 0xFF;
+        }
     }
 }
 
@@ -97,6 +107,13 @@ void rsrc::data::write_byte(uint8_t v)
 void rsrc::data::write_signed_byte(int8_t v)
 {
     write_integer(v);
+}
+
+void rsrc::data::write_byte(uint8_t v, uint64_t n)
+{
+    for (auto i = 0; i < n; ++i) {
+        write_byte(v);
+    }
 }
 
 void rsrc::data::write_word(uint16_t v)
@@ -164,10 +181,41 @@ void rsrc::data::write_cstr(const std::string& str, size_t size)
     m_data.insert(std::end(m_data), std::begin(bytes), std::end(bytes));
 }
 
+void rsrc::data::write_data(const rsrc::data data)
+{
+    write_data(data.m_data);
+}
+
+void rsrc::data::write_data(const std::vector<uint8_t> bytes)
+{
+    if (m_ptr >= size()) {
+        m_data.insert(m_data.end(), bytes.begin(), bytes.end());
+        m_ptr += bytes.size();
+    }
+    else {
+        // TODO: Handle inserting data in the middle of the data stream
+        throw std::runtime_error("not implemented");
+    }
+}
+
+void rsrc::data::pad_to_size(int64_t size)
+{
+    while (m_ptr < size) {
+        write_byte(0x00);
+    }
+}
+
 // MARK: - File
 
 void rsrc::data::export_file(const std::string path) const
 {
     std::ofstream file(path, std::ios::out | std::ofstream::binary);
     std::copy(m_data.begin(), m_data.end(), std::ostreambuf_iterator<char>(file));
+}
+
+// MARK: - Accessors
+
+uint64_t rsrc::data::size() const
+{
+    return static_cast<uint64_t>(m_data.size());
 }

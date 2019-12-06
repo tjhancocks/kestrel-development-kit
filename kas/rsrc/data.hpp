@@ -73,6 +73,11 @@ public:
     void write_byte(uint8_t v);
     void write_signed_byte(int8_t v);
     
+    /**
+     * Write a specific byte to the data _n_ times.
+     */
+    void write_byte(uint8_t v, uint64_t n);
+    
     void write_word(uint16_t v);
     void write_signed_word(int16_t v);
     
@@ -86,6 +91,26 @@ public:
     void write_cstr(const std::string& str, size_t size = 0);
     
     /**
+     * Write another data object into the data.
+     */
+    void write_data(const rsrc::data data);
+    
+    /**
+     * Write a sequence of bytes into the data.
+     */
+    void write_data(const std::vector<uint8_t> bytes);
+    
+    /**
+     * Write zero bytes to the data until the specified size is reached.
+     */
+    void pad_to_size(int64_t size);
+    
+    /**
+     * Returns the current size of the data in bytes.
+     */
+    uint64_t size() const;
+    
+    /**
      * Export the contents of the data to disk.
      */
     void export_file(const std::string path) const;
@@ -93,6 +118,7 @@ public:
 private:
     data::endian m_endian;
     std::vector<uint8_t> m_data;
+    uint64_t m_ptr { 0 };
     
     template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
     T swap(T value, data::endian mode) const;
