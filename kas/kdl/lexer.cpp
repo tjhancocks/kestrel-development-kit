@@ -26,6 +26,7 @@
 #include <fstream>
 #include <streambuf>
 #include <iostream>
+#include "diagnostic/log.hpp"
 
 // MARK: - Token
 
@@ -67,8 +68,8 @@ bool kdl::lexer::token::is_a(kdl::lexer::token::type type) const
 
 // MARK: - Lexer Constructor
 
-kdl::lexer::lexer(const std::string& content)
-    : m_source(content + "\n"), m_pos(0), m_length(content.length() + 1)
+kdl::lexer::lexer(const std::string path, const std::string& content)
+    : m_path(path), m_source(content + "\n"), m_pos(0), m_length(content.length() + 1)
 {
     
 }
@@ -85,7 +86,7 @@ kdl::lexer kdl::lexer::open_file(const std::string path)
     str.assign((std::istreambuf_iterator<char>(f)),
                 std::istreambuf_iterator<char>());
     
-    return kdl::lexer(str);
+    return kdl::lexer(path, str);
 }
 
 // MARK: - Lexical Analysis
@@ -226,7 +227,7 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
         
         // Error States
         else {
-            throw std::runtime_error("Unrecognised character '" + peek() + "' encountered.");
+            log::error(m_path, m_line, "Unrecognised character '" + peek() + "' encountered.");
         }
     }
     
@@ -253,7 +254,7 @@ void kdl::lexer::advance(long offset)
 std::string kdl::lexer::peek(long offset, std::string::size_type size) const
 {
     if (!available(offset, size)) {
-        throw std::runtime_error("Failed to peek source.");
+        log::error(m_path, m_line, "Failed to peek character from source.");
     }
     
     return m_source.substr(m_pos + offset, size);

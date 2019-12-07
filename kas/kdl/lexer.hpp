@@ -101,7 +101,7 @@ public:
     /**
      * Construct a new lexical analyser using the source code provided.
      */
-    lexer(const std::string& source);
+    lexer(const std::string path, const std::string& source);
     
     /**
      * Create a new lexer, using the contents of the specified file as the source.
@@ -177,6 +177,7 @@ private:
     std::string m_source;
     std::vector<token> m_tokens;
     std::string m_slice;
+    std::string m_path;
 };
 
 // MARK: - Test Functions
