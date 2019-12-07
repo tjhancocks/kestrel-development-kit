@@ -111,9 +111,7 @@ public:
     uint64_t size() const;
     
     /**
-     * Export the contents of the data to disk.
      */
-    void export_file(const std::string path) const;
     
 private:
     data::endian m_endian;

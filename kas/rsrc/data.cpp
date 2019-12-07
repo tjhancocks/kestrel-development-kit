@@ -205,14 +205,6 @@ void rsrc::data::pad_to_size(int64_t size)
     }
 }
 
-// MARK: - File
-
-void rsrc::data::export_file(const std::string path) const
-{
-    std::ofstream file(path, std::ios::out | std::ofstream::binary);
-    std::copy(m_data.begin(), m_data.end(), std::ostreambuf_iterator<char>(file));
-}
-
 // MARK: - Accessors
 
 uint64_t rsrc::data::size() const

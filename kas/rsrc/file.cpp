@@ -156,7 +156,7 @@ void rsrc::file::write()
         }
     }
     
-    fork_data.export_file(m_path);
+    fork_data.save(m_path);
 }
 
 // MARK: - Private Write Format Specific Methods
