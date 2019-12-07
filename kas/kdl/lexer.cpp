@@ -36,13 +36,18 @@ kdl::lexer::token::token()
     
 }
 
-kdl::lexer::token::token(const int line, const int offset, const std::string text, kdl::lexer::token::type type)
-    : m_line(line), m_offset(offset), m_text(text), m_type(type)
+kdl::lexer::token::token(const std::string file, const int line, const int offset, const std::string text, kdl::lexer::token::type type)
+    : m_file(file), m_line(line), m_offset(offset), m_text(text), m_type(type)
 {
     
 }
 
 // MARK: - Token Accessors
+
+std::string kdl::lexer::token::file() const
+{
+    return m_file;
+}
 
 int kdl::lexer::token::line() const
 {
@@ -119,7 +124,7 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
             advance();
             consume_while(identifier_set::contains);
             
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, m_slice, token::type::directive));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, m_slice, token::type::directive));
         }
         
         // Literals
@@ -128,7 +133,7 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
             // The string continues until a corresponding '"' is found.
             advance();
             consume_while(match<'"'>::no);
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, m_slice, token::type::string));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, m_slice, token::type::string));
             advance();
         }
         else if (test_if(match<'#'>::yes)) {
@@ -136,7 +141,7 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
             // These take the form of #128, #129, etc.
             advance();
             consume_while(number_set::contains);
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, m_slice, token::type::resource_id));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, m_slice, token::type::resource_id));
         }
         else if (test_if(number_set::contains)) {
             // We're looking at a number, slice it out of the source, and then check the following
@@ -147,10 +152,10 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
             if (test_if(match<'%'>::yes)) {
                 // This is a percentage.
                 advance();
-                m_tokens.push_back(kdl::lexer::token(m_line, 0, number_text, token::type::percentage));
+                m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, number_text, token::type::percentage));
             }
             else {
-                m_tokens.push_back(kdl::lexer::token(m_line, 0, number_text, token::type::integer));
+                m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, number_text, token::type::integer));
             }
         }
         else if (test_if(identifier_set::contains)) {
@@ -160,69 +165,69 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
             
             // TODO: Check for keywords
             
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, text, token::type::identifier));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, text, token::type::identifier));
         }
         
         // Symbols
         else if (test_if(match<';'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::semi_colon));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::semi_colon));
         }
         else if (test_if(match<'{'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::lbrace));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::lbrace));
         }
         else if (test_if(match<'}'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::rbrace));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::rbrace));
         }
         else if (test_if(match<'['>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::lbracket));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::lbracket));
         }
         else if (test_if(match<']'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::rbracket));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::rbracket));
         }
         else if (test_if(match<'('>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::lparen));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::lparen));
         }
         else if (test_if(match<')'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::rparen));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::rparen));
         }
         else if (test_if(match<'<'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::langle));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::langle));
         }
         else if (test_if(match<'>'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::rangle));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::rangle));
         }
         else if (test_if(match<'='>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::equals));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::equals));
         }
         else if (test_if(match<'+'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::plus));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::plus));
         }
         else if (test_if(match<'-'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::minus));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::minus));
         }
         else if (test_if(match<'*'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::star));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::star));
         }
         else if (test_if(match<'/'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::slash));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::slash));
         }
         else if (test_if(match<':'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::colon));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::colon));
         }
         else if (test_if(match<','>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::comma));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::comma));
         }
         else if (test_if(match<'.'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::dot));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::dot));
         }
         else if (test_if(match<'&'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::ampersand));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::ampersand));
         }
         else if (test_if(match<'|'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::pipe));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::pipe));
         }
         else if (test_if(match<'^'>::yes)) {
-            m_tokens.push_back(kdl::lexer::token(m_line, 0, read(), token::type::caret));
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, read(), token::type::caret));
         }
         
         // Error States

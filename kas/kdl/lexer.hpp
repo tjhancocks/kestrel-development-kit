@@ -67,7 +67,12 @@ public:
         /**
          * Construct a new token.
          */
-        token(const int line, const int offset, const std::string text, token::type type);
+        token(const std::string file, const int line, const int offset, const std::string text, token::type type);
+        
+        /**
+         * Returns the name of the file where the token was located.
+         */
+        std::string file() const;
         
         /**
          * Returns the line number of the original source file in which the token
@@ -95,6 +100,7 @@ public:
         int m_offset;
         std::string m_text;
         token::type m_type;
+        std::string m_file;
     };
     
 public:
