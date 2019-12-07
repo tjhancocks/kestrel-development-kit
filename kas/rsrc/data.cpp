@@ -57,6 +57,11 @@ void rsrc::data::set_endian(rsrc::data::endian e)
     m_endian = e;
 }
 
+void rsrc::data::set_insertion_point(uint64_t p)
+{
+    m_ptr = p;
+}
+
 // MARK: - Endian
 
 template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type*>

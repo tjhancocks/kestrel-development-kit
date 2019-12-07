@@ -111,7 +111,9 @@ public:
     uint64_t size() const;
     
     /**
+     * Set the current insertion point of the data.
      */
+    void set_insertion_point(uint64_t p);
     
 private:
     data::endian m_endian;
