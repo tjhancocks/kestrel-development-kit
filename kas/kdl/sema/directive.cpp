@@ -23,6 +23,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "kdl/sema/directive.hpp"
+#include "diagnostic/log.hpp"
 
 // MARK: - Parser
 
@@ -36,14 +37,16 @@ void kdl::directive::parse(kdl::sema *sema)
 {
     // Ensure directive.
     if (sema->expect(condition(kdl::lexer::token::type::directive).falsey())) {
-        throw std::runtime_error("Unexpected token encountered while parsing directive.");
+        auto tk = sema->peek();
+        log::error(tk.file(), tk.line(), "Unexpected token '" + tk.text() + "' encountered while parsing directive.");
     }
     
     // Directive structure: @directive { <args> }
     auto directive = sema->read().text();
     
     if (sema->expect(condition(kdl::lexer::token::type::lbrace).falsey())) {
-        throw std::runtime_error("Expected '{' whilst starting directive.");
+        auto tk = sema->peek();
+        log::error(tk.file(), tk.line(), "Expected '{' whilst starting directive, but found '" + tk.text() + "' instead.");
     }
     sema->advance();
     
@@ -51,7 +54,8 @@ void kdl::directive::parse(kdl::sema *sema)
     auto args = sema->consume(condition(kdl::lexer::token::type::rbrace).falsey());
     
     if (sema->expect(condition(kdl::lexer::token::type::rbrace).falsey())) {
-        throw std::runtime_error("Expected '}' whilst finishing directive.");
+        auto tk = sema->peek();
+        log::error(tk.file(), tk.line(), "Expected '}' whilst finishing directive, but found '" + tk.text() + "' instead.");
     }
     sema->advance();
     
