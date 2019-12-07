@@ -25,10 +25,11 @@
 
 void log::warning(const std::string file, const int line, const std::string message)
 {
-    std::cout << "\x1b[33m" << "Warning " << file << ":L" << std::to_string(line) << " - " << message << "\x1b[0m" << std::endl;
+    std::cout << "\x1b[33m" << "Warning: " << file << ":L" << std::to_string(line) << std::endl << "\x1b[0m  " << message << std::endl;
 }
 
 void log::error(const std::string file, const int line, const std::string message)
 {
-    std::cout << "\x1b[31m" << "Warning " << file << ":L" << std::to_string(line) << " - " << message << "\x1b[0m" << std::endl;
+    std::cout << "\x1b[31m" << "Error: " << file << ":L" << std::to_string(line) << std::endl << "\x1b[0m  " << message << std::endl;
+    exit(1);
 }
