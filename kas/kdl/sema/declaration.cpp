@@ -24,6 +24,7 @@
 #include <stdexcept>
 #include "kdl/sema/declaration.hpp"
 #include "structures/resource.hpp"
+#include "diagnostic/log.hpp"
 
 // MARK: - Parser
 
@@ -86,7 +87,7 @@ kdk::resource kdl::declaration::parse_instance(kdl::sema *sema, const std::strin
     while (sema->expect(condition(lexer::token::type::rparen).falsey())) {
         
         if (sema->expect({ condition(lexer::token::type::identifier).falsey(), condition(lexer::token::type::equals).falsey() })) {
-            throw std::runtime_error("Malformed resource attribute encountered.");
+            log::error(sema->peek().file(), sema->peek().line(), "Malformed resource attribute encountered.");
         }
         auto attribute = sema->read().text();
         sema->advance();
@@ -94,20 +95,20 @@ kdk::resource kdl::declaration::parse_instance(kdl::sema *sema, const std::strin
         if (attribute == "id") {
             // We're expecting a resource id now.
             if (sema->expect({ condition(lexer::token::type::resource_id).falsey() })) {
-                throw std::runtime_error("The id attribute must be assigned a resource id literal.");
+                log::error(sema->peek().file(), sema->peek().line(), "The 'id' attribute must be assigned a resource id literal.");
             }
             resource_id = std::stoi(sema->read().text());
         }
         else if (attribute == "name") {
             // We're expecting a string now.
             if (sema->expect({ condition(lexer::token::type::string).falsey() })) {
-                throw std::runtime_error("The name attribute must be assigned a string literal.");
+                log::error(sema->peek().file(), sema->peek().line(), "The 'name' attribute must be assigned a string literal.");
             }
             resource_name = sema->read().text();
         }
         else {
             // Unrecognised attribute.
-            throw std::runtime_error("Unrecognised resource attribute '" + attribute + "' encountered.");
+            log::error(sema->peek().file(), sema->peek().line(), "Unrecognised resource attribute '" + attribute + "' encountered.");
         }
         
         // Check for a comma. If no comma exists, then we require the presence of a rparen.
@@ -151,7 +152,7 @@ kdk::resource kdl::declaration::parse_instance(kdl::sema *sema, const std::strin
         // found. There _must_ be at least one value provided.
         
         if ( sema->expect({ condition(lexer::token::type::identifier).falsey() })) {
-            throw std::runtime_error("Resource field name must be an 'identifier'");
+            log::error(sema->peek().file(), sema->peek().line(), "Resource field name must be an identifier.");
         }
         auto field_name = sema->read().text();
         
@@ -188,7 +189,7 @@ kdk::resource kdl::declaration::parse_instance(kdl::sema *sema, const std::strin
                 });
                 
                 if (sema->expect({ condition(lexer::token::type::string).falsey(), condition(lexer::token::type::rparen).falsey() })) {
-                    throw std::runtime_error("Malformed file reference found.");
+                    log::error(sema->peek().file(), sema->peek().line(), "Malformed file reference found.");
                 }
                 
                 values.push_back( std::make_tuple(sema->read().text(), kdk::resource::field::value_type::file_reference) );
@@ -199,7 +200,7 @@ kdk::resource kdl::declaration::parse_instance(kdl::sema *sema, const std::strin
                 values.push_back( std::make_tuple(sema->read().text(), kdk::resource::field::value_type::identifier) );
             }
             else {
-                throw std::runtime_error("Unexpected value type encountered.");
+                log::error(sema->peek().file(), sema->peek().line(), "Unexpected value type encountered.");
             }
             
         }
