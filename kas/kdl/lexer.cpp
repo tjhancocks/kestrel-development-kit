@@ -51,7 +51,7 @@ std::string kdl::lexer::token::file() const
 
 int kdl::lexer::token::line() const
 {
-    return m_line;
+    return m_line + 1;
 }
 
 int kdl::lexer::token::offset() const
