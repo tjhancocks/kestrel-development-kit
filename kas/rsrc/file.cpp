@@ -233,7 +233,7 @@ rsrc::data rsrc::file::write_standard()
             // Get the data for the resource and determine its size.
             auto data = resource->blob();
             auto size = data.size();
-            resource->set_data_offset(fork_data.size());
+            resource->set_data_offset(fork_data.size() - data_offset);
             fork_data.write_long(static_cast<uint32_t>(size));
             fork_data.write_data(data);
         }
@@ -257,8 +257,8 @@ rsrc::data rsrc::file::write_standard()
     
     // We're now writing the primary map information, which includes flags, and offsets for
     // the type list and the name list. We can calculate where each of these will be.
-    const uint16_t resource_type_length = 0;
-    const uint16_t resource_length = 0;
+    const uint16_t resource_type_length = 8;
+    const uint16_t resource_length = 20;
     uint16_t type_list_offset = 28; // The type list is 28 bytes from the start of the resource map.
     uint16_t name_list_offset = (m_containers.size() * resource_type_length) + (resource_count * resource_length) + sizeof(uint16_t);
     
@@ -322,7 +322,7 @@ rsrc::data rsrc::file::write_standard()
         }
     }
     
-    // Finally we write out each of the resource names.
+    // Finally we write out each of the resource names, and calculate the map length.
     for (auto container : m_containers) {
         for (auto resource : container->resources()) {
             if (resource->name().empty()) {
@@ -338,8 +338,20 @@ rsrc::data rsrc::file::write_standard()
             fork_data.write_data(bytes);
         }
     }
-    
+    map_length = static_cast<uint16_t>(fork_data.size() - map_offset);
+
     // Fix the preamble values.
+    fork_data.set_insertion_point(0);
+    fork_data.write_long(data_offset);
+    fork_data.write_long(map_offset);
+    fork_data.write_long(data_length);
+    fork_data.write_long(map_length);
+    
+    fork_data.set_insertion_point(map_offset);
+    fork_data.write_long(data_offset);
+    fork_data.write_long(map_offset);
+    fork_data.write_long(data_length);
+    fork_data.write_long(map_length);
     
     return fork_data;
 }

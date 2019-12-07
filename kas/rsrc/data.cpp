@@ -89,7 +89,7 @@ void rsrc::data::write_integer(const T& value)
     auto swapped = swap(value, m_endian);
     
     for (auto i = 0; i < size; ++i) {
-        auto b = (size - 1 - i) << 3;
+        auto b = i << 3;
         
         // Two modes for writing. If we're at the very end of data then we need to insert.
         // If we're not at the end of the data then we can either overwrite the current byte
@@ -162,8 +162,8 @@ void rsrc::data::write_pstr(const std::string& str)
     }
     auto size = static_cast<uint8_t>(bytes.size());
     
-    m_data.push_back(static_cast<uint8_t>(size));
-    m_data.insert(std::end(m_data), std::begin(bytes), std::end(bytes));
+    write_byte(static_cast<uint8_t>(size));
+    write_data(bytes);
 }
 
 void rsrc::data::write_cstr(const std::string& str, size_t size)
@@ -183,7 +183,7 @@ void rsrc::data::write_cstr(const std::string& str, size_t size)
         bytes.resize(size, 0x00);
     }
     
-    m_data.insert(std::end(m_data), std::begin(bytes), std::end(bytes));
+    write_data(bytes);
 }
 
 void rsrc::data::write_data(const rsrc::data data)
