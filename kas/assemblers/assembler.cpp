@@ -22,7 +22,7 @@
 
 #include <fstream>
 #include <tuple>
-#include "types/base_type.hpp"
+#include "assemblers/assembler.hpp"
 
 // MARK: - Helper Functions
 
@@ -39,7 +39,7 @@ bool has_suffix(const std::string &str, const std::string &suffix)
 
 // MARK: - Constructor
 
-kdk::base_type::base_type(kdk::resource res, std::shared_ptr<rsrc::file> rf)
+kdk::assembler::assembler(kdk::resource res, std::shared_ptr<rsrc::file> rf)
     : m_source(res), m_rf(rf)
 {
     
@@ -47,14 +47,14 @@ kdk::base_type::base_type(kdk::resource res, std::shared_ptr<rsrc::file> rf)
 
 // MARK: -
 
-rsrc::data kdk::base_type::assemble()
+rsrc::data kdk::assembler::assemble()
 {
     throw std::runtime_error("Must be overriden in subclass.");
 }
 
 // MARK: - Field Access
 
-bool kdk::base_type::field_exists(const std::string name, std::initializer_list<kdk::resource::field::value_type> allowed_types) const
+bool kdk::assembler::field_exists(const std::string name, std::initializer_list<kdk::resource::field::value_type> allowed_types) const
 {
     auto f = m_source.field_named(name);
     if (!f) {
@@ -81,7 +81,7 @@ bool kdk::base_type::field_exists(const std::string name, std::initializer_list<
     return true;
 }
 
-int64_t kdk::base_type::resource_id_for(const std::string name, const int value_index) const
+int64_t kdk::assembler::resource_id_for(const std::string name, const int value_index) const
 {
     auto f = m_source.field_named(name);
     if (!f) {
@@ -92,7 +92,7 @@ int64_t kdk::base_type::resource_id_for(const std::string name, const int value_
     return std::stoll(value);
 }
 
-int64_t kdk::base_type::integer_for(const std::string name, const int value_index) const
+int64_t kdk::assembler::integer_for(const std::string name, const int value_index) const
 {
     auto f = m_source.field_named(name);
     if (!f) {
@@ -103,7 +103,7 @@ int64_t kdk::base_type::integer_for(const std::string name, const int value_inde
     return std::stoll(value);
 }
 
-std::string kdk::base_type::string_for(const std::string name, const int value_index) const
+std::string kdk::assembler::string_for(const std::string name, const int value_index) const
 {
     auto f = m_source.field_named(name);
     if (!f) {
@@ -113,7 +113,7 @@ std::string kdk::base_type::string_for(const std::string name, const int value_i
     return std::get<0>(f->values().at(value_index));
 }
 
-std::shared_ptr<rsrc::file::resource> kdk::base_type::import_and_resolve_file(const std::string name, int64_t resource_id, const int value_index) const
+std::shared_ptr<rsrc::file::resource> kdk::assembler::import_and_resolve_file(const std::string name, int64_t resource_id, const int value_index) const
 {
     // Load the contents of the file as binary data.
     auto path = string_for(name, value_index);

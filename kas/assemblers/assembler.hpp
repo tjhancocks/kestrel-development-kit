@@ -33,19 +33,19 @@ namespace kdk
 {
 
 /**
- * Base resource type for all kestrel types.
+ * Base resource type assembler for all kestrel types.
  *
- * This base resource type supplies a variety of functions and methods that
+ * This base resource type assembler supplies a variety of functions and methods that
  * are used for reading, parsing and interpreting fields.
  */
-struct base_type
+struct assembler
 {
 public:
     
     /**
      * Construct a base type with the specified resource object.
      */
-    base_type(kdk::resource res, std::shared_ptr<rsrc::file> rf);
+    assembler(kdk::resource res, std::shared_ptr<rsrc::file> rf);
     
     /**
      * Assemble the resource into a binary data blob.

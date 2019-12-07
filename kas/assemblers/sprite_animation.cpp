@@ -21,7 +21,7 @@
 */
 
 #include <iostream>
-#include "types/sprite_animation.hpp"
+#include "assemblers/sprite_animation.hpp"
 
 // MARK: - Assembly
 

@@ -20,7 +20,7 @@
 * SOFTWARE.
 */
 
-#include "types/base_type.hpp"
+#include "assemblers/assembler.hpp"
 
 #if !defined(KDK_SPRITE_ANIMATION)
 #define KDK_SPRITE_ANIMATION
@@ -34,11 +34,11 @@ namespace kdk
  * use in Kestrel. This particular structure represents the Sprite Animation
  * resource or "spïn".
  */
-struct sprite_animation: public base_type
+struct sprite_animation: public assembler
 {
 public:
     
-    using base_type::base_type;
+    using assembler::assembler;
     
     /**
      * Assemble the resource into a binary data blob.

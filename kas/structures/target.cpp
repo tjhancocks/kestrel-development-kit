@@ -22,7 +22,7 @@
 
 #include "structures/target.hpp"
 #include "rsrc/file.hpp"
-#include "types/sprite_animation.hpp"
+#include "assemblers/sprite_animation.hpp"
 
 // MARK: - Constructor
 
