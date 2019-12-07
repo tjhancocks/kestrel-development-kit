@@ -24,6 +24,7 @@
 #include <iostream>
 #include "kdl/sema/directive.hpp"
 #include "kdl/sema/declaration.hpp"
+#include "diagnostic/log.hpp"
 
 // MARK: - Constructor
 
@@ -56,11 +57,10 @@ void kdl::sema::run()
             kdl::declaration::parse(this);
         }
         else {
-            throw std::runtime_error("Unexpected token encountered.");
+            auto token = peek();
+            log::error(token.file(), token.line(), "Unexpected token '" + token.text() + "' encountered");
         }
     }
-    
-    std::cout << "Finished semantic analysis" << std::endl;
 }
 
 // MARK: - Stream
@@ -128,7 +128,7 @@ bool kdl::sema::ensure(std::initializer_list<kdl::condition::truthy_function> li
     for (auto f : list) {
         auto tk = read();
         if (f(tk) == false) {
-            throw std::runtime_error("Could not ensure the correctness of a token.");
+            log::error(tk.file(), tk.line(), "Could not ensure the correctness of the token '" + tk.text() + "'");
         }
     }
     return true;
