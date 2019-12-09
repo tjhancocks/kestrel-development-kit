@@ -20,6 +20,9 @@
 * SOFTWARE.
 */
 
+#include "rsrc/data.hpp"
+#include "structures/resource.hpp"
+
 #if !defined(KDK_ASSEMBLER)
 #define KDK_ASSEMBLER
 
@@ -34,9 +37,27 @@ namespace kdk
  */
 class assembler
 {
+public:
+    /**
+     * Construct a new assembler using the specified resource. This assembler
+     * does not specifically care about type (this information should be provided
+     * by the subclass.)
+     */
+    assembler(const kdk::resource& resource);
     
+    /**
+     * Performs assembly of the resource.
+     *
+     * This method should be implemented by the subclass.
+     */
+    void assemble();
+    
+private:
+    kdk::resource m_resource;
+    rsrc::data m_blob;
 };
 
 };
 
 #endif
+

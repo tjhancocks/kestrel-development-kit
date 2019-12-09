@@ -20,19 +20,11 @@
 * SOFTWARE.
 */
 
-#include "assemblers/assembler.hpp"
-
-// MARK: - Constructor
-
-kdk::assembler::assembler(const kdk::resource& resource)
-    : m_resource(resource)
-{
-    
-}
+#include "assemblers/sprite_animation.hpp"
 
 // MARK: - Assembly
 
-void kdk::assembler::assemble()
+void kdk::sprite_animation::assemble()
 {
-    throw std::runtime_error("Error. The assemble() method should be overriden by the subclass.");
+    
 }

@@ -22,17 +22,34 @@
 
 #include "assemblers/assembler.hpp"
 
-// MARK: - Constructor
+#if !defined(KDK_SPRITE_ANIMATION)
+#define KDK_SPRITE_ANIMATION
 
-kdk::assembler::assembler(const kdk::resource& resource)
-    : m_resource(resource)
+namespace kdk
 {
+
+/**
+ * The kdk::assembler class houses the core implementation for converting a
+ * kdk::resource into a rsrc::data object. The class itself should be subclassed
+ * in order to set up the appropriate layout and definition for the resource
+ * type.
+ */
+class sprite_animation: public assembler
+{
+public:
     
-}
+    using assembler::assembler;
 
-// MARK: - Assembly
+    /**
+     * Performs assembly of the resource.
+     */
+    void assemble();
+    
+private:
+    kdk::resource m_resource;
+    rsrc::data m_blob;
+};
 
-void kdk::assembler::assemble()
-{
-    throw std::runtime_error("Error. The assemble() method should be overriden by the subclass.");
-}
+};
+
+#endif
