@@ -7,14 +7,11 @@
 
 declare SpriteAnimation {
 	
+	` Define a SpriteAnimation using a absolute resource id.
 	new (id = #700, name = "Stars") {
-		sprites = file("stars.tga");
+		sprites = #700;
 		size = 10 10;
-	}
-
-	new (id = #128, name = "Test") {
-		sprites = file("test.tga");
-		size = 100 100;
+		tiles = 1 1;
 	}
 
 }

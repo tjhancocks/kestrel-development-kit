@@ -24,7 +24,14 @@
 
 // MARK: - Assembly
 
-void kdk::sprite_animation::assemble()
+rsrc::data kdk::sprite_animation::assemble()
 {
+    // Handle each of the fields in the resource.
+    auto sprites_id = resource_reference_field("sprites", 0, -1);
+    auto masks_id = resource_reference_field("masks", 2, -1);
+    auto tile_size = size_field("size", 4, std::make_tuple(0, 0), true);
+    auto tiles = size_field("tiles", 8, std::make_tuple(0, 0), true);
     
+    // Finish assembly and return the result to the caller.
+    return assembler::assemble();
 }

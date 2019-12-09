@@ -43,11 +43,7 @@ public:
     /**
      * Performs assembly of the resource.
      */
-    void assemble();
-    
-private:
-    kdk::resource m_resource;
-    rsrc::data m_blob;
+    rsrc::data assemble();
 };
 
 };

@@ -22,6 +22,8 @@
 
 #include "structures/target.hpp"
 #include "rsrc/file.hpp"
+#include "assemblers/assembler.hpp"
+#include "assemblers/sprite_animation.hpp"
 
 // MARK: - Constructor
 
@@ -48,16 +50,12 @@ void kdk::target::build()
     // Currently this is done by manually testing the type and invoking the appropriate
     // type assembler. This could be improved by making KDL more extensible.
     for (auto resource : m_resources) {
-        rsrc::data resource_data;
-        std::string type_code;
         auto type = resource.type();
         
         if (type == "SpriteAnimation") {
-            type_code = "spïn";
-            
+            kdk::sprite_animation assembler { resource };
+            rf->add_resource("spïn", resource.id(), resource.name(), assembler.assemble());
         }
-        
-        rf->add_resource(type_code, resource.id(), resource.name(), resource_data);
     }
     
     // The resource file should be assembled at this point and just needs writting to disk.
