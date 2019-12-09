@@ -22,7 +22,6 @@
 
 #include "structures/target.hpp"
 #include "rsrc/file.hpp"
-#include "assemblers/sprite_animation.hpp"
 
 // MARK: - Constructor
 
@@ -55,7 +54,7 @@ void kdk::target::build()
         
         if (type == "SpriteAnimation") {
             type_code = "spïn";
-            resource_data = kdk::sprite_animation(resource, rf).assemble();
+            
         }
         
         rf->add_resource(type_code, resource.id(), resource.name(), resource_data);

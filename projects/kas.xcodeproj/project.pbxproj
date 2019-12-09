@@ -7,11 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		800D8B7523963C1300C7450B /* assembler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 800D8B7323963C1300C7450B /* assembler.cpp */; };
 		80227081239B719500CE1CFE /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8022707F239B719500CE1CFE /* log.cpp */; };
 		8047D590239307C900D7CDA9 /* data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D58E239307C900D7CDA9 /* data.cpp */; };
 		8047D593239386BE00D7CDA9 /* macroman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D592239386BE00D7CDA9 /* macroman.cpp */; };
-		8047D5972394DB2500D7CDA9 /* sprite_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D5952394DB2500D7CDA9 /* sprite_animation.cpp */; };
 		8047D59A2394DCCB00D7CDA9 /* file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D5982394DCCB00D7CDA9 /* file.cpp */; };
 		80678E05238D89DB00AE94AE /* sema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678E03238D89DB00AE94AE /* sema.cpp */; };
 		80678E9923902ADF00AE94AE /* directive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678E9723902ADF00AE94AE /* directive.cpp */; };
@@ -35,16 +33,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		800D8B7323963C1300C7450B /* assembler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = assembler.cpp; sourceTree = "<group>"; };
-		800D8B7423963C1300C7450B /* assembler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = assembler.hpp; sourceTree = "<group>"; };
 		8022707F239B719500CE1CFE /* log.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = log.cpp; sourceTree = "<group>"; };
 		80227080239B719500CE1CFE /* log.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = log.hpp; sourceTree = "<group>"; };
 		8047D58E239307C900D7CDA9 /* data.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = data.cpp; sourceTree = "<group>"; };
 		8047D58F239307C900D7CDA9 /* data.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = data.hpp; sourceTree = "<group>"; };
 		8047D591239386BE00D7CDA9 /* macroman.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = macroman.hpp; sourceTree = "<group>"; };
 		8047D592239386BE00D7CDA9 /* macroman.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = macroman.cpp; sourceTree = "<group>"; };
-		8047D5952394DB2500D7CDA9 /* sprite_animation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sprite_animation.cpp; sourceTree = "<group>"; };
-		8047D5962394DB2500D7CDA9 /* sprite_animation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = sprite_animation.hpp; sourceTree = "<group>"; };
 		8047D5982394DCCB00D7CDA9 /* file.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = file.cpp; sourceTree = "<group>"; };
 		8047D5992394DCCB00D7CDA9 /* file.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = file.hpp; sourceTree = "<group>"; };
 		80678E03238D89DB00AE94AE /* sema.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sema.cpp; sourceTree = "<group>"; };
@@ -99,10 +93,6 @@
 		8047D5942394DB0500D7CDA9 /* assemblers */ = {
 			isa = PBXGroup;
 			children = (
-				800D8B7423963C1300C7450B /* assembler.hpp */,
-				800D8B7323963C1300C7450B /* assembler.cpp */,
-				8047D5962394DB2500D7CDA9 /* sprite_animation.hpp */,
-				8047D5952394DB2500D7CDA9 /* sprite_animation.cpp */,
 			);
 			path = assemblers;
 			sourceTree = "<group>";
@@ -228,12 +218,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				80940A0E238A598E00137EB1 /* lexer.cpp in Sources */,
-				8047D5972394DB2500D7CDA9 /* sprite_animation.cpp in Sources */,
 				80678EAA2392456B00AE94AE /* resource.cpp in Sources */,
 				80678E9923902ADF00AE94AE /* directive.cpp in Sources */,
 				8047D590239307C900D7CDA9 /* data.cpp in Sources */,
 				80940A0B238A583300137EB1 /* main.cpp in Sources */,
-				800D8B7523963C1300C7450B /* assembler.cpp in Sources */,
 				8047D593239386BE00D7CDA9 /* macroman.cpp in Sources */,
 				8047D59A2394DCCB00D7CDA9 /* file.cpp in Sources */,
 				80678E05238D89DB00AE94AE /* sema.cpp in Sources */,
