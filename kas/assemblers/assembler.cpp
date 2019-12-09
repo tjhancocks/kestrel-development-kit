@@ -33,9 +33,9 @@ kdk::assembler::assembler(const kdk::resource& resource)
 
 // MARK: - Assembly
 
-void kdk::assembler::assemble()
+rsrc::data kdk::assembler::assemble()
 {
-    throw std::runtime_error("Error. The assemble() method should be overriden by the subclass.");
+    return m_blob;
 }
 
 // MARK: - Field Functions

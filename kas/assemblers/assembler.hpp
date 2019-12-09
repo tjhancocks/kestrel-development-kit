@@ -53,7 +53,7 @@ public:
      *
      * This method should be implemented by the subclass.
      */
-    void assemble();
+    rsrc::data assemble();
     
     /**
      * Handle a field with an integer value.
