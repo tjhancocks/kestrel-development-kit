@@ -128,3 +128,46 @@ T kdk::assembler::integer_field(const std::string name, uint64_t offset, uint64_
     }
     
 }
+
+int64_t kdk::assembler::resource_reference_field(const std::string name, uint64_t offset, int64_t default_value, bool required)
+{
+    // Find the field, and determine the type of information it is carrying. Resource References
+    // can take on a number of different formats:
+    //
+    //  - resource_id
+    //  - file(<path>)
+    //
+    // Depending on which of these formats is specified, the field needs to conduct a different
+    // operation.
+    auto field = find_field(name, required);
+    
+    // Ensure the data object is large enough for this field.
+    m_blob.set_insertion_point(m_blob.size());
+    m_blob.pad_to_size(offset + 2);
+    m_blob.set_insertion_point(offset);
+    
+    if (field) {
+        auto values = field->values();
+        
+        if (values.size() != 1) {
+            log::error("<missing>", 0, "The '" + name + "' field expects a single resource reference to be provided.");
+        }
+        
+        if (std::get<1>(values[0]) == kdk::resource::field::value_type::resource_id) {
+            // An absolute Resource ID was provided
+            int16_t id = static_cast<int16_t>(std::stoi(std::get<0>(values[0])));
+            m_blob.write_signed_word(id);
+            return static_cast<int64_t>(id);
+        }
+        else {
+            // Unrecognised value given.
+            log::error("<missing>", 0, "The '" + name + "' field expects a Resource ID or File Reference to be provided.");
+        }
+    }
+    else {
+        // No field exists so write the default value.
+        m_blob.write_signed_word(static_cast<int16_t>(default_value));
+    }
+    
+    return default_value;
+}

@@ -63,6 +63,13 @@ public:
     T integer_field(const std::string name, uint64_t offset, uint64_t count, T default_value, bool required = false);
     
     /**
+     * Handle a field with a Resource Reference value.
+     *
+     * \return The value written into the data object.
+     */
+    int64_t resource_reference_field(const std::string name, uint64_t offset, int64_t default_value, bool required = false);
+    
+    /**
      * Find the specified field in the source resource.
      */
     std::shared_ptr<kdk::resource::field> find_field(const std::string name, bool required = false) const;
