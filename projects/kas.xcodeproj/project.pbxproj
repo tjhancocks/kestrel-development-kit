@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		80206E9A239E025D0035E672 /* assembler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E98239E025D0035E672 /* assembler.cpp */; };
 		80227081239B719500CE1CFE /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8022707F239B719500CE1CFE /* log.cpp */; };
 		8047D590239307C900D7CDA9 /* data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D58E239307C900D7CDA9 /* data.cpp */; };
 		8047D593239386BE00D7CDA9 /* macroman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D592239386BE00D7CDA9 /* macroman.cpp */; };
@@ -33,6 +34,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		80206E98239E025D0035E672 /* assembler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = assembler.cpp; sourceTree = "<group>"; };
+		80206E99239E025D0035E672 /* assembler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = assembler.hpp; sourceTree = "<group>"; };
 		8022707F239B719500CE1CFE /* log.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = log.cpp; sourceTree = "<group>"; };
 		80227080239B719500CE1CFE /* log.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = log.hpp; sourceTree = "<group>"; };
 		8047D58E239307C900D7CDA9 /* data.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = data.cpp; sourceTree = "<group>"; };
@@ -93,6 +96,8 @@
 		8047D5942394DB0500D7CDA9 /* assemblers */ = {
 			isa = PBXGroup;
 			children = (
+				80206E99239E025D0035E672 /* assembler.hpp */,
+				80206E98239E025D0035E672 /* assembler.cpp */,
 			);
 			path = assemblers;
 			sourceTree = "<group>";
@@ -217,6 +222,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				80206E9A239E025D0035E672 /* assembler.cpp in Sources */,
 				80940A0E238A598E00137EB1 /* lexer.cpp in Sources */,
 				80678EAA2392456B00AE94AE /* resource.cpp in Sources */,
 				80678E9923902ADF00AE94AE /* directive.cpp in Sources */,
