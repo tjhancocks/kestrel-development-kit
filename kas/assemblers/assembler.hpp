@@ -63,6 +63,15 @@ public:
     template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
     T integer_field(const std::string name, uint64_t offset, uint64_t count, T default_value, bool required = false);
     
+    uint8_t byte_field(const std::string name, uint64_t offset, uint8_t default_value, bool required = false);
+    int8_t signed_byte_field(const std::string name, uint64_t offset, int8_t default_value, bool required = false);
+    uint16_t word_field(const std::string name, uint64_t offset, uint16_t default_value, bool required = false);
+    int16_t signed_word_field(const std::string name, uint64_t offset, int16_t default_value, bool required = false);
+    uint32_t long_field(const std::string name, uint64_t offset, uint32_t default_value, bool required = false);
+    int32_t signed_long_field(const std::string name, uint64_t offset, int32_t default_value, bool required = false);
+    uint64_t quad_field(const std::string name, uint64_t offset, uint64_t default_value, bool required = false);
+    int64_t signed_quad_field(const std::string name, uint64_t offset, int64_t default_value, bool required = false);
+    
     /**
      * Handle a field with a Resource Reference value.
      *

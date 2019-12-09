@@ -127,6 +127,47 @@ T kdk::assembler::integer_field(const std::string name, uint64_t offset, uint64_
         }
     }
     
+    return default_value;
+}
+
+uint8_t kdk::assembler::byte_field(const std::string name, uint64_t offset, uint8_t default_value, bool required)
+{
+    return integer_field(name, offset, 1, default_value, required);
+}
+
+int8_t kdk::assembler::signed_byte_field(const std::string name, uint64_t offset, int8_t default_value, bool required)
+{
+    return integer_field(name, offset, 1, default_value, required);
+}
+
+uint16_t kdk::assembler::word_field(const std::string name, uint64_t offset, uint16_t default_value, bool required)
+{
+    return integer_field(name, offset, 1, default_value, required);
+}
+
+int16_t kdk::assembler::signed_word_field(const std::string name, uint64_t offset, int16_t default_value, bool required)
+{
+    return integer_field(name, offset, 1, default_value, required);
+}
+
+uint32_t kdk::assembler::long_field(const std::string name, uint64_t offset, uint32_t default_value, bool required)
+{
+    return integer_field(name, offset, 1, default_value, required);
+}
+
+int32_t kdk::assembler::signed_long_field(const std::string name, uint64_t offset, int32_t default_value, bool required)
+{
+    return integer_field(name, offset, 1, default_value, required);
+}
+
+uint64_t kdk::assembler::quad_field(const std::string name, uint64_t offset, uint64_t default_value, bool required)
+{
+    return integer_field(name, offset, 1, default_value, required);
+}
+
+int64_t kdk::assembler::signed_quad_field(const std::string name, uint64_t offset, int64_t default_value, bool required)
+{
+    return integer_field(name, offset, 1, default_value, required);
 }
 
 int64_t kdk::assembler::resource_reference_field(const std::string name, uint64_t offset, int64_t default_value, bool required)
