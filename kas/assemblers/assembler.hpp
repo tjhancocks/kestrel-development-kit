@@ -87,6 +87,12 @@ public:
     std::tuple<int16_t, int16_t> size_field(const std::string name, uint64_t offset, std::tuple<int16_t, int16_t> default_value, bool required = false);
     
     /**
+     * Handle a field with an option. This option can be either a symbolicated option
+     * or resource id or integer.
+     */
+    int16_t option_field(const std::string name, uint64_t offset, std::vector<std::tuple<std::string, int16_t>> symbols, int16_t default_value, bool required = false);
+    
+    /**
      * Find the specified field in the source resource.
      */
     std::shared_ptr<kdk::resource::field> find_field(const std::string name, bool required = false) const;

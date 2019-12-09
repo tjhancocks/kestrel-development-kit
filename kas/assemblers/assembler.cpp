@@ -260,3 +260,58 @@ std::tuple<int16_t, int16_t> kdk::assembler::size_field(const std::string name, 
     
     return default_value;
 }
+
+int16_t kdk::assembler::option_field(const std::string name, uint64_t offset, std::vector<std::tuple<std::string, int16_t>> symbols, int16_t default_value, bool required)
+{
+    
+    // then we need to report as such.
+    // The type information is determined by comparing the number of fields to the count, and checking
+    // the validity of each value.
+    auto field = find_field(name, required);
+    
+    // Ensure the data object is large enough for this field.
+    m_blob.set_insertion_point(m_blob.size());
+    m_blob.pad_to_size(offset + 2);
+    m_blob.set_insertion_point(offset);
+    
+    if (field) {
+        auto values = field->values();
+        
+        if (values.size() != 1) {
+            log::error("<missing>", 0, "The '" + name + "' field expects a single value to be provided..");
+        }
+        
+        if (std::get<1>(values[0]) == kdk::resource::field::value_type::integer
+         || std::get<1>(values[0]) == kdk::resource::field::value_type::resource_id)
+        {
+            // We've got an integer value / resource id.
+            auto value = static_cast<int16_t>(std::stoi(std::get<0>(values[0])));
+            m_blob.write_signed_word(value);
+            return value;
+        }
+        else if (std::get<1>(values[0]) == kdk::resource::field::value_type::identifier) {
+            // We've got a symbol - find its value
+            for (auto t : symbols) {
+                if (std::get<0>(t) == std::get<0>(values[0])) {
+                    // Found!
+                    m_blob.write_signed_word(std::get<1>(t));
+                    return std::get<1>(t);
+                }
+            }
+            
+            // Failed to find symbol
+            log::warning("<missing>", 0, "The '" + name + "' field had an unrecognised option: " + std::get<0>(values[0]));
+            m_blob.write_signed_word(default_value);
+        }
+        else {
+            // Unrecognised value(s) given.
+            log::error("<missing>", 0, "The '" + name + "' field expects both the width and height to be integers.");
+        }
+    }
+    else {
+        // No field exists so write the default value.
+        m_blob.write_signed_word(default_value);
+    }
+    
+    return default_value;
+}
