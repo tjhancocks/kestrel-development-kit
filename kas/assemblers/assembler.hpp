@@ -20,6 +20,8 @@
 * SOFTWARE.
 */
 
+#include <type_traits>
+#include <memory>
 #include "rsrc/data.hpp"
 #include "structures/resource.hpp"
 
@@ -51,6 +53,19 @@ public:
      * This method should be implemented by the subclass.
      */
     void assemble();
+    
+    /**
+     * Handle a field with an integer value.
+     *
+     * \return The value written into the data object.
+     */
+    template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type* = nullptr>
+    T integer_field(const std::string name, uint64_t offset, uint64_t count, T default_value, bool required = false);
+    
+    /**
+     * Find the specified field in the source resource.
+     */
+    std::shared_ptr<kdk::resource::field> find_field(const std::string name, bool required = false) const;
     
 private:
     kdk::resource m_resource;
