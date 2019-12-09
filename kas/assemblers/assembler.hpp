@@ -22,6 +22,7 @@
 
 #include <type_traits>
 #include <memory>
+#include <tuple>
 #include "rsrc/data.hpp"
 #include "structures/resource.hpp"
 
@@ -68,6 +69,13 @@ public:
      * \return The value written into the data object.
      */
     int64_t resource_reference_field(const std::string name, uint64_t offset, int64_t default_value, bool required = false);
+    
+    /**
+     * Handle a field with a size (width, height) value.
+     *
+     * \return The value written into the data object.
+     */
+    std::tuple<int16_t, int16_t> size_field(const std::string name, uint64_t offset, std::tuple<int16_t, int16_t> default_value, bool required = false);
     
     /**
      * Find the specified field in the source resource.

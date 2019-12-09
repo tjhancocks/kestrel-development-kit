@@ -171,3 +171,51 @@ int64_t kdk::assembler::resource_reference_field(const std::string name, uint64_
     
     return default_value;
 }
+
+std::tuple<int16_t, int16_t> kdk::assembler::size_field(const std::string name, uint64_t offset, std::tuple<int16_t, int16_t> default_value, bool required)
+{
+    // Find the field, and determine the type of information it is carrying. If we have a type mismatch,
+    // then we need to report as such.
+    // The type information is determined by comparing the number of fields to the count, and checking
+    // the validity of each value.
+    auto field = find_field(name, required);
+    
+    // Ensure the data object is large enough for this field.
+    m_blob.set_insertion_point(m_blob.size());
+    m_blob.pad_to_size(offset + 4); // 2 Words
+    m_blob.set_insertion_point(offset);
+    
+    if (field) {
+        auto values = field->values();
+        
+        if (values.size() != 2) {
+            log::error("<missing>", 0, "The '" + name + "' field expects a width and a height to be provided.");
+        }
+        
+        if (std::get<1>(values[0]) == kdk::resource::field::value_type::integer
+         && std::get<1>(values[1]) == kdk::resource::field::value_type::integer)
+        {
+            auto width = static_cast<int16_t>(std::stoi(std::get<0>(values[0])));
+            auto height = static_cast<int16_t>(std::stoi(std::get<0>(values[1])));
+            
+            m_blob.write_signed_word(width);
+            m_blob.write_signed_word(height);
+            
+            return std::make_tuple(width, height);
+        }
+        else {
+            // Unrecognised value(s) given.
+            log::error("<missing>", 0, "The '" + name + "' field expects both the width and height to be integers.");
+        }
+    }
+    else {
+        // No field exists so write the default value.
+        auto width = static_cast<int16_t>(std::get<0>(default_value));
+        auto height = static_cast<int16_t>(std::get<0>(default_value));
+        
+        m_blob.write_signed_word(width);
+        m_blob.write_signed_word(height);
+    }
+    
+    return default_value;
+}
