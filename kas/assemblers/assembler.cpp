@@ -80,16 +80,16 @@ void kdk::assembler::assemble(kdk::assembler::field field)
                 case kdk::resource::field::value_type::percentage: {
                     switch (expected_value.size()) {
                         case 1:
-                            m_blob.write_byte(static_cast<uint8_t>(std::stoi(std::get<0>(value))));
+                            m_blob.write_signed_byte(static_cast<uint8_t>(std::stoi(std::get<0>(value))));
                             break;
                         case 2:
-                            m_blob.write_word(static_cast<uint16_t>(std::stoi(std::get<0>(value))));
+                            m_blob.write_signed_word(static_cast<uint16_t>(std::stoi(std::get<0>(value))));
                             break;
                         case 4:
-                            m_blob.write_long(static_cast<uint32_t>(std::stoi(std::get<0>(value))));
+                            m_blob.write_signed_long(static_cast<uint32_t>(std::stoi(std::get<0>(value))));
                             break;
                         case 8:
-                            m_blob.write_quad(static_cast<uint64_t>(std::stoi(std::get<0>(value))));
+                            m_blob.write_signed_quad(static_cast<uint64_t>(std::stoi(std::get<0>(value))));
                             break;
                         default:
                             throw std::runtime_error("Unexpected integer size expectation encountered.");
