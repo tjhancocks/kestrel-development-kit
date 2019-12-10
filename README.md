@@ -22,7 +22,7 @@ kas -o plugin.kdat -f plugin.kdl
 ```
 
 ### Kestrel Definition Language
-The Kestrel Definition Language is a specially designed _Domain Specific Language_ (DSL) for representing Kestrel Resources in a textual format.
+The Kestrel Definition Language is a specially designed _Domain Specific Language_ (DSL) for representing Kestrel Resources in a textual format. See the [KDL specification](documentation/kdl-specification.md) for complete documentation.
 
 Below is an example of the _KDL_
 
