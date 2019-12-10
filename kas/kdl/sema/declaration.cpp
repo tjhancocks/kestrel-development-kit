@@ -195,6 +195,30 @@ kdk::resource kdl::declaration::parse_instance(kdl::sema *sema, const std::strin
                 values.push_back( std::make_tuple(sema->read().text(), kdk::resource::field::value_type::file_reference) );
                 sema->advance();
             }
+            else if ( sema->expect({ condition(lexer::token::type::identifier, "rgb").truthy() }) ) {
+                // RGB Color value...
+                sema->ensure({
+                    condition(lexer::token::type::identifier, "rgb").truthy(),
+                    condition(lexer::token::type::lparen).truthy()
+                });
+                
+                if (sema->expect({
+                    condition(lexer::token::type::integer).falsey(),
+                    condition(lexer::token::type::integer).falsey(),
+                    condition(lexer::token::type::integer).falsey(),
+                    condition(lexer::token::type::rparen).falsey()
+                })) {
+                    log::error(sema->peek().file(), sema->peek().line(), "Malformed RGB color found.");
+                }
+                
+                auto red = static_cast<uint8_t>(std::stoi(sema->read().text()));
+                auto green = static_cast<uint8_t>(std::stoi(sema->read().text()));
+                auto blue = static_cast<uint8_t>(std::stoi(sema->read().text()));
+                uint32_t rgb = (red << 16) | (green << 8) | (blue);
+                
+                values.push_back( std::make_tuple(std::to_string(rgb), kdk::resource::field::value_type::color) );
+                sema->advance();
+            }
             else if ( sema->expect({ condition(lexer::token::type::identifier).truthy() }) ) {
                 // Identifier reference...
                 values.push_back( std::make_tuple(sema->read().text(), kdk::resource::field::value_type::identifier) );

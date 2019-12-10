@@ -61,6 +61,7 @@ public:
             string,
             percentage,
             file_reference,
+            color,
         };
         
     public:

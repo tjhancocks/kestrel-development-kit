@@ -69,7 +69,8 @@ public:
                 integer = (1 << 0),
                 resource_reference = (1 << 1),
                 bitmask = (1 << 2),
-                string = (1 << 3)
+                string = (1 << 3),
+                color = (1 << 4),
             };
             
         public:

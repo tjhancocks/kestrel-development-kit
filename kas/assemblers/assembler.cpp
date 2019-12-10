@@ -115,6 +115,12 @@ void kdk::assembler::assemble(kdk::assembler::field field)
                     // TODO
                     break;
                 }
+                    
+                case kdk::resource::field::value_type::color: {
+                    auto rgb = static_cast<uint32_t>(std::stoi(std::get<0>(value)));
+                    m_blob.write_long(rgb);
+                    break;
+                }
             }
         }
     }
@@ -258,6 +264,9 @@ bool kdk::assembler::field::value::type_allowed(kdk::resource::field::value_type
         }
         case kdk::resource::field::value_type::percentage: {
             return m_type_mask & kdk::assembler::field::value::type::integer;
+        }
+        case kdk::resource::field::value_type::color: {
+            return m_type_mask & kdk::assembler::field::value::type::color;
         }
     }
 }
