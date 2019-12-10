@@ -21,6 +21,7 @@ declare Asteroid {
 	new(id = #128) {
 		strength = 50;
 		yield = metal 20;
+		particles = 4 rgb(200 100 0);
 	}
 
 }

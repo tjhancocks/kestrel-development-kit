@@ -64,6 +64,19 @@ rsrc::data kdk::asteroid::assemble()
         })
     );
     
+    assembler::assemble(
+		kdk::assembler::field::named("particles").set_required(false).set_values({
+            kdk::assembler::field::value::expect("count", kdk::assembler::field::value::type::integer, 8, 2)
+                .set_default_value([] (rsrc::data& data) {
+                    data.write_signed_word(5);
+                }),
+            kdk::assembler::field::value::expect("color", kdk::assembler::field::value::type::color, 10, 4)
+                .set_default_value([] (rsrc::data& data) {
+                    data.write_long(0x00FFFFFF);
+                }),
+        })
+	);
+    
     // Finish assembly and return the result to the caller.
     return assembler::assemble();
 }
