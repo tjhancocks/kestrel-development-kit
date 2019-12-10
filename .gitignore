@@ -4,3 +4,6 @@
 # Xcode Specifics
 *xcshareddata*
 *xcuserdata*
+
+# Project
+build/
