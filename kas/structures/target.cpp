@@ -24,6 +24,7 @@
 #include "rsrc/file.hpp"
 #include "assemblers/assembler.hpp"
 #include "assemblers/sprite_animation.hpp"
+#include "assemblers/asteroid.hpp"
 
 // MARK: - Constructor
 
@@ -55,6 +56,10 @@ void kdk::target::build()
         if (type == "SpriteAnimation") {
             kdk::sprite_animation assembler { resource };
             rf->add_resource("spïn", resource.id(), resource.name(), assembler.assemble());
+        }
+        else if (type == "Asteroid") {
+            kdk::asteroid assembler { resource };
+            rf->add_resource("röid", resource.id(), resource.name(), assembler.assemble());
         }
     }
     

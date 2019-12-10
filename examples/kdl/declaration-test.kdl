@@ -15,3 +15,12 @@ declare SpriteAnimation {
 	}
 
 }
+
+declare Asteroid {
+	
+	new(id = #128) {
+		strength = 50;
+		yield = metal 20;
+	}
+
+}
