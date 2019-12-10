@@ -245,6 +245,9 @@ bool kdk::assembler::field::value::type_allowed(kdk::resource::field::value_type
             return m_type_mask & kdk::assembler::field::value::type::resource_reference;
         }
         case kdk::resource::field::value_type::identifier: {
+            if (!m_symbols.empty()) {
+                return m_type_mask & kdk::assembler::field::value::type::resource_reference;
+            }
             return m_type_mask & (kdk::assembler::field::value::type::integer | kdk::assembler::field::value::type::bitmask);
         }
         case kdk::resource::field::value_type::integer: {
