@@ -22,19 +22,16 @@
 
 #include "assemblers/assembler.hpp"
 
-#if !defined(KDK_SPRITE_ANIMATION)
-#define KDK_SPRITE_ANIMATION
+#if !defined(KDK_ASTEROID)
+#define KDK_ASTEROID
 
 namespace kdk
 {
 
 /**
- * The kdk::assembler class houses the core implementation for converting a
- * kdk::resource into a rsrc::data object. The class itself should be subclassed
- * in order to set up the appropriate layout and definition for the resource
- * type.
+ * The kdk::asteroid class is responsible for assembling Asteroid, or 'röid' resources.
  */
-class sprite_animation: public assembler
+class asteroid: public assembler
 {
 public:
     
@@ -49,4 +46,3 @@ public:
 };
 
 #endif
-
