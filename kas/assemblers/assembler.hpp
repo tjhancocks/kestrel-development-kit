@@ -116,6 +116,11 @@ public:
              */
             void write_default_value(rsrc::data& data) const;
             
+            /**
+             * Returns a vector of symbol tuples for the value.
+             */
+            std::vector<std::tuple<std::string, int64_t>>& symbols();
+            
         private:
             std::string m_name;
             kdk::assembler::field::value::type m_type_mask;
@@ -223,6 +228,12 @@ public:
 private:
     kdk::resource m_resource;
     rsrc::data m_blob;
+    
+    /**
+     * Write the specified value as an integer to the data at the current
+     * offset.
+     */
+    void encode(const std::string value, uint64_t width, bool is_signed = true);
 };
 
 };

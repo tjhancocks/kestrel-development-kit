@@ -78,22 +78,8 @@ void kdk::assembler::assemble(kdk::assembler::field field)
             switch (std::get<1>(value)) {
                 case kdk::resource::field::value_type::integer:
                 case kdk::resource::field::value_type::percentage: {
-                    switch (expected_value.size()) {
-                        case 1:
-                            m_blob.write_signed_byte(static_cast<int8_t>(std::stoi(std::get<0>(value))));
-                            break;
-                        case 2:
-                            m_blob.write_signed_word(static_cast<int16_t>(std::stoi(std::get<0>(value))));
-                            break;
-                        case 4:
-                            m_blob.write_signed_long(static_cast<int32_t>(std::stoi(std::get<0>(value))));
-                            break;
-                        case 8:
-                            m_blob.write_signed_quad(static_cast<int64_t>(std::stoi(std::get<0>(value))));
-                            break;
-                        default:
-                            throw std::runtime_error("Unexpected integer size expectation encountered.");
-                    }
+                    encode(std::get<0>(value), expected_value.size());
+                    break;
                 }
                     
                 case kdk::resource::field::value_type::resource_id: {
@@ -107,7 +93,14 @@ void kdk::assembler::assemble(kdk::assembler::field field)
                 }
                     
                 case kdk::resource::field::value_type::identifier: {
-                    // TODO
+                    for (auto symbol : expected_value.symbols()) {
+                        if (std::get<0>(value) == std::get<0>(symbol)) {
+                            encode(std::get<0>(value), expected_value.size());
+                            break;
+                        }
+                    }
+                    
+                    log::error("<missing>", 0, "The symbol '" + std::get<0>(value) + "' was not recognised.");
                     break;
                 }
                     
@@ -131,6 +124,37 @@ void kdk::assembler::assemble(kdk::assembler::field field)
         }
     }
     
+}
+
+void kdk::assembler::encode(const std::string value, uint64_t width, bool is_signed)
+{
+    if (width == 1 && is_signed) {
+        m_blob.write_signed_byte(static_cast<int8_t>(std::stol(value)));
+    }
+    else if (width == 1) {
+        m_blob.write_byte(static_cast<uint8_t>(std::stoul(value)));
+    }
+    else if (width == 2 && is_signed) {
+        m_blob.write_signed_word(static_cast<int16_t>(std::stol(value)));
+    }
+    else if (width == 2) {
+        m_blob.write_word(static_cast<uint16_t>(std::stoul(value)));
+    }
+    else if (width == 4 && is_signed) {
+        m_blob.write_signed_long(static_cast<int32_t>(std::stol(value)));
+    }
+    else if (width == 4) {
+        m_blob.write_long(static_cast<uint32_t>(std::stoul(value)));
+    }
+    else if (width == 8 && is_signed) {
+        m_blob.write_signed_quad(static_cast<int64_t>(std::stoll(value)));
+    }
+    else if (width == 8) {
+        m_blob.write_quad(static_cast<uint64_t>(std::stoull(value)));
+    }
+    else {
+        throw std::runtime_error("Illegal integer width");
+    }
 }
 
 // MARK: - Fields
@@ -213,7 +237,7 @@ std::vector<kdk::assembler::field::value>& kdk::assembler::field::expected_value
 kdk::assembler::field::value::value(std::string name, kdk::assembler::field::value::type type, uint64_t offset, uint64_t size)
     : m_name(name), m_type_mask(type), m_offset(offset), m_size(size)
 {
-    
+    // TODO: Correct the size for certain types.
 }
 
 kdk::assembler::field::value kdk::assembler::field::value::expect(const std::string& name, kdk::assembler::field::value::type type, uint64_t offset, uint64_t size)
@@ -241,6 +265,11 @@ uint64_t kdk::assembler::field::value::size() const
 uint64_t kdk::assembler::field::value::offset() const
 {
     return m_offset;
+}
+
+std::vector<std::tuple<std::string, int64_t>>& kdk::assembler::field::value::symbols()
+{
+    return m_symbols;
 }
 
 bool kdk::assembler::field::value::type_allowed(kdk::resource::field::value_type type) const
