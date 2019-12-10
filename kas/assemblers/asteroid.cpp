@@ -77,6 +77,47 @@ rsrc::data kdk::asteroid::assemble()
         })
 	);
     
+    assembler::assemble(
+        kdk::assembler::field::named("fragments").set_required(false).set_values({
+            kdk::assembler::field::value::expect("count", kdk::assembler::field::value::type::integer, 18, 2)
+                .set_default_value([] (rsrc::data& data) {
+                    data.write_signed_word(2);
+                })
+                .set_symbols({
+                    std::make_tuple("none", 0)
+                }),
+            kdk::assembler::field::value::expect("fragment_1", kdk::assembler::field::value::type::resource_reference, 14, 2)
+                .set_default_value([] (rsrc::data& data) {
+                    data.write_signed_word(-1);
+                })
+                .set_symbols({
+                    std::make_tuple("unused", -1)
+                }),
+            kdk::assembler::field::value::expect("fragment_2", kdk::assembler::field::value::type::resource_reference, 16, 2)
+                .set_default_value([] (rsrc::data& data) {
+                    data.write_signed_word(-1);
+                })
+                .set_symbols({
+                    std::make_tuple("unused", -1)
+                }),
+        })
+    );
+    
+    assembler::assemble(
+        kdk::assembler::field::named("explosion").set_values({
+            kdk::assembler::field::value::expect("value", kdk::assembler::field::value::type::integer, 20, 2)
+                .set_symbols({
+                    std::make_tuple("none", -1)
+                }),
+        })
+    );
+    
+    assembler::assemble(
+        kdk::assembler::field::named("mass").set_values({
+            kdk::assembler::field::value::expect("value", kdk::assembler::field::value::type::integer, 22, 2)
+        })
+    );
+    
     // Finish assembly and return the result to the caller.
     return assembler::assemble();
 }

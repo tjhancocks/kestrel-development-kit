@@ -22,6 +22,7 @@ declare Asteroid {
 		strength = 50;
 		yield = metal 20;
 		particles = 4 rgb(200 100 0);
+		fragments = 3 #128 unused;
 	}
 
 }
