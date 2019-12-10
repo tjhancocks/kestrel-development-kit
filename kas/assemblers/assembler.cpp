@@ -38,280 +38,222 @@ rsrc::data kdk::assembler::assemble()
     return m_blob;
 }
 
+void kdk::assembler::assemble(kdk::assembler::field field)
+{
+    // Find the field with in the resource
+    auto resource_field = find_field(field.name(), field.is_required());
+    
+    // Ensure the data object is large enough for this field.
+    m_blob.set_insertion_point(m_blob.size());
+    m_blob.pad_to_size(field.required_data_size());
+    m_blob.set_insertion_point(field.offset());
+    
+    // Is the field deprecated? If show show a warning.
+    if (field.is_deprecated()) {
+        log::warning("<missing>", 0, "The field '" + field.name() + "' is deprecated.");
+    }
+    
+    // If the field was provided in the script, then handle it, otherwise try to fill it in with
+    // default values.
+    if (resource_field) {
+        // Check the number of values matches what we actually have.
+        if (resource_field->values().size() != field.expected_values().size()) {
+            log::error("<missing>", 0, "Incorrect number of values passed to field '" + field.name() + "'.");
+        }
+        
+        // Prepare to encode and validate each of the values.
+        for (auto n = 0; n < field.expected_values().size(); ++n) {
+            auto value = resource_field->values()[n];
+            auto expected_value = field.expected_values()[n];
+            
+            if (!expected_value.type_allowed(std::get<1>(value))) {
+                // The value type is incorrect
+                log::error("<missing>", 0, "Incorrect value type provided on field '" + field.name() + "' value " + std::to_string(n) + ".");
+            }
+            
+            // Seek to the appropriate location in the data for encoding.
+            m_blob.set_insertion_point(expected_value.offset());
+            
+            // Handle the value appropriately and encode it into the data.
+            switch (std::get<1>(value)) {
+                case kdk::resource::field::value_type::integer:
+                case kdk::resource::field::value_type::percentage: {
+                    switch (expected_value.size()) {
+                        case 1:
+                            m_blob.write_byte(static_cast<uint8_t>(std::stoi(std::get<0>(value))));
+                            break;
+                        case 2:
+                            m_blob.write_word(static_cast<uint16_t>(std::stoi(std::get<0>(value))));
+                            break;
+                        case 4:
+                            m_blob.write_long(static_cast<uint32_t>(std::stoi(std::get<0>(value))));
+                            break;
+                        case 8:
+                            m_blob.write_quad(static_cast<uint64_t>(std::stoi(std::get<0>(value))));
+                            break;
+                        default:
+                            throw std::runtime_error("Unexpected integer size expectation encountered.");
+                    }
+                }
+                    
+                case kdk::resource::field::value_type::resource_id: {
+                    m_blob.write_signed_word(static_cast<int16_t>(std::stoi(std::get<0>(value))));
+                    break;
+                }
+                    
+                case kdk::resource::field::value_type::string: {
+                    // TODO
+                    break;
+                }
+                    
+                case kdk::resource::field::value_type::identifier: {
+                    // TODO
+                    break;
+                }
+                    
+                case kdk::resource::field::value_type::file_reference: {
+                    // TODO
+                    break;
+                }
+            }
+        }
+    }
+    
+}
+
+// MARK: - Fields
+
+kdk::assembler::field::field(const std::string& name)
+    : m_name(name)
+{
+    
+}
+
+kdk::assembler::field kdk::assembler::field::named(const std::string &name)
+{
+    return kdk::assembler::field(name);
+}
+
+kdk::assembler::field kdk::assembler::field::set_deprecated(bool deprecated)
+{
+    m_deprecated = deprecated;
+    return *this;
+}
+
+kdk::assembler::field kdk::assembler::field::set_required(bool required)
+{
+    m_required = required;
+    return *this;
+}
+
+kdk::assembler::field kdk::assembler::field::set_values(const std::vector<kdk::assembler::field::value>& values)
+{
+    m_expected_values = values;
+    return *this;
+}
+
+uint64_t kdk::assembler::field::size() const
+{
+    uint64_t size = 0;
+    for (auto v : m_expected_values) {
+        size += v.size();
+    }
+    return size;
+}
+
+uint64_t kdk::assembler::field::required_data_size() const
+{
+    uint64_t minimum_size = 0;
+    for (auto v : m_expected_values) {
+        uint64_t size = v.offset() + v.size();
+        minimum_size = std::max(minimum_size, size);
+    }
+    return minimum_size;
+}
+
+uint64_t kdk::assembler::field::offset() const
+{
+    return m_expected_values[0].offset();
+}
+
+bool kdk::assembler::field::is_required() const
+{
+    return m_required;
+}
+
+bool kdk::assembler::field::is_deprecated() const
+{
+    return m_deprecated;
+}
+
+std::string& kdk::assembler::field::name()
+{
+    return m_name;
+}
+
+std::vector<kdk::assembler::field::value>& kdk::assembler::field::expected_values()
+{
+    return m_expected_values;
+}
+
+// MARK: - Values
+
+kdk::assembler::field::value::value(std::string name, kdk::assembler::field::value::type type, uint64_t offset, uint64_t size)
+    : m_name(name), m_type_mask(type), m_offset(offset), m_size(size)
+{
+    
+}
+
+kdk::assembler::field::value kdk::assembler::field::value::expect(const std::string& name, kdk::assembler::field::value::type type, uint64_t offset, uint64_t size)
+{
+    return kdk::assembler::field::value(name, type, offset, size);
+}
+
+kdk::assembler::field::value kdk::assembler::field::value::set_symbols(const std::vector<std::tuple<std::string, int64_t>> symbols)
+{
+    m_symbols = symbols;
+    return *this;
+}
+
+uint64_t kdk::assembler::field::value::size() const
+{
+    return m_size;
+}
+
+uint64_t kdk::assembler::field::value::offset() const
+{
+    return m_offset;
+}
+
+bool kdk::assembler::field::value::type_allowed(kdk::resource::field::value_type type) const
+{
+    switch (type) {
+        case kdk::resource::field::value_type::file_reference:
+        case kdk::resource::field::value_type::resource_id: {
+            return m_type_mask & kdk::assembler::field::value::type::resource_reference;
+        }
+        case kdk::resource::field::value_type::identifier: {
+            return m_type_mask & (kdk::assembler::field::value::type::integer | kdk::assembler::field::value::type::bitmask);
+        }
+        case kdk::resource::field::value_type::integer: {
+            return m_type_mask & (kdk::assembler::field::value::type::integer | kdk::assembler::field::value::type::bitmask);
+        }
+        case kdk::resource::field::value_type::string: {
+            return m_type_mask & kdk::assembler::field::value::type::string;
+        }
+        case kdk::resource::field::value_type::percentage: {
+            return m_type_mask & kdk::assembler::field::value::type::integer;
+        }
+    }
+}
+
 // MARK: - Field Functions
 
-std::shared_ptr<kdk::resource::field> kdk::assembler::find_field(const std::string name, bool required) const
+std::shared_ptr<kdk::resource::field> kdk::assembler::find_field(std::string& name, bool required) const
 {
     auto field = m_resource.field_named(name);
     if (required && !field) {
         log::error("<missing>", 0, "Missing field '" + name + "' in resource.");
     }
     return field;
-}
-
-template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type*>
-T kdk::assembler::integer_field(const std::string name, uint64_t offset, uint64_t count, T default_value, bool required)
-{
-    // Determine the size of the integer in bytes.
-    auto size = sizeof(T);
-    
-    // Find the field, and determine the type of information it is carrying. If we have a type mismatch,
-    // then we need to report as such.
-    // The type information is determined by comparing the number of fields to the count, and checking
-    // the validity of each value.
-    auto field = find_field(name, required);
-    
-    if (field) {
-        auto values = field->values();
-        
-        if (values.size() != count) {
-            log::error("<missing>", 0, "The '" + name + "' field expects " + std::to_string(count) + " values provided.");
-        }
-        
-        for (auto v : values) {
-            if (std::get<1>(v) != kdk::resource::field::value_type::integer) {
-                log::error("<missing>", 0, "The '" + name + "' field expects only integer values to be provided.");
-            }
-        }
-    }
-    
-    // Now that we have validated the field, determine how many additional bytes need to be added to
-    // the data object. This can be determine by taking the offset of the field within the data, and
-    // adding the size of the field.
-    auto field_size = size * count;
-    m_blob.set_insertion_point(m_blob.size());
-    m_blob.pad_to_size(offset + field_size);
-    
-    // Move to the correct insertion point and insert the values.
-    m_blob.set_insertion_point(offset);
-    if (field) {
-        // The field exists, so we're using the values provided by the field.
-        auto values = field->values();
-        
-        for (auto v : values) {
-            T value = static_cast<T>(std::stoi(std::get<0>(v)));
-            
-            switch (size) {
-                case 1:
-                    m_blob.write_byte(value);
-                    break;
-                case 2:
-                    m_blob.write_word(value);
-                    break;
-                case 4:
-                    m_blob.write_long(value);
-                    break;
-                case 8:
-                    m_blob.write_quad(value);
-                    break;
-            }
-        }
-    }
-    else {
-        // No field exists so we're using the default values.
-        for (auto n = 0; n < count; ++n) {
-            switch (size) {
-                case 1:
-                    m_blob.write_byte(default_value);
-                    break;
-                case 2:
-                    m_blob.write_word(default_value);
-                    break;
-                case 4:
-                    m_blob.write_long(default_value);
-                    break;
-                case 8:
-                    m_blob.write_quad(default_value);
-                    break;
-            }
-        }
-    }
-    
-    return default_value;
-}
-
-uint8_t kdk::assembler::byte_field(const std::string name, uint64_t offset, uint8_t default_value, bool required)
-{
-    return integer_field(name, offset, 1, default_value, required);
-}
-
-int8_t kdk::assembler::signed_byte_field(const std::string name, uint64_t offset, int8_t default_value, bool required)
-{
-    return integer_field(name, offset, 1, default_value, required);
-}
-
-uint16_t kdk::assembler::word_field(const std::string name, uint64_t offset, uint16_t default_value, bool required)
-{
-    return integer_field(name, offset, 1, default_value, required);
-}
-
-int16_t kdk::assembler::signed_word_field(const std::string name, uint64_t offset, int16_t default_value, bool required)
-{
-    return integer_field(name, offset, 1, default_value, required);
-}
-
-uint32_t kdk::assembler::long_field(const std::string name, uint64_t offset, uint32_t default_value, bool required)
-{
-    return integer_field(name, offset, 1, default_value, required);
-}
-
-int32_t kdk::assembler::signed_long_field(const std::string name, uint64_t offset, int32_t default_value, bool required)
-{
-    return integer_field(name, offset, 1, default_value, required);
-}
-
-uint64_t kdk::assembler::quad_field(const std::string name, uint64_t offset, uint64_t default_value, bool required)
-{
-    return integer_field(name, offset, 1, default_value, required);
-}
-
-int64_t kdk::assembler::signed_quad_field(const std::string name, uint64_t offset, int64_t default_value, bool required)
-{
-    return integer_field(name, offset, 1, default_value, required);
-}
-
-int64_t kdk::assembler::resource_reference_field(const std::string name, uint64_t offset, int64_t default_value, bool required)
-{
-    // Find the field, and determine the type of information it is carrying. Resource References
-    // can take on a number of different formats:
-    //
-    //  - resource_id
-    //  - file(<path>)
-    //
-    // Depending on which of these formats is specified, the field needs to conduct a different
-    // operation.
-    auto field = find_field(name, required);
-    
-    // Ensure the data object is large enough for this field.
-    m_blob.set_insertion_point(m_blob.size());
-    m_blob.pad_to_size(offset + 2);
-    m_blob.set_insertion_point(offset);
-    
-    if (field) {
-        auto values = field->values();
-        
-        if (values.size() != 1) {
-            log::error("<missing>", 0, "The '" + name + "' field expects a single resource reference to be provided.");
-        }
-        
-        if (std::get<1>(values[0]) == kdk::resource::field::value_type::resource_id) {
-            // An absolute Resource ID was provided
-            int16_t id = static_cast<int16_t>(std::stoi(std::get<0>(values[0])));
-            m_blob.write_signed_word(id);
-            return static_cast<int64_t>(id);
-        }
-        else {
-            // Unrecognised value given.
-            log::error("<missing>", 0, "The '" + name + "' field expects a Resource ID or File Reference to be provided.");
-        }
-    }
-    else {
-        // No field exists so write the default value.
-        m_blob.write_signed_word(static_cast<int16_t>(default_value));
-    }
-    
-    return default_value;
-}
-
-std::tuple<int16_t, int16_t> kdk::assembler::size_field(const std::string name, uint64_t offset, std::tuple<int16_t, int16_t> default_value, bool required)
-{
-    // Find the field, and determine the type of information it is carrying. If we have a type mismatch,
-    // then we need to report as such.
-    // The type information is determined by comparing the number of fields to the count, and checking
-    // the validity of each value.
-    auto field = find_field(name, required);
-    
-    // Ensure the data object is large enough for this field.
-    m_blob.set_insertion_point(m_blob.size());
-    m_blob.pad_to_size(offset + 4); // 2 Words
-    m_blob.set_insertion_point(offset);
-    
-    if (field) {
-        auto values = field->values();
-        
-        if (values.size() != 2) {
-            log::error("<missing>", 0, "The '" + name + "' field expects a width and a height to be provided.");
-        }
-        
-        if (std::get<1>(values[0]) == kdk::resource::field::value_type::integer
-         && std::get<1>(values[1]) == kdk::resource::field::value_type::integer)
-        {
-            auto width = static_cast<int16_t>(std::stoi(std::get<0>(values[0])));
-            auto height = static_cast<int16_t>(std::stoi(std::get<0>(values[1])));
-            
-            m_blob.write_signed_word(width);
-            m_blob.write_signed_word(height);
-            
-            return std::make_tuple(width, height);
-        }
-        else {
-            // Unrecognised value(s) given.
-            log::error("<missing>", 0, "The '" + name + "' field expects both the width and height to be integers.");
-        }
-    }
-    else {
-        // No field exists so write the default value.
-        auto width = static_cast<int16_t>(std::get<0>(default_value));
-        auto height = static_cast<int16_t>(std::get<0>(default_value));
-        
-        m_blob.write_signed_word(width);
-        m_blob.write_signed_word(height);
-    }
-    
-    return default_value;
-}
-
-int16_t kdk::assembler::option_field(const std::string name, uint64_t offset, std::vector<std::tuple<std::string, int16_t>> symbols, int16_t default_value, bool required)
-{
-    
-    // then we need to report as such.
-    // The type information is determined by comparing the number of fields to the count, and checking
-    // the validity of each value.
-    auto field = find_field(name, required);
-    
-    // Ensure the data object is large enough for this field.
-    m_blob.set_insertion_point(m_blob.size());
-    m_blob.pad_to_size(offset + 2);
-    m_blob.set_insertion_point(offset);
-    
-    if (field) {
-        auto values = field->values();
-        
-        if (values.size() != 1) {
-            log::error("<missing>", 0, "The '" + name + "' field expects a single value to be provided..");
-        }
-        
-        if (std::get<1>(values[0]) == kdk::resource::field::value_type::integer
-         || std::get<1>(values[0]) == kdk::resource::field::value_type::resource_id)
-        {
-            // We've got an integer value / resource id.
-            auto value = static_cast<int16_t>(std::stoi(std::get<0>(values[0])));
-            m_blob.write_signed_word(value);
-            return value;
-        }
-        else if (std::get<1>(values[0]) == kdk::resource::field::value_type::identifier) {
-            // We've got a symbol - find its value
-            for (auto t : symbols) {
-                if (std::get<0>(t) == std::get<0>(values[0])) {
-                    // Found!
-                    m_blob.write_signed_word(std::get<1>(t));
-                    return std::get<1>(t);
-                }
-            }
-            
-            // Failed to find symbol
-            log::warning("<missing>", 0, "The '" + name + "' field had an unrecognised option: " + std::get<0>(values[0]));
-            m_blob.write_signed_word(default_value);
-        }
-        else {
-            // Unrecognised value(s) given.
-            log::error("<missing>", 0, "The '" + name + "' field expects both the width and height to be integers.");
-        }
-    }
-    else {
-        // No field exists so write the default value.
-        m_blob.write_signed_word(default_value);
-    }
-    
-    return default_value;
 }
