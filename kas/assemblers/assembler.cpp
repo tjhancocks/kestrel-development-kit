@@ -88,7 +88,14 @@ void kdk::assembler::assemble(kdk::assembler::field field)
                 }
                     
                 case kdk::resource::field::value_type::string: {
-                    // TODO
+                    if (expected_value.type_mask() & kdk::assembler::field::value::type::p_string) {
+                        // C String
+                        m_blob.write_cstr(std::get<0>(value), expected_value.size());
+                    }
+                    else {
+                        // Pascal String
+                        m_blob.write_pstr(std::get<0>(value));
+                    }
                     break;
                 }
                     
@@ -298,6 +305,11 @@ bool kdk::assembler::field::value::type_allowed(kdk::resource::field::value_type
             return m_type_mask & kdk::assembler::field::value::type::color;
         }
     }
+}
+                        
+kdk::assembler::field::value::type kdk::assembler::field::value::type_mask() const
+{
+    return m_type_mask;
 }
 
 void kdk::assembler::field::value::write_default_value(rsrc::data& data) const

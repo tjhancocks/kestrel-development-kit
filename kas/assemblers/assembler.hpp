@@ -71,6 +71,8 @@ public:
                 bitmask = (1 << 2),
                 string = (1 << 3),
                 color = (1 << 4),
+                c_string = (1 << 3) | (1 << 10),
+                p_string = (1 << 3) | (1 << 11),
             };
             
         public:
@@ -110,6 +112,11 @@ public:
              * Test the type of the value
              */
             bool type_allowed(kdk::resource::field::value_type type) const;
+            
+            /**
+             * Returns the type mask of the value.
+             */
+            kdk::assembler::field::value::type type_mask() const;
             
             /**
              * Write the default value into the data.
