@@ -118,6 +118,12 @@ void kdk::assembler::assemble(kdk::assembler::field field)
             }
         }
     }
+    else {
+        // No field was specified in the resource, so write the default values.
+        for (auto expected : field.expected_values()) {
+            expected.write_default_value(m_blob);
+        }
+    }
     
 }
 
@@ -215,6 +221,12 @@ kdk::assembler::field::value kdk::assembler::field::value::set_symbols(const std
     return *this;
 }
 
+kdk::assembler::field::value kdk::assembler::field::value::set_default_value(const std::function<void(rsrc::data&)> default_value)
+{
+    m_default_value = default_value;
+    return *this;
+}
+
 uint64_t kdk::assembler::field::value::size() const
 {
     return m_size;
@@ -244,6 +256,14 @@ bool kdk::assembler::field::value::type_allowed(kdk::resource::field::value_type
         case kdk::resource::field::value_type::percentage: {
             return m_type_mask & kdk::assembler::field::value::type::integer;
         }
+    }
+}
+
+void kdk::assembler::field::value::write_default_value(rsrc::data& data) const
+{
+    if (m_default_value) {
+        data.set_insertion_point(m_offset);
+        m_default_value(data);
     }
 }
 

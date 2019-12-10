@@ -90,6 +90,12 @@ public:
             kdk::assembler::field::value set_symbols(const std::vector<std::tuple<std::string, int64_t>> symbols);
             
             /**
+             * Specify a lambda that can be called so a default value can be written into the
+             * data object.
+             */
+            kdk::assembler::field::value set_default_value(const std::function<void(rsrc::data&)> default_value);
+            
+            /**
              * Returns the size of the value when encoded
              */
             uint64_t size() const;
@@ -104,12 +110,18 @@ public:
              */
             bool type_allowed(kdk::resource::field::value_type type) const;
             
+            /**
+             * Write the default value into the data.
+             */
+            void write_default_value(rsrc::data& data) const;
+            
         private:
             std::string m_name;
             kdk::assembler::field::value::type m_type_mask;
             std::vector<std::tuple<std::string, int64_t>> m_symbols;
             uint64_t m_size;
             uint64_t m_offset;
+            std::function<void(rsrc::data&)> m_default_value;
         };
         
     public:
