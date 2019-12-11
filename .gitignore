@@ -1,7 +1,10 @@
 # macOS Specifics
 .DS_Store
 
-# Xcode Specifics
+# IDE Specifics
+## CLion
+.idea/
+## XCode
 *xcshareddata*
 *xcuserdata*
 
