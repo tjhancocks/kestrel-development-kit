@@ -65,7 +65,7 @@ int main(int argc, const char **argv)
     
     std::string output_file { "kestrel-plugin.kdat" };
     if (option_exists(argv, argv + argc, "-o")) {
-        output_file = get_option(argv, argv + argc, "-f");
+        output_file = get_option(argv, argv + argc, "-o");
     }
     
     
