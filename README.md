@@ -48,3 +48,26 @@ declare NPC {
 }
 
 ```
+
+## Building
+In order to build the assembler, you will need to have the following tools installed on your machine:
+
+- git
+- CMake 3.0+
+- C++ Compiler that supports the C++14 Standard
+
+To build the project you will need to clone the repository to your machine. You can optionally fork the repository as well if you wish to contribute.
+
+```sh
+git clone https://github.com/tjhancocks/kestrel-development-kit.git
+cd kestrel-development-kit
+```
+
+Once you have the project cloned, then you can build the project using the following commands.
+
+```sh
+cmake -H. -Bbuild
+cmake --build build -- -j3
+```
+
+Once the project has been successfully built you will find the `kas` executable located in the `/bin` directory of the project.

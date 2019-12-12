@@ -18,27 +18,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-# Locate all KAS Source Files and Intermediates
-kas-sources := $(shell find kas -type f \( -name "*.cpp" \))
-kas-objects := $(kas-sources:%.cpp=%.o)
+cmake_minimum_required(VERSION 3.0)
 
-# Top Level Rules
-.PHONY: all
-all: build/kas
+project(KDK)
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(CMAKE_CXX_STANDARD 14)
 
-.PHONY: clean
-clean:
-	-@rm -v $(kas-objects)
-	-@rm -rf build
-	
-# Directory
-build:
-	-@mkdir -p build
+include_directories("${PROJECT_SOURCE_DIR}/kas")
 
-# Targets
-build/kas: build $(kas-objects)
-	$(CXX) -I./kas -o $@ $(kas-objects)
-
-# Intermediates
-%.o: %.cpp
-	$(CXX) -c -I./kas -std=gnu++14 -o $@ $^
+file(GLOB_RECURSE kas_sources
+	kas/*.cpp
+) 
+add_executable(kas ${kas_sources})
