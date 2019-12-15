@@ -20,6 +20,7 @@
 * SOFTWARE.
 */
 
+#include <memory>
 #include "assemblers/assembler.hpp"
 
 #if !defined(KDK_SPRITE_ANIMATION)
@@ -29,22 +30,10 @@ namespace kdk
 {
 
 /**
- * The kdk::assembler class houses the core implementation for converting a
- * kdk::resource into a rsrc::data object. The class itself should be subclassed
- * in order to set up the appropriate layout and definition for the resource
- * type.
- */
-class sprite_animation: public assembler
-{
-public:
-    
-    using assembler::assembler;
-
-    /**
-     * Performs assembly of the resource.
-     */
-    rsrc::data assemble();
-};
+* Construct a new `SpriteAnimation` type assembler, and return it to the caller. This
+* assembler is responsible for assembling SpriteAnimation, or 'spïn' resources.
+*/
+std::shared_ptr<kdk::assembler> sprite_animation_assembler();
 
 };
 

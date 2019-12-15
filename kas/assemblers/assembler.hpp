@@ -90,7 +90,7 @@ public:
             /**
              * Specify the symbols that can be provided as a value substitution
              */
-            kdk::assembler::field::value set_symbols(const std::vector<std::tuple<std::string, int64_t>> symbols);
+            kdk::assembler::field::value set_symbols(const std::vector<std::tuple<std::string, std::string>> symbols);
             
             /**
              * Specify a lambda that can be called so a default value can be written into the
@@ -126,12 +126,12 @@ public:
             /**
              * Returns a vector of symbol tuples for the value.
              */
-            std::vector<std::tuple<std::string, int64_t>>& symbols();
+            std::vector<std::tuple<std::string, std::string>>& symbols();
             
         private:
             std::string m_name;
             kdk::assembler::field::value::type m_type_mask;
-            std::vector<std::tuple<std::string, int64_t>> m_symbols;
+            std::vector<std::tuple<std::string, std::string>> m_symbols;
             uint64_t m_size;
             uint64_t m_offset;
             std::function<void(rsrc::data&)> m_default_value;
@@ -208,39 +208,37 @@ public:
     };
     
 public:
-    /**
-     * Construct a new assembler using the specified resource. This assembler
-     * does not specifically care about type (this information should be provided
-     * by the subclass.)
-     */
-    assembler(const kdk::resource& resource);
     
     /**
-     * Performs assembly of the resource.
+     * Performs assembly of the specified resource.
      *
      * This method should be implemented by the subclass.
      */
-    rsrc::data assemble();
+    rsrc::data assemble_resource(const kdk::resource resource);
     
     /**
-     * Assemble the specified field.
+     * Add field definition to the assembler.
      */
-    void assemble(const kdk::assembler::field field);
+    void add_field(const kdk::assembler::field field);
     
     /**
      * Find the specified field in the source resource.
      */
-    std::shared_ptr<kdk::resource::field> find_field(std::string& name, bool required = false) const;
+    std::shared_ptr<kdk::resource::field> find_field(std::string& name, const kdk::resource resource, bool required = false) const;
     
 private:
-    kdk::resource m_resource;
-    rsrc::data m_blob;
+    std::vector<kdk::assembler::field> m_fields;
+    
+    /**
+     * Assemble the specified field in to the provided resource object.
+     */
+    void assemble(const kdk::resource resource, kdk::assembler::field field, rsrc::data& blob);
     
     /**
      * Write the specified value as an integer to the data at the current
      * offset.
      */
-    void encode(const std::string value, uint64_t width, bool is_signed = true);
+    void encode(rsrc::data& blob, const std::string value, uint64_t width, bool is_signed = true);
 };
 
 };

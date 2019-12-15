@@ -20,6 +20,7 @@
 * SOFTWARE.
 */
 
+#include <memory>
 #include "assemblers/assembler.hpp"
 
 #if !defined(KDK_ASTEROID)
@@ -29,19 +30,10 @@ namespace kdk
 {
 
 /**
- * The kdk::asteroid class is responsible for assembling Asteroid, or 'röid' resources.
+ * Construct a new `Asteroid` type assembler, and return it to the caller. This
+ * assembler is responsible for assembling Asteroid, or 'röid' resources.
  */
-class asteroid: public assembler
-{
-public:
-    
-    using assembler::assembler;
-
-    /**
-     * Performs assembly of the resource.
-     */
-    rsrc::data assemble();
-};
+std::shared_ptr<kdk::assembler> asteroid_assembler();
 
 };
 
