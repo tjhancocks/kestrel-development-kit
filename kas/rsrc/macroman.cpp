@@ -155,7 +155,7 @@ rsrc::mac_roman rsrc::mac_roman::from_str(const std::string &str)
         // Look up the MacRoman byte for the codepoint and then add it to the vector.
         for (auto j = 0; j < 0x100; ++j) {
             if (cp_table[j] == codepoint) {
-                mac_roman_bytes.push_back(cp_table[j]);
+                mac_roman_bytes.push_back(j);
                 
             }
         }
