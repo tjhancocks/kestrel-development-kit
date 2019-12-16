@@ -67,14 +67,16 @@ void rsrc::data::set_insertion_point(uint64_t p)
 template<typename T, typename std::enable_if<std::is_arithmetic<T>::value>::type*>
 T rsrc::data::swap(T value, rsrc::data::endian mode) const
 {
+    if (mode == little) {
+        return value;
+    }
+
     T v = 0;
     auto size = sizeof(T);
     
-    if (mode == big) {
-        for (auto i = 0; i < size; ++i) {
-            auto b = (size - 1 - i) << 3;
-            v |= ((value >> b) & 0xFF) << (i << 3);
-        }
+    for (auto i = 0; i < size; ++i) {
+        auto b = (size - 1 - i) << 3;
+        v |= ((value >> b) & 0xFF) << (i << 3);
     }
     
     return v;
