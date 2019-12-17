@@ -23,6 +23,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "kdl/sema/directive.hpp"
+#include "kdl/sema/define_directive.hpp"
 #include "diagnostic/log.hpp"
 
 // MARK: - Parser
@@ -62,8 +63,14 @@ void kdl::directive::parse(kdl::sema *sema)
     // Prepare to execute the directive.
     
     if (directive == "out") {
+        // The `@out` directive prints to the standard output.
         for (auto a : args) {
             std::cout << a.text() << std::endl;
         }
+    }
+    else if (directive == "define") {
+        // Defines a new resource type for the assembler to use. This is a complex operation,
+        // so hand off to another function.
+        kdl::define_directive::parse(sema);
     }
 }

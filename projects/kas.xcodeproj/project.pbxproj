@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8013C47623A925BB00AFA554 /* define_directive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8013C47423A925BB00AFA554 /* define_directive.cpp */; };
 		80206E9A239E025D0035E672 /* assembler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E98239E025D0035E672 /* assembler.cpp */; };
 		80206E9D239E23520035E672 /* sprite_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E9B239E23520035E672 /* sprite_animation.cpp */; };
 		80206EA0239EAC830035E672 /* asteroid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E9E239EAC830035E672 /* asteroid.cpp */; };
@@ -36,6 +37,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8013C47423A925BB00AFA554 /* define_directive.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = define_directive.cpp; sourceTree = "<group>"; };
+		8013C47523A925BB00AFA554 /* define_directive.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = define_directive.hpp; sourceTree = "<group>"; };
 		80206E98239E025D0035E672 /* assembler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = assembler.cpp; sourceTree = "<group>"; };
 		80206E99239E025D0035E672 /* assembler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = assembler.hpp; sourceTree = "<group>"; };
 		80206E9B239E23520035E672 /* sprite_animation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sprite_animation.cpp; sourceTree = "<group>"; };
@@ -117,6 +120,8 @@
 			children = (
 				80678E9823902ADF00AE94AE /* directive.hpp */,
 				80678E9723902ADF00AE94AE /* directive.cpp */,
+				8013C47523A925BB00AFA554 /* define_directive.hpp */,
+				8013C47423A925BB00AFA554 /* define_directive.cpp */,
 				80678EA32390D42600AE94AE /* declaration.hpp */,
 				80678EA22390D42600AE94AE /* declaration.cpp */,
 			);
@@ -245,6 +250,7 @@
 				80227081239B719500CE1CFE /* log.cpp in Sources */,
 				80678EA42390D42600AE94AE /* declaration.cpp in Sources */,
 				80206E9D239E23520035E672 /* sprite_animation.cpp in Sources */,
+				8013C47623A925BB00AFA554 /* define_directive.cpp in Sources */,
 				80678EA12390D2E000AE94AE /* target.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
