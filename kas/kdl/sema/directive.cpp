@@ -51,18 +51,10 @@ void kdl::directive::parse(kdl::sema *sema)
     }
     sema->advance();
     
-    // Consume each of the arguments.
-    auto args = sema->consume(condition(kdl::lexer::token::type::rbrace).falsey());
-    
-    if (sema->expect(condition(kdl::lexer::token::type::rbrace).falsey())) {
-        auto tk = sema->peek();
-        log::error(tk.file(), tk.line(), "Expected '}' whilst finishing directive, but found '" + tk.text() + "' instead.");
-    }
-    sema->advance();
-    
-    // Prepare to execute the directive.
-    
     if (directive == "out") {
+        // Consume each of the arguments.
+        auto args = sema->consume(condition(kdl::lexer::token::type::rbrace).falsey());
+        
         // The `@out` directive prints to the standard output.
         for (auto a : args) {
             std::cout << a.text() << std::endl;
@@ -73,4 +65,13 @@ void kdl::directive::parse(kdl::sema *sema)
         // so hand off to another function.
         kdl::define_directive::parse(sema);
     }
+    else {
+        log::error(sema->peek().file(), sema->peek().line(), "Unknown directive @" + directive);
+    }
+    
+    if (sema->expect(condition(kdl::lexer::token::type::rbrace).falsey())) {
+        auto tk = sema->peek();
+        log::error(tk.file(), tk.line(), "Expected '}' whilst finishing directive, but found '" + tk.text() + "' instead.");
+    }
+    sema->advance();
 }

@@ -29,10 +29,51 @@
 
 void kdl::define_directive::parse(kdl::sema *sema)
 {
+    std::string resource_type_name;
+    std::string resource_type_code;
+    
+    auto file = sema->peek().file();
+    auto line = sema->peek().line();
+    
     // Keep going until we encounter the closing brace.
     while (sema->expect({ kdl::condition(kdl::lexer::token::type::rbrace).falsey() })) {
         
+        // All items in the directive start with an identifier. Check what the identifier
+        // is in order to determine the course of action.
+        auto item_name = sema->read().text();
         
+        if (item_name == "name") {
+            // Specify the name of the directive.
+            sema->ensure({ kdl::condition(kdl::lexer::token::type::equals).truthy() });
+            
+            // Get the value of the item.
+            if (sema->expect({ kdl::condition(kdl::lexer::token::type::string).falsey() })) {
+                log::error(sema->peek().file(), sema->peek().line(), "Type definition name must be a string.");
+            }
+            resource_type_name = sema->read().text();
+        }
+        else if (item_name == "code") {
+            // Specify the name of the directive.
+            sema->ensure({ kdl::condition(kdl::lexer::token::type::equals).truthy() });
+            
+            // Get the value of the item.
+            if (sema->expect({ kdl::condition(kdl::lexer::token::type::string).falsey() })) {
+                log::error(sema->peek().file(), sema->peek().line(), "Type definition code must be a string.");
+            }
+            resource_type_code = sema->read().text();
+        }
         
+        sema->ensure({ kdl::condition(kdl::lexer::token::type::semi_colon).truthy() });
     }
+    
+    // Validate the type being defined.
+    if (resource_type_code.empty()) {
+        log::error(file, line, "Type definition must include a type code.");
+    }
+    
+    if (resource_type_name.empty()) {
+        log::error(file, line, "Type definition must include a type name.");
+    }
+    
+    std::cout << "Define resource type: " << resource_type_name << " '" << resource_type_code << "'" << std::endl;
 }
