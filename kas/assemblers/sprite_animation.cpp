@@ -24,37 +24,36 @@
 
 // MARK: - Assembly
 
-rsrc::data kdk::sprite_animation::assemble()
+std::shared_ptr<kdk::assembler> kdk::sprite_animation_assembler()
 {
-    // Handle each of the fields in the resource.
-    assembler::assemble(
+    auto assembler = std::make_shared<kdk::assembler>();
+    
+    assembler->add_field(
         kdk::assembler::field::named("sprites").set_required(true).set_values({
             kdk::assembler::field::value::expect("sprite_id", kdk::assembler::field::value::type::resource_reference, 0, 2)
         })
-	);
+    );
 
-    assembler::assemble(
-		// The 'masks' field is intended to be deprecated by Kestrel and thus should be warned about.
+    assembler->add_field(
+        // The 'masks' field is intended to be deprecated by Kestrel and thus should be warned about.
         kdk::assembler::field::named("masks").set_required(false).set_deprecated(true).set_values({
             kdk::assembler::field::value::expect("mask_id", kdk::assembler::field::value::type::resource_reference, 2, 2)
         })
-	);
+    );
     
-    assembler::assemble(
+    assembler->add_field(
         kdk::assembler::field::named("size").set_required(true).set_values({
             kdk::assembler::field::value::expect("width", kdk::assembler::field::value::type::integer, 4, 2),
             kdk::assembler::field::value::expect("height", kdk::assembler::field::value::type::integer, 6, 2),
         })
-	);
+    );
     
-    assembler::assemble(
+    assembler->add_field(
         kdk::assembler::field::named("tiles").set_required(true).set_values({
             kdk::assembler::field::value::expect("x_count", kdk::assembler::field::value::type::integer, 8, 2),
             kdk::assembler::field::value::expect("y_count", kdk::assembler::field::value::type::integer, 10, 2),
         })
     );
     
-    
-    // Finish assembly and return the result to the caller.
-    return assembler::assemble();
+    return assembler;
 }

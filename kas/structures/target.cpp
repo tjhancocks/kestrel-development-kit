@@ -54,12 +54,12 @@ void kdk::target::build()
         auto type = resource.type();
         
         if (type == "SpriteAnimation") {
-            kdk::sprite_animation assembler { resource };
-            rf->add_resource("spïn", resource.id(), resource.name(), assembler.assemble());
+            auto assembler = kdk::sprite_animation_assembler();
+            rf->add_resource("spïn", resource.id(), resource.name(), assembler->assemble_resource(resource));
         }
         else if (type == "Asteroid") {
-            kdk::asteroid assembler { resource };
-            rf->add_resource("röid", resource.id(), resource.name(), assembler.assemble());
+            auto assembler = kdk::asteroid_assembler();
+            rf->add_resource("röid", resource.id(), resource.name(), assembler->assemble_resource(resource));
         }
     }
     

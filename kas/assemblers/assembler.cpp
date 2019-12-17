@@ -23,30 +23,34 @@
 #include "assemblers/assembler.hpp"
 #include "diagnostic/log.hpp"
 
-// MARK: - Constructor
-
-kdk::assembler::assembler(const kdk::resource& resource)
-    : m_resource(resource)
-{
-    
-}
 
 // MARK: - Assembly
 
-rsrc::data kdk::assembler::assemble()
+rsrc::data kdk::assembler::assemble_resource(const kdk::resource resource)
 {
-    return m_blob;
+    rsrc::data blob { };
+    
+    for (auto field : m_fields) {
+        assemble(resource, field, blob);
+    }
+    
+    return blob;
 }
 
-void kdk::assembler::assemble(kdk::assembler::field field)
+void kdk::assembler::add_field(const kdk::assembler::field field)
+{
+    m_fields.push_back(field);
+}
+
+void kdk::assembler::assemble(const kdk::resource resource, kdk::assembler::field field, rsrc::data& blob)
 {
     // Find the field with in the resource
-    auto resource_field = find_field(field.name(), field.is_required());
+    auto resource_field = find_field(field.name(), resource, field.is_required());
     
     // Ensure the data object is large enough for this field.
-    m_blob.set_insertion_point(m_blob.size());
-    m_blob.pad_to_size(field.required_data_size());
-    m_blob.set_insertion_point(field.offset());
+    blob.set_insertion_point(blob.size());
+    blob.pad_to_size(field.required_data_size());
+    blob.set_insertion_point(field.offset());
     
     // Is the field deprecated? If show show a warning.
     if (field.is_deprecated()) {
@@ -72,29 +76,29 @@ void kdk::assembler::assemble(kdk::assembler::field field)
             }
             
             // Seek to the appropriate location in the data for encoding.
-            m_blob.set_insertion_point(expected_value.offset());
+            blob.set_insertion_point(expected_value.offset());
             
             // Handle the value appropriately and encode it into the data.
             switch (std::get<1>(value)) {
                 case kdk::resource::field::value_type::integer:
                 case kdk::resource::field::value_type::percentage: {
-                    encode(std::get<0>(value), expected_value.size());
+                    encode(blob, std::get<0>(value), expected_value.size());
                     break;
                 }
                     
                 case kdk::resource::field::value_type::resource_id: {
-                    m_blob.write_signed_word(static_cast<int16_t>(std::stoi(std::get<0>(value))));
+                    blob.write_signed_word(static_cast<int16_t>(std::stoi(std::get<0>(value))));
                     break;
                 }
                     
                 case kdk::resource::field::value_type::string: {
                     if (expected_value.type_mask() & kdk::assembler::field::value::type::p_string) {
                         // C String
-                        m_blob.write_cstr(std::get<0>(value), expected_value.size());
+                        blob.write_cstr(std::get<0>(value), expected_value.size());
                     }
                     else {
                         // Pascal String
-                        m_blob.write_pstr(std::get<0>(value));
+                        blob.write_pstr(std::get<0>(value));
                     }
                     break;
                 }
@@ -102,12 +106,13 @@ void kdk::assembler::assemble(kdk::assembler::field field)
                 case kdk::resource::field::value_type::identifier: {
                     for (auto symbol : expected_value.symbols()) {
                         if (std::get<0>(value) == std::get<0>(symbol)) {
-                            encode(std::get<0>(value), expected_value.size());
-                            break;
+                            encode(blob, std::get<1>(symbol), expected_value.size());
+                            goto SYMBOL_FOUND;
                         }
                     }
                     
                     log::error("<missing>", 0, "The symbol '" + std::get<0>(value) + "' was not recognised.");
+                SYMBOL_FOUND:
                     break;
                 }
                     
@@ -118,7 +123,7 @@ void kdk::assembler::assemble(kdk::assembler::field field)
                     
                 case kdk::resource::field::value_type::color: {
                     auto rgb = static_cast<uint32_t>(std::stoi(std::get<0>(value)));
-                    m_blob.write_long(rgb);
+                    blob.write_long(rgb);
                     break;
                 }
             }
@@ -127,37 +132,37 @@ void kdk::assembler::assemble(kdk::assembler::field field)
     else {
         // No field was specified in the resource, so write the default values.
         for (auto expected : field.expected_values()) {
-            expected.write_default_value(m_blob);
+            expected.write_default_value(blob);
         }
     }
     
 }
 
-void kdk::assembler::encode(const std::string value, uint64_t width, bool is_signed)
+void kdk::assembler::encode(rsrc::data& blob, const std::string value, uint64_t width, bool is_signed)
 {
     if (width == 1 && is_signed) {
-        m_blob.write_signed_byte(static_cast<int8_t>(std::stol(value)));
+        blob.write_signed_byte(static_cast<int8_t>(std::stol(value)));
     }
     else if (width == 1) {
-        m_blob.write_byte(static_cast<uint8_t>(std::stoul(value)));
+        blob.write_byte(static_cast<uint8_t>(std::stoul(value)));
     }
     else if (width == 2 && is_signed) {
-        m_blob.write_signed_word(static_cast<int16_t>(std::stol(value)));
+        blob.write_signed_word(static_cast<int16_t>(std::stol(value)));
     }
     else if (width == 2) {
-        m_blob.write_word(static_cast<uint16_t>(std::stoul(value)));
+        blob.write_word(static_cast<uint16_t>(std::stoul(value)));
     }
     else if (width == 4 && is_signed) {
-        m_blob.write_signed_long(static_cast<int32_t>(std::stol(value)));
+        blob.write_signed_long(static_cast<int32_t>(std::stol(value)));
     }
     else if (width == 4) {
-        m_blob.write_long(static_cast<uint32_t>(std::stoul(value)));
+        blob.write_long(static_cast<uint32_t>(std::stoul(value)));
     }
     else if (width == 8 && is_signed) {
-        m_blob.write_signed_quad(static_cast<int64_t>(std::stoll(value)));
+        blob.write_signed_quad(static_cast<int64_t>(std::stoll(value)));
     }
     else if (width == 8) {
-        m_blob.write_quad(static_cast<uint64_t>(std::stoull(value)));
+        blob.write_quad(static_cast<uint64_t>(std::stoull(value)));
     }
     else {
         throw std::runtime_error("Illegal integer width");
@@ -252,7 +257,7 @@ kdk::assembler::field::value kdk::assembler::field::value::expect(const std::str
     return kdk::assembler::field::value(name, type, offset, size);
 }
 
-kdk::assembler::field::value kdk::assembler::field::value::set_symbols(const std::vector<std::tuple<std::string, int64_t>> symbols)
+kdk::assembler::field::value kdk::assembler::field::value::set_symbols(const std::vector<std::tuple<std::string, std::string>> symbols)
 {
     m_symbols = symbols;
     return *this;
@@ -274,7 +279,7 @@ uint64_t kdk::assembler::field::value::offset() const
     return m_offset;
 }
 
-std::vector<std::tuple<std::string, int64_t>>& kdk::assembler::field::value::symbols()
+std::vector<std::tuple<std::string, std::string>>& kdk::assembler::field::value::symbols()
 {
     return m_symbols;
 }
@@ -322,9 +327,9 @@ void kdk::assembler::field::value::write_default_value(rsrc::data& data) const
 
 // MARK: - Field Functions
 
-std::shared_ptr<kdk::resource::field> kdk::assembler::find_field(std::string& name, bool required) const
+std::shared_ptr<kdk::resource::field> kdk::assembler::find_field(std::string& name, const kdk::resource resource, bool required) const
 {
-    auto field = m_resource.field_named(name);
+    auto field = resource.field_named(name);
     if (required && !field) {
         log::error("<missing>", 0, "Missing field '" + name + "' in resource.");
     }

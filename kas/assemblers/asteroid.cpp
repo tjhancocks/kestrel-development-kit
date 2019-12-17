@@ -24,24 +24,25 @@
 
 // MARK: - Assembly
 
-rsrc::data kdk::asteroid::assemble()
+std::shared_ptr<kdk::assembler> kdk::asteroid_assembler()
 {
-    // Handle each of the fields in the resource.
-    assembler::assemble(
+    auto assembler = std::make_shared<kdk::assembler>();
+    
+    assembler->add_field(
         kdk::assembler::field::named("strength").set_required(true).set_values({
             kdk::assembler::field::value::expect("value", kdk::assembler::field::value::type::integer, 0, 2),
         })
     );
     
-    assembler::assemble(
+    assembler->add_field(
         kdk::assembler::field::named("spin_rate").set_values({
             kdk::assembler::field::value::expect("value", kdk::assembler::field::value::type::integer, 2, 2)
                 .set_symbols({
-                    std::make_tuple("very_slow", 10),
-                    std::make_tuple("slow", 30),
-                    std::make_tuple("medium", 50),
-                    std::make_tuple("fast", 70),
-                    std::make_tuple("very_fast", 100)
+                    std::make_tuple("very_slow", "10"),
+                    std::make_tuple("slow", "30"),
+                    std::make_tuple("medium", "50"),
+                    std::make_tuple("fast", "70"),
+                    std::make_tuple("very_fast", "100")
                 })
                 .set_default_value([] (rsrc::data& data) {
                     data.write_signed_word(50);
@@ -49,23 +50,23 @@ rsrc::data kdk::asteroid::assemble()
         })
     );
     
-    assembler::assemble(
+    assembler->add_field(
         kdk::assembler::field::named("yield").set_required(true).set_values({
             kdk::assembler::field::value::expect("type", kdk::assembler::field::value::type::resource_reference, 4, 2)
                 .set_symbols({
-                    std::make_tuple("food", 0),
-                    std::make_tuple("industrial", 1),
-                    std::make_tuple("medical", 2),
-                    std::make_tuple("luxury", 3),
-                    std::make_tuple("metal", 4),
-                    std::make_tuple("equipment", 5),
+                    std::make_tuple("food", "0"),
+                    std::make_tuple("industrial", "1"),
+                    std::make_tuple("medical", "2"),
+                    std::make_tuple("luxury", "3"),
+                    std::make_tuple("metal", "4"),
+                    std::make_tuple("equipment", "5"),
                 }),
             kdk::assembler::field::value::expect("quantity", kdk::assembler::field::value::type::integer, 6, 2)
         })
     );
     
-    assembler::assemble(
-		kdk::assembler::field::named("particles").set_required(false).set_values({
+    assembler->add_field(
+        kdk::assembler::field::named("particles").set_required(false).set_values({
             kdk::assembler::field::value::expect("count", kdk::assembler::field::value::type::integer, 8, 2)
                 .set_default_value([] (rsrc::data& data) {
                     data.write_signed_word(5);
@@ -75,53 +76,48 @@ rsrc::data kdk::asteroid::assemble()
                     data.write_long(0x00FFFFFF);
                 }),
         })
-	);
+    );
     
-    assembler::assemble(
+    assembler->add_field(
         kdk::assembler::field::named("fragments").set_required(false).set_values({
             kdk::assembler::field::value::expect("count", kdk::assembler::field::value::type::integer, 18, 2)
                 .set_default_value([] (rsrc::data& data) {
                     data.write_signed_word(2);
                 })
                 .set_symbols({
-                    std::make_tuple("none", 0)
+                    std::make_tuple("none", "0")
                 }),
             kdk::assembler::field::value::expect("fragment_1", kdk::assembler::field::value::type::resource_reference, 14, 2)
                 .set_default_value([] (rsrc::data& data) {
                     data.write_signed_word(-1);
                 })
                 .set_symbols({
-                    std::make_tuple("unused", -1)
+                    std::make_tuple("unused", "-1")
                 }),
             kdk::assembler::field::value::expect("fragment_2", kdk::assembler::field::value::type::resource_reference, 16, 2)
                 .set_default_value([] (rsrc::data& data) {
                     data.write_signed_word(-1);
                 })
                 .set_symbols({
-                    std::make_tuple("unused", -1)
+                    std::make_tuple("unused", "-1")
                 }),
         })
     );
     
-    assembler::assemble(
+    assembler->add_field(
         kdk::assembler::field::named("explosion").set_values({
             kdk::assembler::field::value::expect("value", kdk::assembler::field::value::type::integer, 20, 2)
                 .set_symbols({
-                    std::make_tuple("none", -1)
+                    std::make_tuple("none", "-1")
                 }),
         })
     );
     
-    assembler::assemble(
+    assembler->add_field(
         kdk::assembler::field::named("mass").set_values({
             kdk::assembler::field::value::expect("value", kdk::assembler::field::value::type::integer, 22, 2)
         })
     );
     
-    // Finish assembly and return the result to the caller.
-    return assembler::assemble();
+    return assembler;
 }
-
-// MARK: - Fields
-
-
