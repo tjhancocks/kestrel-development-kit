@@ -6,4 +6,12 @@
 	` actually represents this type when encoded into a resource
 	` file.
 	code = "fööb";
+
+	` The field is a single value that is contained in the resource
+	` type. The field provides information that the assembler 
+	` needs to determine what values it should be seeing, and how
+	` they should be encoded.
+	field("bar") {
+
+	};
 }

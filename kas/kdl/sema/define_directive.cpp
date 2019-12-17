@@ -62,6 +62,31 @@ void kdl::define_directive::parse(kdl::sema *sema)
             }
             resource_type_code = sema->read().text();
         }
+        else if (item_name == "field") {
+            // Add a new field into the resource type.
+            // The syntax is:
+            //  field(field-name) { args }
+            sema->ensure({ kdl::condition(kdl::lexer::token::type::lparen).truthy() });
+            
+            if (sema->expect({ kdl::condition(kdl::lexer::token::type::string).falsey() })) {
+                log::error(sema->peek().file(), sema->peek().line(), "Type definition field name should be a string.");
+            }
+            auto field_name = sema->read().text();
+            
+            sema->ensure({
+                kdl::condition(kdl::lexer::token::type::rparen).truthy(),
+                kdl::condition(kdl::lexer::token::type::lbrace).truthy()
+            });
+            
+            // We're now inside the context of the field. Pass on to another function
+            // to parse this.
+            
+            // TODO
+            
+            sema->ensure({
+                kdl::condition(kdl::lexer::token::type::rbrace).truthy()
+            });
+        }
         
         sema->ensure({ kdl::condition(kdl::lexer::token::type::semi_colon).truthy() });
     }
