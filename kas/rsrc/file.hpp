@@ -48,7 +48,8 @@ public:
     enum format
     {
         standard,
-        extended
+        extended,
+        rez
     };
     
     /**
@@ -185,6 +186,7 @@ private:
     
     rsrc::data write_extended();
     rsrc::data write_standard();
+    rsrc::data write_rez();
 };
 
 };
