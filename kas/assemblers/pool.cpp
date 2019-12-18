@@ -61,7 +61,10 @@ std::string kdk::assembler_pool::type_code_named(const std::string type_name, bo
         }
     }
     
-    log::error("<missing>", 0, "Unrecognised declaration type '" + type_name + "'");
+    if (!no_error) {
+        log::error("<missing>", 0, "Unrecognised declaration type '" + type_name + "'");
+    }
+    
     return nullptr;
 }
 
