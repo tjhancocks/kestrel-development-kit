@@ -191,6 +191,37 @@ static inline kdk::assembler::field::value parse_field_value(kdl::sema *sema)
     return kdk::assembler::field::value(value_name, value_type, value_offset, length_required ? value_length : value_size);
 }
 
+static inline void parse_symbol_list(kdl::sema *sema, kdk::assembler::field::value& value)
+{
+    std::vector<std::tuple<std::string, std::string>> symbols;
+    
+    sema->ensure({ kdl::condition(kdl::lexer::token::type::lbrace).truthy() });
+    
+    while (sema->expect({ kdl::condition(kdl::lexer::token::type::rbrace).falsey() })) {
+        // Get the name of the symbol
+        if (sema->expect({ kdl::condition(kdl::lexer::token::type::identifier).falsey() })) {
+            log::error(sema->peek().file(), sema->peek().line(), "Symbol name should be an identifier.");
+        }
+        auto symbol_name = sema->read().text();
+        
+        sema->ensure({ kdl::condition(kdl::lexer::token::type::equals).truthy() });
+        
+        // Get the value of the symbol. These are _always_ integers.
+        if (sema->expect({ kdl::condition(kdl::lexer::token::type::integer).falsey() })) {
+            log::error(sema->peek().file(), sema->peek().line(), "Symbol value should be an integer.");
+        }
+        auto symbol_value = sema->read().text();
+        
+        sema->ensure({ kdl::condition(kdl::lexer::token::type::semi_colon).truthy() });
+        
+        symbols.push_back(std::make_tuple(symbol_name, symbol_value));
+    }
+    
+    sema->ensure({ kdl::condition(kdl::lexer::token::type::rbrace).truthy() });
+    
+    value.set_symbols(symbols);
+}
+
 // MARK: - Parser
 
 void kdl::define_directive::parse(kdl::sema *sema)
@@ -242,6 +273,11 @@ void kdl::define_directive::parse(kdl::sema *sema)
                 }
                 else if (attribute_name == "value") {
                     auto value = parse_field_value(sema);
+                    
+                    // Check if there is a symbol list attached.
+                    if (sema->expect({ kdl::condition(kdl::lexer::token::type::lbrace).truthy() })) {
+                        parse_symbol_list(sema, value);
+                    }
                     
                     field_values.push_back(value);
                 }
