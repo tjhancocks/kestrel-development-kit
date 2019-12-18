@@ -10,8 +10,6 @@
 		8013C47623A925BB00AFA554 /* define_directive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8013C47423A925BB00AFA554 /* define_directive.cpp */; };
 		801619CD23AA047600D19B6C /* pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 801619CB23AA047600D19B6C /* pool.cpp */; };
 		80206E9A239E025D0035E672 /* assembler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E98239E025D0035E672 /* assembler.cpp */; };
-		80206E9D239E23520035E672 /* sprite_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E9B239E23520035E672 /* sprite_animation.cpp */; };
-		80206EA0239EAC830035E672 /* asteroid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E9E239EAC830035E672 /* asteroid.cpp */; };
 		80227081239B719500CE1CFE /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8022707F239B719500CE1CFE /* log.cpp */; };
 		8047D590239307C900D7CDA9 /* data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D58E239307C900D7CDA9 /* data.cpp */; };
 		8047D593239386BE00D7CDA9 /* macroman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D592239386BE00D7CDA9 /* macroman.cpp */; };
@@ -44,10 +42,6 @@
 		801619CC23AA047600D19B6C /* pool.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = pool.hpp; sourceTree = "<group>"; };
 		80206E98239E025D0035E672 /* assembler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = assembler.cpp; sourceTree = "<group>"; };
 		80206E99239E025D0035E672 /* assembler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = assembler.hpp; sourceTree = "<group>"; };
-		80206E9B239E23520035E672 /* sprite_animation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sprite_animation.cpp; sourceTree = "<group>"; };
-		80206E9C239E23520035E672 /* sprite_animation.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = sprite_animation.hpp; sourceTree = "<group>"; };
-		80206E9E239EAC830035E672 /* asteroid.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = asteroid.cpp; sourceTree = "<group>"; };
-		80206E9F239EAC830035E672 /* asteroid.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = asteroid.hpp; sourceTree = "<group>"; };
 		8022707F239B719500CE1CFE /* log.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = log.cpp; sourceTree = "<group>"; };
 		80227080239B719500CE1CFE /* log.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = log.hpp; sourceTree = "<group>"; };
 		8047D58E239307C900D7CDA9 /* data.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = data.cpp; sourceTree = "<group>"; };
@@ -112,10 +106,6 @@
 				80206E98239E025D0035E672 /* assembler.cpp */,
 				801619CC23AA047600D19B6C /* pool.hpp */,
 				801619CB23AA047600D19B6C /* pool.cpp */,
-				80206E9C239E23520035E672 /* sprite_animation.hpp */,
-				80206E9B239E23520035E672 /* sprite_animation.cpp */,
-				80206E9F239EAC830035E672 /* asteroid.hpp */,
-				80206E9E239EAC830035E672 /* asteroid.cpp */,
 			);
 			path = assemblers;
 			sourceTree = "<group>";
@@ -249,13 +239,11 @@
 				80678E9923902ADF00AE94AE /* directive.cpp in Sources */,
 				8047D590239307C900D7CDA9 /* data.cpp in Sources */,
 				80940A0B238A583300137EB1 /* main.cpp in Sources */,
-				80206EA0239EAC830035E672 /* asteroid.cpp in Sources */,
 				8047D593239386BE00D7CDA9 /* macroman.cpp in Sources */,
 				8047D59A2394DCCB00D7CDA9 /* file.cpp in Sources */,
 				80678E05238D89DB00AE94AE /* sema.cpp in Sources */,
 				80227081239B719500CE1CFE /* log.cpp in Sources */,
 				80678EA42390D42600AE94AE /* declaration.cpp in Sources */,
-				80206E9D239E23520035E672 /* sprite_animation.cpp in Sources */,
 				8013C47623A925BB00AFA554 /* define_directive.cpp in Sources */,
 				80678EA12390D2E000AE94AE /* target.cpp in Sources */,
 			);

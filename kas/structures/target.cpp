@@ -23,8 +23,7 @@
 #include "structures/target.hpp"
 #include "rsrc/file.hpp"
 #include "assemblers/assembler.hpp"
-#include "assemblers/sprite_animation.hpp"
-#include "assemblers/asteroid.hpp"
+#include "assemblers/pool.hpp"
 
 // MARK: - Constructor
 
@@ -53,13 +52,10 @@ void kdk::target::build()
     for (auto resource : m_resources) {
         auto type = resource.type();
         
-        if (type == "SpriteAnimation") {
-            auto assembler = kdk::sprite_animation_assembler();
-            rf->add_resource("spïn", resource.id(), resource.name(), assembler->assemble_resource(resource));
-        }
-        else if (type == "Asteroid") {
-            auto assembler = kdk::asteroid_assembler();
-            rf->add_resource("röid", resource.id(), resource.name(), assembler->assemble_resource(resource));
+        auto assembler = kdk::assembler_pool::shared().assembler_named(type);
+        if (assembler) {
+            auto code = kdk::assembler_pool::shared().type_code_named(type);
+            rf->add_resource(code, resource.id(), resource.name(), assembler->assemble_resource(resource));
         }
     }
     

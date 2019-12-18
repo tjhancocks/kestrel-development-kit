@@ -20,3 +20,10 @@
 		};
 	};
 }
+
+
+declare FooBar {
+	new (id = #128) {
+		bar = 57005;
+	}
+}
