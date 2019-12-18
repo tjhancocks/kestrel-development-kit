@@ -25,6 +25,7 @@
 #include "kdl/sema/define_directive.hpp"
 #include "diagnostic/log.hpp"
 #include "assemblers/assembler.hpp"
+#include "assemblers/pool.hpp"
 
 // MARK: - Private Parser Functions
 
@@ -314,5 +315,11 @@ void kdl::define_directive::parse(kdl::sema *sema)
         log::error(file, line, "Type definition must include at least one field.");
     }
     
-    std::cout << "Define resource type: " << resource_type_name << " '" << resource_type_code << "'" << std::endl;
+    // Construct the type assembler and register it into main assembler.
+    auto assembler = std::make_shared<kdk::assembler>();
+    for (auto field : resource_fields) {
+        assembler->add_field(field);
+    }
+    kdk::assembler_pool::shared().register_assembler(resource_type_name, resource_type_code, assembler);
+    
 }
