@@ -13,5 +13,6 @@
 	` they should be encoded.
 	field("bar") {
 		required;
+		value(name = "baz", type = integer, offset = 0, size = word);
 	};
 }

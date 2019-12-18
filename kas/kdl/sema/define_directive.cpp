@@ -54,6 +54,143 @@ static inline std::string parse_field_name(kdl::sema *sema)
     return field_name;
 }
 
+static inline kdk::assembler::field::value parse_field_value(kdl::sema *sema)
+{
+    auto file = sema->peek().file();
+    auto line = sema->peek().line();
+    
+    sema->ensure({ kdl::condition(kdl::lexer::token::type::lparen).truthy() });
+    
+    // Default attributes - all attributes are provided as strings ready to be parsed
+    // later
+    kdk::assembler::field::value::type value_type { kdk::assembler::field::value::type::integer };
+    uint64_t value_size { 0 };
+    uint64_t value_length { 0 };
+    std::string value_name;
+    uint64_t value_offset { 0 };
+    
+    bool length_required = false;
+    bool size_required = false;
+    
+    while (sema->expect({ kdl::condition(kdl::lexer::token::type::rparen).falsey() })) {
+        
+        if (sema->expect({ kdl::condition(kdl::lexer::token::type::identifier).falsey(), kdl::condition(kdl::lexer::token::type::equals).falsey() })) {
+            log::error(sema->peek().file(), sema->peek().line(), "Malformed value attribute encountered.");
+        }
+        auto attribute = sema->read().text();
+        sema->advance();
+        
+        if (attribute == "name") {
+            if (sema->expect({ kdl::condition(kdl::lexer::token::type::string).falsey() })) {
+                log::error(sema->peek().file(), sema->peek().line(), "The name attribute of a type definition value must be a string.");
+            }
+            value_name = sema->read().text();
+        }
+        else if (attribute == "offset") {
+            if (sema->expect({ kdl::condition(kdl::lexer::token::type::integer).falsey() })) {
+                log::error(sema->peek().file(), sema->peek().line(), "The offset attribute of a type definition value must be an integer.");
+            }
+            value_offset = std::stoull(sema->read().text());
+        }
+        else if (attribute == "length") {
+            if (sema->expect({ kdl::condition(kdl::lexer::token::type::integer).falsey() })) {
+                log::error(sema->peek().file(), sema->peek().line(), "The length attribute of a type definition value must be an integer.");
+            }
+            value_length = std::stoull(sema->read().text());
+        }
+        else if (attribute == "size") {
+            if (sema->expect({ kdl::condition(kdl::lexer::token::type::integer).truthy() })) {
+                value_size = std::stoull(sema->read().text());
+            }
+            else if (sema->expect({ kdl::condition(kdl::lexer::token::type::identifier).truthy() })) {
+                auto size_symbol = sema->read().text();
+                
+                if (size_symbol == "byte") {
+                    value_size = 1;
+                }
+                else if (size_symbol == "word") {
+                    value_size = 2;
+                }
+                else if (size_symbol == "dword" || size_symbol == "long") {
+                    value_size = 4;
+                }
+                else if (size_symbol == "qword" || size_symbol == "quad") {
+                    value_size = 8;
+                }
+                else {
+                    log::error(sema->peek().file(), sema->peek().line(), "Unrecognised size type '" + size_symbol + "'.");
+                }
+                
+            }
+            else {
+                log::error(sema->peek().file(), sema->peek().line(), "The offset attribute of a type definition value must be an integer.");
+            }
+        }
+        else if (attribute == "type") {
+            if (sema->expect({ kdl::condition(kdl::lexer::token::type::identifier).falsey() })) {
+                log::error(sema->peek().file(), sema->peek().line(), "The type attribute of a type definition value must be an identifier.");
+            }
+            
+            auto type_symbol = sema->read().text();
+            
+            if (type_symbol == "resource_reference") {
+                value_size = 2;
+                value_type = kdk::assembler::field::value::type::resource_reference;
+            }
+            else if (type_symbol == "integer") {
+                size_required = true;
+                value_type = kdk::assembler::field::value::type::integer;
+            }
+            else if (type_symbol == "string") {
+                length_required = true;
+                value_type = kdk::assembler::field::value::type::string;
+            }
+            else if (type_symbol == "c_string") {
+                value_type = kdk::assembler::field::value::type::c_string;
+            }
+            else if (type_symbol == "resource_reference") {
+                value_type = kdk::assembler::field::value::type::p_string;
+            }
+            else if (type_symbol == "color") {
+                value_size = 4;
+                value_type = kdk::assembler::field::value::type::color;
+            }
+            else if (type_symbol == "bitmask") {
+                size_required = true;
+                value_type = kdk::assembler::field::value::type::resource_reference;
+            }
+            else {
+                log::error(sema->peek().file(), sema->peek().line(), "Unrecognised type '" + type_symbol + "'.");
+            }
+        }
+        else {
+            // Unrecognised attribute.
+            log::error(sema->peek().file(), sema->peek().line(), "Unrecognised value attribute '" + attribute + "' encountered.");
+        }
+        
+        // Check for a comma. If no comma exists, then we require the presence of a rparen.
+        if (sema->expect({ kdl::condition(kdl::lexer::token::type::comma).truthy() })) {
+            sema->advance();
+            continue;
+        }
+        
+        break;
+    }
+    
+    sema->ensure({ kdl::condition(kdl::lexer::token::type::rparen).truthy() });
+    
+    // Construct the value structure.
+    if (size_required && value_size == 0) {
+        log::error(file, line, "Expected the 'size' attribute to be specified on type definition field value.");
+    }
+    
+    if (length_required && value_length == 0) {
+        log::error(file, line, "Expected the 'length' attribute to be specified on type definition field value.");
+    }
+    
+    return kdk::assembler::field::value(value_name, value_type, value_offset, length_required ? value_length : value_size);
+}
+
 // MARK: - Parser
 
 void kdl::define_directive::parse(kdl::sema *sema)
@@ -104,7 +241,9 @@ void kdl::define_directive::parse(kdl::sema *sema)
                     required = true;
                 }
                 else if (attribute_name == "value") {
+                    auto value = parse_field_value(sema);
                     
+                    field_values.push_back(value);
                 }
                 
                 sema->ensure({ kdl::condition(kdl::lexer::token::type::semi_colon).truthy() });
