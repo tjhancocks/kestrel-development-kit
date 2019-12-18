@@ -25,6 +25,11 @@
 
 // MARK: - Singleton
 
+kdk::assembler_pool::assembler_pool()
+{
+    
+}
+
 kdk::assembler_pool& kdk::assembler_pool::shared()
 {
     static kdk::assembler_pool instance;
