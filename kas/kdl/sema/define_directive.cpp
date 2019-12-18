@@ -26,6 +26,34 @@
 #include "diagnostic/log.hpp"
 #include "assemblers/assembler.hpp"
 
+// MARK: - Private Parser Functions
+
+static inline std::string parse_constant_item(kdl::sema *sema)
+{
+    // Specify the name of the directive.
+    sema->ensure({ kdl::condition(kdl::lexer::token::type::equals).truthy() });
+    
+    // Get the value of the item.
+    if (sema->expect({ kdl::condition(kdl::lexer::token::type::string).falsey() })) {
+        log::error(sema->peek().file(), sema->peek().line(), "Type definition constant must be a string.");
+    }
+    return sema->read().text();
+}
+
+static inline std::string parse_field_name(kdl::sema *sema)
+{
+    sema->ensure({ kdl::condition(kdl::lexer::token::type::lparen).truthy() });
+    
+    if (sema->expect({ kdl::condition(kdl::lexer::token::type::string).falsey() })) {
+        log::error(sema->peek().file(), sema->peek().line(), "Type definition field name should be a string.");
+    }
+    auto field_name = sema->read().text();
+    
+    sema->ensure({ kdl::condition(kdl::lexer::token::type::rparen).truthy() });
+    
+    return field_name;
+}
+
 // MARK: - Parser
 
 void kdl::define_directive::parse(kdl::sema *sema)
@@ -45,43 +73,22 @@ void kdl::define_directive::parse(kdl::sema *sema)
         auto item_name = sema->read().text();
         
         if (item_name == "name") {
-            // Specify the name of the directive.
-            sema->ensure({ kdl::condition(kdl::lexer::token::type::equals).truthy() });
-            
-            // Get the value of the item.
-            if (sema->expect({ kdl::condition(kdl::lexer::token::type::string).falsey() })) {
-                log::error(sema->peek().file(), sema->peek().line(), "Type definition name must be a string.");
-            }
-            resource_type_name = sema->read().text();
+            resource_type_name = parse_constant_item(sema);
         }
         else if (item_name == "code") {
-            // Specify the name of the directive.
-            sema->ensure({ kdl::condition(kdl::lexer::token::type::equals).truthy() });
-            
-            // Get the value of the item.
-            if (sema->expect({ kdl::condition(kdl::lexer::token::type::string).falsey() })) {
-                log::error(sema->peek().file(), sema->peek().line(), "Type definition code must be a string.");
-            }
-            resource_type_code = sema->read().text();
+            resource_type_code = parse_constant_item(sema);
         }
         else if (item_name == "field") {
             // Add a new field into the resource type.
             // The syntax is:
             //  field(field-name) { args }
-            sema->ensure({ kdl::condition(kdl::lexer::token::type::lparen).truthy() });
             
-            if (sema->expect({ kdl::condition(kdl::lexer::token::type::string).falsey() })) {
-                log::error(sema->peek().file(), sema->peek().line(), "Type definition field name should be a string.");
-            }
-            auto field_name = sema->read().text();
-            
-            // Field attributes
+            auto field_name = parse_field_name(sema);
             auto required = false;
             std::string deprecated;
             std::vector<kdk::assembler::field::value> field_values;
             
             sema->ensure({
-                kdl::condition(kdl::lexer::token::type::rparen).truthy(),
                 kdl::condition(kdl::lexer::token::type::lbrace).truthy()
             });
             
@@ -95,6 +102,9 @@ void kdl::define_directive::parse(kdl::sema *sema)
                 
                 if (attribute_name == "required") {
                     required = true;
+                }
+                else if (attribute_name == "value") {
+                    
                 }
                 
                 sema->ensure({ kdl::condition(kdl::lexer::token::type::semi_colon).truthy() });
