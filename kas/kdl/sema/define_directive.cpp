@@ -24,6 +24,7 @@
 #include <stdexcept>
 #include "kdl/sema/define_directive.hpp"
 #include "diagnostic/log.hpp"
+#include "assemblers/assembler.hpp"
 
 // MARK: - Parser
 
@@ -31,6 +32,7 @@ void kdl::define_directive::parse(kdl::sema *sema)
 {
     std::string resource_type_name;
     std::string resource_type_code;
+    std::vector<kdk::assembler::field> resource_fields;
     
     auto file = sema->peek().file();
     auto line = sema->peek().line();
@@ -73,19 +75,42 @@ void kdl::define_directive::parse(kdl::sema *sema)
             }
             auto field_name = sema->read().text();
             
+            // Field attributes
+            auto required = false;
+            std::string deprecated;
+            std::vector<kdk::assembler::field::value> field_values;
+            
             sema->ensure({
                 kdl::condition(kdl::lexer::token::type::rparen).truthy(),
                 kdl::condition(kdl::lexer::token::type::lbrace).truthy()
             });
             
-            // We're now inside the context of the field. Pass on to another function
-            // to parse this.
-            
-            // TODO
+            // Loop until we find the terminating r-brace.
+            while (sema->expect({ kdl::condition(kdl::lexer::token::type::rbrace).falsey() })) {
+                // All field attributes start with an identifier.
+                if (sema->expect({ kdl::condition(kdl::lexer::token::type::identifier).falsey() })) {
+                    log::error(sema->peek().file(), sema->peek().line(), "Type definition field attribute should start with an identifier");
+                }
+                auto attribute_name = sema->read().text();
+                
+                if (attribute_name == "required") {
+                    required = true;
+                }
+                
+                sema->ensure({ kdl::condition(kdl::lexer::token::type::semi_colon).truthy() });
+            }
             
             sema->ensure({
                 kdl::condition(kdl::lexer::token::type::rbrace).truthy()
             });
+            
+            // Construct the field.
+            resource_fields.push_back(
+                kdk::assembler::field(field_name)
+                    .set_values(field_values)
+                	.set_required(required)
+			);
+            
         }
         
         sema->ensure({ kdl::condition(kdl::lexer::token::type::semi_colon).truthy() });
@@ -98,6 +123,10 @@ void kdl::define_directive::parse(kdl::sema *sema)
     
     if (resource_type_name.empty()) {
         log::error(file, line, "Type definition must include a type name.");
+    }
+    
+    if (resource_fields.empty()) {
+        log::error(file, line, "Type definition must include at least one field.");
     }
     
     std::cout << "Define resource type: " << resource_type_name << " '" << resource_type_code << "'" << std::endl;

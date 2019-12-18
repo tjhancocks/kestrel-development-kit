@@ -12,6 +12,6 @@
 	` needs to determine what values it should be seeing, and how
 	` they should be encoded.
 	field("bar") {
-
+		required;
 	};
 }
