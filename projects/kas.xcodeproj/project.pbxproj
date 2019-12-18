@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		8013C47623A925BB00AFA554 /* define_directive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8013C47423A925BB00AFA554 /* define_directive.cpp */; };
+		801619CD23AA047600D19B6C /* pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 801619CB23AA047600D19B6C /* pool.cpp */; };
 		80206E9A239E025D0035E672 /* assembler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E98239E025D0035E672 /* assembler.cpp */; };
 		80206E9D239E23520035E672 /* sprite_animation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E9B239E23520035E672 /* sprite_animation.cpp */; };
 		80206EA0239EAC830035E672 /* asteroid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E9E239EAC830035E672 /* asteroid.cpp */; };
@@ -39,6 +40,8 @@
 /* Begin PBXFileReference section */
 		8013C47423A925BB00AFA554 /* define_directive.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = define_directive.cpp; sourceTree = "<group>"; };
 		8013C47523A925BB00AFA554 /* define_directive.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = define_directive.hpp; sourceTree = "<group>"; };
+		801619CB23AA047600D19B6C /* pool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pool.cpp; sourceTree = "<group>"; };
+		801619CC23AA047600D19B6C /* pool.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = pool.hpp; sourceTree = "<group>"; };
 		80206E98239E025D0035E672 /* assembler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = assembler.cpp; sourceTree = "<group>"; };
 		80206E99239E025D0035E672 /* assembler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = assembler.hpp; sourceTree = "<group>"; };
 		80206E9B239E23520035E672 /* sprite_animation.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sprite_animation.cpp; sourceTree = "<group>"; };
@@ -107,6 +110,8 @@
 			children = (
 				80206E99239E025D0035E672 /* assembler.hpp */,
 				80206E98239E025D0035E672 /* assembler.cpp */,
+				801619CC23AA047600D19B6C /* pool.hpp */,
+				801619CB23AA047600D19B6C /* pool.cpp */,
 				80206E9C239E23520035E672 /* sprite_animation.hpp */,
 				80206E9B239E23520035E672 /* sprite_animation.cpp */,
 				80206E9F239EAC830035E672 /* asteroid.hpp */,
@@ -240,6 +245,7 @@
 				80206E9A239E025D0035E672 /* assembler.cpp in Sources */,
 				80940A0E238A598E00137EB1 /* lexer.cpp in Sources */,
 				80678EAA2392456B00AE94AE /* resource.cpp in Sources */,
+				801619CD23AA047600D19B6C /* pool.cpp in Sources */,
 				80678E9923902ADF00AE94AE /* directive.cpp in Sources */,
 				8047D590239307C900D7CDA9 /* data.cpp in Sources */,
 				80940A0B238A583300137EB1 /* main.cpp in Sources */,
