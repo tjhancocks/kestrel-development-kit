@@ -38,34 +38,19 @@ kdk::assembler_pool& kdk::assembler_pool::shared()
 
 // MARK: - Assembler Look-up
 
-std::shared_ptr<kdk::assembler> kdk::assembler_pool::assembler_named(const std::string type_name, bool no_error) const
+std::tuple<std::string, std::shared_ptr<kdk::assembler>> kdk::assembler_pool::assembler_named(const std::string type_name, bool no_error) const
 {
     for (auto t : m_assemblers) {
         if (std::get<0>(t) == type_name) {
-            return std::get<2>(t);
+            return std::make_tuple(std::get<1>(t), std::get<2>(t));
         }
     }
     
     if (!no_error) {
-        log::error("<missing>", 0, "Unrecognised declaration type '" + type_name + "'");
+        log::error("<missing>", 0, "Fatal error whilst resolving type name '" + type_name + "'. The type doesn't exist.");
     }
     
-    return nullptr;
-}
-
-std::string kdk::assembler_pool::type_code_named(const std::string type_name, bool no_error) const
-{
-    for (auto t : m_assemblers) {
-        if (std::get<0>(t) == type_name) {
-            return std::get<1>(t);
-        }
-    }
-    
-    if (!no_error) {
-        log::error("<missing>", 0, "Unrecognised declaration type '" + type_name + "'");
-    }
-    
-    return "????";
+    return std::make_tuple("", nullptr);
 }
 
 
@@ -74,12 +59,14 @@ std::string kdk::assembler_pool::type_code_named(const std::string type_name, bo
 void kdk::assembler_pool::register_assembler(const std::string type_name, const std::string type_code, std::shared_ptr<kdk::assembler> assembler)
 {
     // Ensure this is a unique/novel assembler.
-    if (assembler_named(type_name, true)) {
-        log::error("<missing>", 0, "Duplicated declaration type '" + type_name + "'");
-    }
-    
-    if (type_code_named(type_name, true) == type_code) {
-        log::error("<missing>", 0, "Duplicated resource type '" + type_code + "'");
+    for (auto t : m_assemblers) {
+        if (std::get<0>(t) == type_name) {
+            log::error("<missing>", 0, "Duplicated declaration type '" + type_name + "'");
+        }
+        
+        if (std::get<1>(t) == type_code) {
+            log::error("<missing>", 0, "Duplicated resource type '" + type_code + "'");
+        }
     }
     
     m_assemblers.push_back(std::make_tuple(type_name, type_code, assembler));

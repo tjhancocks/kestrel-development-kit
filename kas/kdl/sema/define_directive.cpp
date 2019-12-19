@@ -29,6 +29,73 @@
 
 // MARK: - Private Parser Functions
 
+static inline kdk::assembler::field::value::type parse_value_type(kdl::sema *sema)
+{
+    if (sema->expect({ kdl::condition(kdl::lexer::token::type::identifier).falsey() })) {
+        log::error(sema->peek().file(), sema->peek().line(), "The type attribute of a type definition value must be an identifier.");
+    }
+    
+    auto type_symbol = sema->read().text();
+    
+    if (type_symbol == "resource_reference") {
+        return kdk::assembler::field::value::type::resource_reference;
+    }
+    else if (type_symbol == "integer") {
+        return kdk::assembler::field::value::type::integer;
+    }
+    else if (type_symbol == "string") {
+        return kdk::assembler::field::value::type::string;
+    }
+    else if (type_symbol == "c_string") {
+        return kdk::assembler::field::value::type::c_string;
+    }
+    else if (type_symbol == "resource_reference") {
+        return kdk::assembler::field::value::type::p_string;
+    }
+    else if (type_symbol == "color") {
+        return kdk::assembler::field::value::type::color;
+    }
+    else if (type_symbol == "bitmask") {
+        return kdk::assembler::field::value::type::resource_reference;
+    }
+    else {
+        log::error(sema->peek().file(), sema->peek().line(), "Unrecognised type '" + type_symbol + "'.");
+    }
+    
+    throw std::runtime_error("Fatal error whilst resolving type symbol.");
+}
+
+static inline uint64_t parse_value_size(kdl::sema *sema)
+{
+    if (sema->expect({ kdl::condition(kdl::lexer::token::type::integer).truthy() })) {
+        return std::stoull(sema->read().text());
+    }
+    else if (sema->expect({ kdl::condition(kdl::lexer::token::type::identifier).truthy() })) {
+        auto size_symbol = sema->read().text();
+        
+        if (size_symbol == "byte") {
+            return 1;
+        }
+        else if (size_symbol == "word") {
+            return 2;
+        }
+        else if (size_symbol == "dword" || size_symbol == "long") {
+            return 4;
+        }
+        else if (size_symbol == "qword" || size_symbol == "quad") {
+            return 8;
+        }
+        else {
+            log::error(sema->peek().file(), sema->peek().line(), "Unrecognised size type '" + size_symbol + "'.");
+        }
+    }
+    else {
+        log::error(sema->peek().file(), sema->peek().line(), "The offset attribute of a type definition value must be an integer.");
+    }
+    
+    throw std::runtime_error("Fatal error whilst resolving value size.");
+}
+
 static inline std::string parse_constant_item(kdl::sema *sema)
 {
     // Specify the name of the directive.
@@ -100,68 +167,34 @@ static inline kdk::assembler::field::value parse_field_value(kdl::sema *sema)
             value_length = std::stoull(sema->read().text());
         }
         else if (attribute == "size") {
-            if (sema->expect({ kdl::condition(kdl::lexer::token::type::integer).truthy() })) {
-                value_size = std::stoull(sema->read().text());
-            }
-            else if (sema->expect({ kdl::condition(kdl::lexer::token::type::identifier).truthy() })) {
-                auto size_symbol = sema->read().text();
-                
-                if (size_symbol == "byte") {
-                    value_size = 1;
-                }
-                else if (size_symbol == "word") {
-                    value_size = 2;
-                }
-                else if (size_symbol == "dword" || size_symbol == "long") {
-                    value_size = 4;
-                }
-                else if (size_symbol == "qword" || size_symbol == "quad") {
-                    value_size = 8;
-                }
-                else {
-                    log::error(sema->peek().file(), sema->peek().line(), "Unrecognised size type '" + size_symbol + "'.");
-                }
-                
-            }
-            else {
-                log::error(sema->peek().file(), sema->peek().line(), "The offset attribute of a type definition value must be an integer.");
-            }
+            value_size = parse_value_size(sema);
         }
         else if (attribute == "type") {
-            if (sema->expect({ kdl::condition(kdl::lexer::token::type::identifier).falsey() })) {
-                log::error(sema->peek().file(), sema->peek().line(), "The type attribute of a type definition value must be an identifier.");
-            }
+            value_type = parse_value_type(sema);
             
-            auto type_symbol = sema->read().text();
-            
-            if (type_symbol == "resource_reference") {
-                value_size = 2;
-                value_type = kdk::assembler::field::value::type::resource_reference;
-            }
-            else if (type_symbol == "integer") {
-                size_required = true;
-                value_type = kdk::assembler::field::value::type::integer;
-            }
-            else if (type_symbol == "string") {
-                length_required = true;
-                value_type = kdk::assembler::field::value::type::string;
-            }
-            else if (type_symbol == "c_string") {
-                value_type = kdk::assembler::field::value::type::c_string;
-            }
-            else if (type_symbol == "resource_reference") {
-                value_type = kdk::assembler::field::value::type::p_string;
-            }
-            else if (type_symbol == "color") {
-                value_size = 4;
-                value_type = kdk::assembler::field::value::type::color;
-            }
-            else if (type_symbol == "bitmask") {
-                size_required = true;
-                value_type = kdk::assembler::field::value::type::resource_reference;
-            }
-            else {
-                log::error(sema->peek().file(), sema->peek().line(), "Unrecognised type '" + type_symbol + "'.");
+            switch (value_type) {
+                case kdk::assembler::field::value::type::resource_reference:
+                    value_size = 2;
+                    break;
+                    
+                case kdk::assembler::field::value::type::integer:
+                    size_required = true;
+                    break;
+                    
+                case kdk::assembler::field::value::type::string:
+                    length_required = true;
+                    break;
+                    
+                case kdk::assembler::field::value::type::color:
+                    value_size = 4;
+                    break;
+                    
+                case kdk::assembler::field::value::type::bitmask:
+                    size_required = true;
+                    break;
+                    
+                default:
+                    break;
             }
         }
         else {

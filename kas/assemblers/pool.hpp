@@ -48,9 +48,7 @@ public:
     
     static assembler_pool& shared();
     
-    std::shared_ptr<kdk::assembler> assembler_named(const std::string type_name, bool no_error = false) const;
-    std::string type_code_named(const std::string type_name, bool no_error = false) const;
-    
+    std::tuple<std::string, std::shared_ptr<kdk::assembler>> assembler_named(const std::string type_name, bool no_error = false) const;
     void register_assembler(const std::string type_name, const std::string type_code, std::shared_ptr<kdk::assembler> assembler);
     
 private:

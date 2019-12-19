@@ -53,9 +53,8 @@ void kdk::target::build()
         auto type = resource.type();
         
         auto assembler = kdk::assembler_pool::shared().assembler_named(type);
-        if (assembler) {
-            auto code = kdk::assembler_pool::shared().type_code_named(type);
-            rf->add_resource(code, resource.id(), resource.name(), assembler->assemble_resource(resource));
+        if (std::get<1>(assembler)) {
+            rf->add_resource(std::get<0>(assembler), resource.id(), resource.name(), std::get<1>(assembler)->assemble_resource(resource));
         }
     }
     
