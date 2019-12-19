@@ -26,4 +26,8 @@ declare FooBar {
 	new (id = #128) {
 		bar = 57005;
 	}
+
+	new (id = #129) {
+		bar = gamma;
+	}
 }
