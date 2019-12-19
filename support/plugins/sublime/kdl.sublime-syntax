@@ -1,0 +1,92 @@
+%YAML 1.2
+---
+name: KDL (Kestrel Development Kit)
+file_extensions:
+  - kdl
+scope: source.kdl
+contexts:
+  main:
+    # Strings begin and end with quotes, and use backslashes as an escape
+    # character
+    - match: '"'
+      scope: punctuation.definition.string.begin.kdl
+      push: double_quoted_string
+
+    # Comments begin with a '//' and finish at the end of the line
+    - match: '`'
+      scope: punctuation.definition.comment.kdl
+      push: line_comment
+
+    # Numbers
+    - match: '\b(-)?[0-9.]+\b'
+      scope: constant.numeric.kdl
+
+    # Directives
+    - match: '^\s*((@)(import|out|require|name|author|version))\s*'
+      captures: 
+        1: keyword.kdl
+
+    - match: '^\s*((@)(define))\s*'
+      captures: 
+        1: keyword.kdl
+
+    # Declarations
+    - match: '^\s*(declare)\s+([A-Za-z0-9_]+)\s*\{\s*'
+      captures: 
+        1: keyword.control.kdl
+        2: entity.name.kdl
+      push: declaration
+
+  double_quoted_string:
+    - meta_scope: string.quoted.double.kdl
+    - match: '\\.'
+      scope: constant.character.escape.kdl
+    - match: '"'
+      scope: punctuation.definition.string.end.kdl
+      pop: true
+
+  line_comment:
+    - meta_scope: comment.line.kdl
+    - match: $
+      pop: true
+
+  declaration:
+    - meta_scope: meta.type-declaration-block.kdl
+    - match: '(?=\})'
+      pop: true
+    - match: '\s*(new)\s*\(\s*'
+      captures:
+        1: keyword.control.kdl
+      push: arguments
+    - match: '\{'
+      scope: punctuation.definition.block.begin.kdl
+      push:
+        - meta_scope: meta.resource-declaration-block.kdl
+        - match: '(?=\})'
+          pop: true
+        - include: declaration_block
+
+  arguments:
+    - meta_scope: meta.function.parameters.kdl
+    - match: '(?=\))'
+      pop: true
+    - match: '\s*(id|name)\s*'
+      captures:
+        1: entity.other.attribute-name.kdl
+    - match: '\s*([#]{1}(-)?[0-9.]+)\s*'
+      captures: 
+        1: constant.numeric.kdl
+    - match: '"'
+      scope: punctuation.definition.string.begin.kdl
+      push: double_quoted_string
+
+  declaration_block:
+    - match: '\s*([A-Za-z0-9_]+)\s*[=]{1}\s*'
+      captures:
+        1: entity.name.kdl
+    - match: '\s*([#]{0,1}(-)?[0-9.]+)\s*'
+      captures: 
+        1: constant.numeric.kdl
+    - match: '"'
+      scope: punctuation.definition.string.begin.kdl
+      push: double_quoted_string
