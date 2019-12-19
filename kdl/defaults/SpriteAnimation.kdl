@@ -1,0 +1,61 @@
+` Copyright (c) 2019 Tom Hancocks
+` 
+` Permission is hereby granted, free of charge, to any person obtaining a copy
+` of this software and associated documentation files (the "Software"), to deal
+` in the Software without restriction, including without limitation the rights
+` to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+` copies of the Software, and to permit persons to whom the Software is
+` furnished to do so, subject to the following conditions:
+` 
+` The above copyright notice and this permission notice shall be included in all
+` copies or substantial portions of the Software.
+` 
+` THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+` IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+` FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+` AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+` LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+` OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+` SOFTWARE.
+
+` SpriteAnimation
+`
+` The SpriteAnimation type is used by the Kestrel Engine to determine the
+` animation and geometry information of an image asset.
+@define {
+	name = "SpriteAnimation";
+	code = "spïn";
+
+	` The Sprites field is used to determine which image resource should
+	` be used for the animated sprite.
+	field("sprites") {
+		required;
+		value(name = "id", type = resource_reference, offset = 0);
+	};
+
+	` The Masks field is used to determine which image resource should be
+	` used as a transparancy mask for the animated sprite.
+	field("masks") {
+		deprecated("The Masks field of the SpriteAnimation is unused by Kestrel.");
+		value(name = "id", type = resource_reference, offset = 2, default = none) {
+			none = #-1;
+		};
+	};
+
+	` The size field is used to determine the size of each frame of 
+	` animation.
+	field("size") {
+		required;
+		value(name = "width", type = integer, size = word, offset = 4);
+		value(name = "height", type = integer, size = word, offset = 6);
+	};
+
+	` The tiles field is used to determine the arrangment of sprite frames within
+	` the source image.
+	field("size") {
+		required;
+		value(name = "x", type = integer, size = word, offset = 8);
+		value(name = "y", type = integer, size = word, offset = 10);
+	};
+
+}
