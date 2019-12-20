@@ -54,7 +54,7 @@ void kdk::assembler::assemble(const kdk::resource resource, kdk::assembler::fiel
     
     // Is the field deprecated? If show show a warning.
     if (field.is_deprecated()) {
-        log::warning("<missing>", 0, "The field '" + field.name() + "' is deprecated.");
+        log::warning("<missing>", 0, field.deprecation_note());
     }
     
     // If the field was provided in the script, then handle it, otherwise try to fill it in with
