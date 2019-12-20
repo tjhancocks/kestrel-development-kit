@@ -65,6 +65,11 @@ void kdl::sema::run()
 
 // MARK: - Stream
 
+void kdl::sema::insert_tokens(std::vector<kdl::lexer::token> tokens)
+{
+    m_tokens.insert(m_tokens.begin() + m_ptr, tokens.begin(), tokens.end());
+}
+
 bool kdl::sema::finished(long offset, long count) const
 {
     auto ptr = (m_ptr + offset);

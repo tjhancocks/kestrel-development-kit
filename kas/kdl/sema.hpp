@@ -123,6 +123,11 @@ public:
      */
     kdk::target& target();
     
+    /**
+     * Insert new tokens into the token stream at the current location.
+     */
+    void insert_tokens(std::vector<kdl::lexer::token> tokens);
+    
 private:
     long m_ptr { 0 };
     std::vector<kdl::lexer::token> m_tokens;

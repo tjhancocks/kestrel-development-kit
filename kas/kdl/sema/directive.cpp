@@ -25,6 +25,7 @@
 #include "kdl/sema/directive.hpp"
 #include "kdl/sema/define_directive.hpp"
 #include "diagnostic/log.hpp"
+#include "kdl/lexer.hpp"
 
 // MARK: - Parser
 
@@ -64,6 +65,18 @@ void kdl::directive::parse(kdl::sema *sema)
         // Defines a new resource type for the assembler to use. This is a complex operation,
         // so hand off to another function.
         kdl::define_directive::parse(sema);
+    }
+    else if (directive == "import") {
+        // Consume each of the arguments.
+        auto args = sema->consume(condition(kdl::lexer::token::type::rbrace).falsey());
+        
+        // The `@import` directive imports the contents of another file and inserts it
+        // into the current token stream.
+        for (auto a : args) {
+            auto lexer = kdl::lexer::open_file(a.text());
+            auto tokens = lexer.analyze();
+            sema->insert_tokens(tokens);
+        }
     }
     else {
         log::error(sema->peek().file(), sema->peek().line(), "Unknown directive @" + directive);
