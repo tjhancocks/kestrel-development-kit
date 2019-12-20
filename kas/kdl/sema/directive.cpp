@@ -24,6 +24,7 @@
 #include <stdexcept>
 #include "kdl/sema/directive.hpp"
 #include "diagnostic/log.hpp"
+#include "kdl/lexer.hpp"
 
 // MARK: - Parser
 
@@ -64,6 +65,13 @@ void kdl::directive::parse(kdl::sema *sema)
     if (directive == "out") {
         for (auto a : args) {
             std::cout << a.text() << std::endl;
+        }
+    }
+    else if (directive == "import") {
+        for (auto a : args) {
+            auto lexer = kdl::lexer::open_file(a.text());
+            auto tokens = lexer.analyze();
+            sema->insert_tokens(tokens);
         }
     }
 }
