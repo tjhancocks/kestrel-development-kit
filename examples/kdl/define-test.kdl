@@ -19,6 +19,11 @@
 			gamma = 1000;
 		};
 	};
+
+	field("baz") {
+		deprecated("The baz field is deprecated.");
+		value(name = "baz", type = p_string, offset = 2);
+	}
 }
 
 

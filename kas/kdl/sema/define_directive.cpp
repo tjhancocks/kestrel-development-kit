@@ -287,7 +287,7 @@ void kdl::define_directive::parse(kdl::sema *sema)
             
             auto field_name = parse_field_name(sema);
             auto required = false;
-            std::string deprecated;
+            std::string deprecation_note;
             std::vector<kdk::assembler::field::value> field_values;
             
             sema->ensure({
@@ -304,6 +304,22 @@ void kdl::define_directive::parse(kdl::sema *sema)
                 
                 if (attribute_name == "required") {
                     required = true;
+                }
+                else if (attribute_name == "deprecated") {
+                    // Parse the deprecation note. This is a fixed format and does not change. No need
+                    // for fancy stack based parsing.
+                    if (sema->expect({
+                        kdl::condition(kdl::lexer::token::type::lparen).truthy(),
+                        kdl::condition(kdl::lexer::token::type::string).truthy(),
+                        kdl::condition(kdl::lexer::token::type::rparen).truthy(),
+                    })) {
+                        sema->advance();
+                        deprecation_note = sema->read().text();
+                        sema->advance();
+                    }
+                    else {
+                        log::error(sema->peek().file(), sema->peek().line(), "Invalid `deprecated()` format found.");
+                    }
                 }
                 else if (attribute_name == "value") {
                     auto value = parse_field_value(sema);
@@ -327,7 +343,8 @@ void kdl::define_directive::parse(kdl::sema *sema)
             resource_fields.push_back(
                 kdk::assembler::field(field_name)
                     .set_values(field_values)
-                	.set_required(required)
+                    .set_deprecation_note(deprecation_note)
+                    .set_required(required)
 			);
             
         }
