@@ -152,7 +152,7 @@ public:
         /**
          * Indicate if the field is deprecated or not
          */
-        kdk::assembler::field set_deprecated(bool deprecated);
+        kdk::assembler::field set_deprecation_note(const std::string note);
         
         /**
          * Indicate if the field is required or not
@@ -191,6 +191,11 @@ public:
         bool is_deprecated() const;
         
         /**
+         * Returns the deprecation note of the field.
+         */
+        std::string deprecation_note() const;
+        
+        /**
          * Returns the name of the field.
          */
         std::string& name();
@@ -202,7 +207,7 @@ public:
         
     private:
         bool m_required { false };
-        bool m_deprecated { false };
+        std::string m_deprecation_note { "" };
         std::string m_name;
         std::vector<kdk::assembler::field::value> m_expected_values;
     };

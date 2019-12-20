@@ -182,9 +182,9 @@ kdk::assembler::field kdk::assembler::field::named(const std::string &name)
     return kdk::assembler::field(name);
 }
 
-kdk::assembler::field kdk::assembler::field::set_deprecated(bool deprecated)
+kdk::assembler::field kdk::assembler::field::set_deprecation_note(const std::string note)
 {
-    m_deprecated = deprecated;
+    m_deprecation_note = note;
     return *this;
 }
 
@@ -231,7 +231,12 @@ bool kdk::assembler::field::is_required() const
 
 bool kdk::assembler::field::is_deprecated() const
 {
-    return m_deprecated;
+    return !m_deprecation_note.empty();
+}
+
+std::string kdk::assembler::field::deprecation_note() const
+{
+    return m_deprecation_note;
 }
 
 std::string& kdk::assembler::field::name()
