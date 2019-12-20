@@ -49,7 +49,7 @@ static inline kdk::assembler::field::value::type parse_value_type(kdl::sema *sem
     else if (type_symbol == "c_string") {
         return kdk::assembler::field::value::type::c_string;
     }
-    else if (type_symbol == "resource_reference") {
+    else if (type_symbol == "p_string") {
         return kdk::assembler::field::value::type::p_string;
     }
     else if (type_symbol == "color") {
