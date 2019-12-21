@@ -1,92 +1,403 @@
 %YAML 1.2
+
+#
+# Copyright (c) 2019 Tom Hancocks
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+#
+
 ---
 name: KDL (Kestrel Development Kit)
-file_extensions:
-  - kdl
+file_extensions: kdl
 scope: source.kdl
+
 contexts:
+
+  # The prototypes are syntax rules that are loaded into all other syntax rule
+  # contexts.
+  prototype:
+    - include: single-line-comment
+
+  # The main context is the root syntax matching context. These are syntax
+  # rules that can only be matched at the top level of the document.
   main:
-    # Strings begin and end with quotes, and use backslashes as an escape
-    # character
-    - match: '"'
-      scope: punctuation.definition.string.begin.kdl
-      push: double_quoted_string
+    - include: directive
+    - include: declaration
 
-    # Comments begin with a '//' and finish at the end of the line
+  #############################################################################
+  # Comment Rules
+
+  single-line-comment:
     - match: '`'
-      scope: punctuation.definition.comment.kdl
-      push: line_comment
-
-    # Numbers
-    - match: '\b(-)?[0-9.]+\b'
-      scope: constant.numeric.kdl
-
-    # Directives
-    - match: '^\s*((@)(import|out|require|name|author|version))\s*'
-      captures: 
-        1: keyword.kdl
-
-    - match: '^\s*((@)(define))\s*'
-      captures: 
-        1: keyword.kdl
-
-    # Declarations
-    - match: '^\s*(declare)\s+([A-Za-z0-9_]+)\s*\{\s*'
-      captures: 
-        1: keyword.control.kdl
-        2: entity.name.kdl
-      push: declaration
-
-  double_quoted_string:
-    - meta_scope: string.quoted.double.kdl
-    - match: '\\.'
-      scope: constant.character.escape.kdl
-    - match: '"'
-      scope: punctuation.definition.string.end.kdl
-      pop: true
-
-  line_comment:
-    - meta_scope: comment.line.kdl
-    - match: $
-      pop: true
-
-  declaration:
-    - meta_scope: meta.type-declaration-block.kdl
-    - match: '(?=\})'
-      pop: true
-    - match: '\s*(new)\s*\(\s*'
-      captures:
-        1: keyword.control.kdl
-      push: arguments
-    - match: '\{'
-      scope: punctuation.definition.block.begin.kdl
+      scope: punctuation.definition.comment.begin.kdl
       push:
-        - meta_scope: meta.resource-declaration-block.kdl
-        - match: '(?=\})'
+        - meta_scope: comment.line.kdl
+        - match: $
           pop: true
-        - include: declaration_block
 
-  arguments:
-    - meta_scope: meta.function.parameters.kdl
-    - match: '(?=\))'
-      pop: true
-    - match: '\s*(id|name)\s*'
+  #############################################################################
+  # Directive Rules
+
+  directive:
+    # The first set of directives that we're going to try and match are the simple
+    # ones that simple take a set of strings as input.
+    - match: '((@)(out|import|name|version|require|author))'
+      scope: meta.preprocessor.directive.kdl
       captures:
-        1: entity.other.attribute-name.kdl
-    - match: '\s*([#]{1}(-)?[0-9.]+)\s*'
-      captures: 
-        1: constant.numeric.kdl
-    - match: '"'
-      scope: punctuation.definition.string.begin.kdl
-      push: double_quoted_string
+        1: keyword.kdl
+      push:
+        - match: '\{'
+          scope:
+            punctuation.definition.block.begin.kdl
+            keyword.operator.kdl
+          set:
+            - meta_scope: meta.block.directive.kdl
+            - include: string-literal
+            - match: '\}'
+              scope:
+                punctuation.definition.block.end.kdl
+                keyword.operator.kdl
+              pop: true
 
-  declaration_block:
-    - match: '\s*([A-Za-z0-9_]+)\s*[=]{1}\s*'
+    # The second directive type is the type definition directive. This is much
+    # more complex, as its body contains its own syntax rules.
+    - match: '((@)(define))'
+      scope: meta.preprocessor.directive.type-definition.kdl
+      captures:
+        1: keyword.kdl
+      push: directive-define-body
+
+  directive-define-body:
+    - match: '\{'
+      scope:
+        punctuation.definition.block.begin.kdl
+        keyword.operator.kdl
+      set:
+        - meta_scope: meta.block.directive.kdl
+        - include: type-definition-root-variable
+        - include: type-definition-field
+        - match: '\}'
+          scope:
+            punctuation.definition.block.begin.kdl
+            keyword.operator.kdl
+          pop: true
+
+  # Type Definition Root Variables are the mechanism by which key characteristics
+  # are defined for a resource type (such as name within KDL, and Type Code).
+  type-definition-root-variable:
+    - match: '\b(name|code)\s*\=\s*'
+      captures:
+        1: variable.language.kdl
+      push:
+        - match: ';'
+          pop: true
+        - include: string-literal
+
+  # Type Definition Fields are the mechanism by which actual value fields for
+  # resource type are defined.
+  type-definition-field:
+    - match: '\b(field)\b'
+      captures:
+        1: variable.function.kdl
+      push: [type-definition-field-body, type-definition-field-name]
+
+  type-definition-field-name:
+    - match: '\('
+      scope:
+        punctuation.definition.field.name.begin.kdl
+        keyword.operator.kdl
+      set:
+        - include: string-literal
+        - match: '\)'
+          scope:
+            punctuation.definition.field.name.end.kdl
+            keyword.operator.kdl
+          pop: true
+
+  type-definition-field-body:
+    - match: '\{'
+      scope:
+        punctuation.definition.field.body.begin.kdl
+        keyword.operator.kdl
+      set:
+        - include: type-definition-field-require
+        - include: type-definition-field-deprecated
+        - include: type-definition-field-value
+        - match: '\}'
+          scope:
+            punctuation.definition.field.body.end.kdl
+            keyword.operator.kdl
+          pop: true
+
+  type-definition-field-require:
+    - match: '\b(required);'
+      captures:
+        1: keyword.kdl
+
+  type-definition-field-deprecated:
+    - match: '\b(deprecated)\s*(\()'
+      captures:
+        1: variable.function.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: string-literal
+        - match: '(\));'
+          captures:
+            1: keyword.operator.kdl
+          pop: true
+
+  type-definition-field-value:
+    - match: '\b(value)\b'
+      captures:
+        1: variable.function.kdl
+      push: [type-definition-field-value-symbols, type-definition-field-value-argument]
+
+  type-definition-field-value-argument:
+    - match: '\('
+      scope: keyword.operator.kdl
+      set:
+        - include: type-definition-field-value-name
+        - include: type-definition-field-value-offset
+        - include: type-definition-field-value-length
+        - include: type-definition-field-value-size
+        - include: type-definition-field-value-type
+        - match: '\)'
+          scope: keyword.operator.kdl
+          pop: true
+
+  type-definition-field-value-symbols:
+    - match: '(?=\{)'
+      set:
+        - match: '\{'
+          scope: keyword.operator.kdl
+          set:
+            - include: type-definition-field-value-symbol-definition
+            - match: '(\});'
+              captures:
+                1: keyword.operator.kdl
+              pop: true
+    - match: ';'
+      pop: true
+
+  type-definition-field-value-symbol-definition:
+    - match: '\b([A-Za-z0-9_]+)\s*(\=)\s*'
       captures:
         1: entity.name.kdl
-    - match: '\s*([#]{0,1}(-)?[0-9.]+)\s*'
-      captures: 
-        1: constant.numeric.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: number-literal
+        - include: string-literal
+        - include: percentage-literal
+        - include: resource-literal
+        - match: ';'
+          pop: true
+
+  type-definition-field-value-name:
+    - match: '\b(name)\s*(\=)\s*'
+      captures:
+        1: variable.parameter.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: string-literal
+        - match: ',|(?=\))'
+          pop: true
+
+  type-definition-field-value-offset:
+    - match: '\b(offset)\s*(\=)\s*'
+      captures:
+        1: variable.parameter.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: number-literal
+        - match: ',|(?=\))'
+          pop: true
+
+  type-definition-field-value-length:
+    - match: '\b(length)\s*(\=)\s*'
+      captures:
+        1: variable.parameter.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: number-literal
+        - match: ',|(?=\))'
+          pop: true
+
+  type-definition-field-value-size:
+    - match: '\b(size)\s*(\=)\s*'
+      captures:
+        1: variable.parameter.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: number-literal
+        - include: integer-width-literal
+        - match: ',|(?=\))'
+          pop: true
+
+  type-definition-field-value-type:
+    - match: '\b(type)\s*(\=)\s*'
+      captures:
+        1: variable.parameter.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: value-type-literal
+        - match: ',|(?=\))'
+          pop: true
+
+  #############################################################################
+  # Declarations
+
+  declaration:
+    - match: '\b(declare)\s*([A-Za-z0-9_]+)\b'
+      captures:
+        1: keyword.declaration.struct.kdl
+        2: entity.name.kdl
+      push: declaration-body
+
+  declaration-body:
+    - match: '\{'
+      scope:
+        punctuation.declaration.block.begin.kdl
+        keyword.operator.kdl
+      set:
+        - meta_scope: meta.block.declaration.kdl
+        - include: declaration-instance
+        - match: '\}'
+          scope:
+            punctuation.declaration.block.begin.kdl
+            keyword.operator.kdl
+          pop: true
+
+  declaration-instance:
+    - match: '\b(new|override)\b'
+      captures:
+        1: variable.function.kdl
+      push: [declaration-instance-body, declaration-instance-arguments]
+
+  declaration-instance-arguments:
+    - match: '\('
+      scope: keyword.operator.kdl
+      set:
+        - include: declaration-instance-argument-id
+        - include: declaration-instance-argument-name
+        - match: '\)'
+          scope: keyword.operator.kdl
+          pop: true
+
+  declaration-instance-body:
+    - match: '\{'
+      scope: keyword.operator.kdl
+      set:
+        - include: declaration-instance-body-value
+        - match: '\}'
+          scope: keyword.operator.kdl
+          pop: true
+
+  declaration-instance-argument-id:
+    - match: '\b(id)\s*(\=)\s*'
+      captures:
+        1: variable.parameter.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: resource-literal
+        - match: ',|(?=\))'
+          pop: true
+
+  declaration-instance-argument-name:
+    - match: '\b(name)\s*(\=)\s*'
+      captures:
+        1: variable.parameter.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: string-literal
+        - match: ',|(?=\))'
+          pop: true
+
+  declaration-instance-body-value:
+    - match: '\b([A-Za-z0-9_]+)\s*(\=)\s*'
+      captures:
+        1: entity.name.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: color-function
+        - include: file-function
+        - include: number-literal
+        - include: string-literal
+        - include: percentage-literal
+        - include: resource-literal
+        - include: identifier-literal
+        - match: ';'
+          pop: true
+
+  #############################################################################
+  # Literals
+
+  identifier-literal:
+    - match: '[A-Za-z0-9_]+'
+      scope: constant.other.kdl
+
+  string-literal:
     - match: '"'
       scope: punctuation.definition.string.begin.kdl
-      push: double_quoted_string
+      push:
+        - meta_scope: string.quoted.double.kdl
+        - match: '"|(\n)'
+          scope: punctuation.definition.string.end.kdl
+          pop: true
+
+  number-literal:
+    - match: '(-)?[0-9]+'
+      scope: constant.numeric.integer.decimal.kdl
+
+  percentage-literal:
+    - match: '(-)?[0-9]+(\%)'
+      scope: constant.numeric.integer.percentage.kdl
+
+  resource-literal:
+    - match: '(\#)(-)?[0-9]+'
+      scope: constant.numeric.integer.decimal.kdl
+
+  integer-width-literal:
+    - match: '\b(byte|word|dword|qword|long|quad)\b'
+      scope: constant.language.kdl
+
+  value-type-literal:
+    - match: '\b(((c|p)_)string|integer|percentage|resource_reference|color|bitmask)\b'
+      scope: constant.language.kdl
+
+  color-function:
+    - match: '\b(rgb)\s*(\()'
+      captures:
+        1: variable.function.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: number-literal
+        - match: '\)'
+          scope: keyword.operator.kdl
+          pop: true
+
+  file-function:
+    - match: '\b(file)\s*(\()'
+      captures:
+        1: variable.function.kdl
+        2: keyword.operator.kdl
+      push:
+        - include: string-literal
+        - match: '\)'
+          scope: keyword.operator.kdl
+          pop: true
