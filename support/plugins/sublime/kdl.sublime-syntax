@@ -24,7 +24,8 @@
 
 ---
 name: KDL (Kestrel Development Kit)
-file_extensions: kdl
+file_extensions:
+  - kdl
 scope: source.kdl
 
 contexts:
@@ -92,6 +93,7 @@ contexts:
         - meta_scope: meta.block.directive.kdl
         - include: type-definition-root-variable
         - include: type-definition-field
+        - include: type-reference-definition
         - match: '\}'
           scope:
             punctuation.definition.block.begin.kdl
@@ -108,6 +110,54 @@ contexts:
         - match: ';'
           pop: true
         - include: string-literal
+
+  # Type References are a mechanism for describing how a resource type links to
+  # and references another, including the relationship between resource id's.
+  type-reference-definition:
+    - match: '\b(reference)\b'
+      captures:
+        1: variable.function.kdl
+      push: [type-reference-definition-body, type-reference-definition-name]
+
+  type-reference-definition-name:
+    - match: '\('
+      scope:
+        punctuation.definition.reference.name.begin.kdl
+        keyword.operator.kdl
+      set:
+        - include: string-literal
+        - match: '\)'
+          scope:
+            punctuation.definition.reference.name.end.kdl
+            keyword.operator.kdl
+          pop: true
+
+  type-reference-definition-body:
+    - match: '\{'
+      scope:
+        punctuation.definition.reference.body.begin.kdl
+        keyword.operator.kdl
+      set:
+        - match: '\}'
+          scope:
+            punctuation.definition.reference.body.end.kdl
+            keyword.operator.kdl
+          pop: true
+        - include: type-reference-definition-variable
+
+  type-reference-definition-variable:
+    - match: '\b(type|id-mapping|max-id)\s*\=\s*'
+      captures:
+        1: variable.language.kdl
+      push:
+        - match: ';'
+          pop: true
+        - include: string-literal
+        - include: number-literal
+        - include: variable-literal
+        - include: resource-literal
+        - match: '(\+|-|\*|\/)'
+          scope: keyword.operator.kdl
 
   # Type Definition Fields are the mechanism by which actual value fields for
   # resource type are defined.
@@ -225,6 +275,10 @@ contexts:
         2: keyword.operator.kdl
       push:
         - include: number-literal
+        - match: '\b(none)\b'
+          captures:
+            1: constant.language.kdl
+          pop: true
         - match: ',|(?=\))'
           pop: true
 
@@ -335,11 +389,12 @@ contexts:
         2: keyword.operator.kdl
       push:
         - include: color-function
-        - include: file-function
+        - include: contents-function
         - include: number-literal
         - include: string-literal
         - include: percentage-literal
         - include: resource-literal
+        - include: variable-literal
         - include: identifier-literal
         - match: ';'
           pop: true
@@ -348,8 +403,12 @@ contexts:
   # Literals
 
   identifier-literal:
-    - match: '[A-Za-z0-9_]+'
+    - match: '[A-Za-z0-9_-]+'
       scope: constant.other.kdl
+
+  variable-literal:
+    - match: '\$[A-Za-z0-9_-]+'
+      scope: variable.kdl
 
   string-literal:
     - match: '"'
@@ -377,8 +436,12 @@ contexts:
       scope: constant.language.kdl
 
   value-type-literal:
-    - match: '\b(((c|p)_)string|integer|percentage|resource_reference|color|bitmask)\b'
+    - match: '\b(((c|p)_)string|integer|percentage|color|bitmask)\b'
       scope: constant.language.kdl
+    - match: '\b(reference)\s*([A-Za-z0-9_]+)\b'
+      captures:
+        1: constant.language.kdl
+        2: entity.name.kdl
 
   color-function:
     - match: '\b(rgb)\s*(\()'
@@ -391,8 +454,8 @@ contexts:
           scope: keyword.operator.kdl
           pop: true
 
-  file-function:
-    - match: '\b(file)\s*(\()'
+  contents-function:
+    - match: '\b(contents\-of|import)\s*(\()'
       captures:
         1: variable.function.kdl
         2: keyword.operator.kdl

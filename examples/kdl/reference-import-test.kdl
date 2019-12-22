@@ -1,0 +1,30 @@
+` This file is used for testing spelling possibilities with KDL.
+
+@define {
+
+	name = "Alpha";
+	code = "älph";
+
+	reference("BetaReference") {
+		type = "Beta";
+		id-mapping = $id - 128 + 600;
+		max-id = #640;
+	}
+
+	field("bar") {
+		value(type = reference BetaReference, offset = none);
+	}
+
+}
+
+declare Alpha {
+
+	new(id = #128) {
+		bar = import("bar-data"); ` Import 'bar-data' as `Beta` #600
+	}
+
+	new(id = #145) {
+		bar = import("bar-data"); ` Import 'bar-data' as `Beta` #626
+	}
+
+}
