@@ -43,6 +43,45 @@ class assembler
 public:
     
     /**
+     * The Reference structures represents an explicit referencing of another resource
+     * type. For example, type 'Alpha' is linked to a resource of type 'Beta' with the
+     * defined id relationship.
+     */
+    struct reference
+    {
+    public:
+        /**
+         * Construct a new Reference structure for the specified field name.
+         */
+        reference(const std::string name);
+        
+        /**
+         * Set the referenced resource type. The resource type is "stringly typed" and
+         * not checked at this point. Instead the type is only checked when the reference
+         * is resolved.
+         */
+        kdk::assembler::reference set_type(const std::string type);
+        
+        /**
+         * Set the ID Mapping Operations.
+         */
+        kdk::assembler::reference set_id_mapping(const std::vector<std::tuple<char, std::string>> operations);
+        
+        /**
+         * Set the upper and lower bounds of the valid range of IDs that are valid for
+         * the reference.
+         */
+        kdk::assembler::reference set_id_range(int64_t lower, int64_t upper);
+        
+    private:
+        std::string m_name;
+        std::string m_type;
+        int64_t m_lower_id;
+        int64_t m_upper_id;
+        std::vector<std::tuple<char, std::string>> m_id_map_operations;
+    };
+    
+    /**
      * The Field structure represents a field that will be parsed from a `kdk::resource`
      * and converted into raw binary data.
      */
@@ -206,6 +245,7 @@ public:
         std::vector<kdk::assembler::field::value>& expected_values();
         
     private:
+        bool m_virtual { false };
         bool m_required { false };
         std::string m_deprecation_note { "" };
         std::string m_name;
@@ -222,6 +262,11 @@ public:
     rsrc::data assemble_resource(const kdk::resource resource);
     
     /**
+     * Add reference definition to the assembler.
+     */
+    void add_reference(const kdk::assembler::reference reference);
+    
+    /**
      * Add field definition to the assembler.
      */
     void add_field(const kdk::assembler::field field);
@@ -233,6 +278,7 @@ public:
     
 private:
     std::vector<kdk::assembler::field> m_fields;
+    std::vector<kdk::assembler::reference> m_refs;
     
     /**
      * Assemble the specified field in to the provided resource object.

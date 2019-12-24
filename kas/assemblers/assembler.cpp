@@ -37,6 +37,11 @@ rsrc::data kdk::assembler::assemble_resource(const kdk::resource resource)
     return blob;
 }
 
+void kdk::assembler::add_reference(const kdk::assembler::reference reference)
+{
+    m_refs.push_back(reference);
+}
+
 void kdk::assembler::add_field(const kdk::assembler::field field)
 {
     m_fields.push_back(field);
@@ -167,6 +172,33 @@ void kdk::assembler::encode(rsrc::data& blob, const std::string value, uint64_t 
     else {
         throw std::runtime_error("Illegal integer width");
     }
+}
+
+// MARK: - References
+
+kdk::assembler::reference::reference(const std::string name)
+    : m_name(name)
+{
+    
+}
+
+kdk::assembler::reference kdk::assembler::reference::set_type(const std::string type)
+{
+    m_type = type;
+    return *this;
+}
+
+kdk::assembler::reference kdk::assembler::reference::set_id_mapping(const std::vector<std::tuple<char, std::string>> operations)
+{
+    m_id_map_operations = operations;
+    return *this;
+}
+
+kdk::assembler::reference kdk::assembler::reference::set_id_range(int64_t lower, int64_t upper)
+{
+    m_lower_id = lower;
+    m_upper_id = upper;
+    return *this;
 }
 
 // MARK: - Fields
