@@ -263,6 +263,7 @@ void kdl::define_directive::parse(kdl::sema *sema)
     std::string resource_type_name;
     std::string resource_type_code;
     std::vector<kdk::assembler::field> resource_fields;
+    std::vector<kdk::assembler::reference> resource_references;
     
     auto file = sema->peek().file();
     auto line = sema->peek().line();
@@ -348,6 +349,120 @@ void kdl::define_directive::parse(kdl::sema *sema)
 			);
             
         }
+        else if (item_name == "reference") {
+            // Add a new field into the resource type.
+            // The syntax is:
+            //  reference(reference_name) { args }
+            
+            auto reference_name = parse_field_name(sema);
+            std::string type_name;
+            std::vector<std::tuple<char, std::string>> id_map_operations;
+            std::string lower_bound;
+            std::string upper_bound;
+            
+            sema->ensure({
+                kdl::condition(kdl::lexer::token::type::lbrace).truthy()
+            });
+            
+            // Loop until we find the terminating r-brace.
+            while (sema->expect({ kdl::condition(kdl::lexer::token::type::rbrace).falsey() })) {
+                // All reference attributes start with an identifier.
+                if (sema->expect({ kdl::condition(kdl::lexer::token::type::identifier).falsey() })) {
+                    log::error(sema->peek().file(), sema->peek().line(), "Type definition reference attribute should start with an identifier");
+                }
+                auto attribute_name = sema->read().text();
+                
+                sema->ensure({
+                    kdl::condition(kdl::lexer::token::type::equals).truthy()
+                });
+                
+                if (attribute_name == "type") {
+                    if (sema->expect({ kdl::condition(kdl::lexer::token::type::string).truthy() })) {
+                        type_name = sema->read().text();
+                    }
+                    else {
+                        log::error(sema->peek().file(), sema->peek().line(), "Invalid reference type name. Expected a string.");
+                    }
+                }
+                else if (attribute_name == "valid_id_range") {
+                    // The valid id range accepts two resource id's, which represent a lower and upper bound on the
+                    // resources that can be produced.
+                    if (sema->expect({
+                        kdl::condition(kdl::lexer::token::type::resource_id).truthy(),
+                        kdl::condition(kdl::lexer::token::type::resource_id).truthy(),
+                    })) {
+                        lower_bound = sema->read().text();
+                        upper_bound = sema->read().text();
+                    }
+                    else {
+                        log::error(sema->peek().file(), sema->peek().line(), "Invalid resource id range provided. Expected two resource ids.");
+                    }
+                }
+                else if (attribute_name == "id_mapping") {
+                    // The id mapping accepts a repeating pattern of variables, numbers and arithmetic symbols (+, -, * /). We
+                    // keep iterating until we find a ';' or an invalid token.
+                    char current_operator = '+';
+                    
+                    while (sema->expect({ kdl::condition(kdl::lexer::token::type::semi_colon).falsey() })) {
+                        // Check if the token is an ID variable
+                        if (sema->expect({ kdl::condition(kdl::lexer::token::type::variable, "id").truthy() })) {
+                            id_map_operations.push_back(std::make_tuple(current_operator, sema->read().text()));
+                        }
+                        // Check if the token is an integer
+                        else if (sema->expect({ kdl::condition(kdl::lexer::token::type::integer).truthy() })) {
+                            id_map_operations.push_back(std::make_tuple(current_operator, sema->read().text()));
+                        }
+                        else {
+                            log::error(sema->peek().file(), sema->peek().line(), "Invalid token found inside id_mapping. Expected $id or integer.");
+                        }
+                        
+                        // Check if the token is a plus
+                        if (sema->expect({ kdl::condition(kdl::lexer::token::type::plus).truthy() })) {
+                            sema->advance();
+                            current_operator = '+';
+                        }
+                        // Check if the token is a minus
+                        else if (sema->expect({ kdl::condition(kdl::lexer::token::type::minus).truthy() })) {
+                            sema->advance();
+                            current_operator = '-';
+                        }
+                        // Check if the token is a star (multiply)
+                        else if (sema->expect({ kdl::condition(kdl::lexer::token::type::star).truthy() })) {
+                            sema->advance();
+                            current_operator = '*';
+                        }
+                        // Check if the token is a slash (divide)
+                        else if (sema->expect({ kdl::condition(kdl::lexer::token::type::slash).truthy() })) {
+                            sema->advance();
+                            current_operator = '/';
+                        }
+                        // Check if the token is a semi-colon
+                        else if (sema->expect({ kdl::condition(kdl::lexer::token::type::semi_colon).truthy() })) {
+                            break;
+                        }
+                        // Invalid operator token encountered
+                        else {
+                            log::error(sema->peek().file(), sema->peek().line(), "Invalid operator token found inside id_mapping. Expected +, -, * or /.");
+                        }
+                    }
+                    
+                }
+                
+                sema->ensure({ kdl::condition(kdl::lexer::token::type::semi_colon).truthy() });
+            }
+            
+            sema->ensure({
+                kdl::condition(kdl::lexer::token::type::rbrace).truthy()
+            });
+            
+            // Finished parsing the reference definition...
+            resource_references.push_back(
+				kdk::assembler::reference(reference_name)
+                    .set_id_mapping(id_map_operations)
+                    .set_type(type_name)
+                    .set_id_range(std::stoll(lower_bound), std::stoll(upper_bound))
+			);
+        }
         
         sema->ensure({ kdl::condition(kdl::lexer::token::type::semi_colon).truthy() });
     }
@@ -369,6 +484,9 @@ void kdl::define_directive::parse(kdl::sema *sema)
     auto assembler = std::make_shared<kdk::assembler>();
     for (auto field : resource_fields) {
         assembler->add_field(field);
+    }
+    for (auto reference : resource_references) {
+        assembler->add_reference(reference);
     }
     kdk::assembler_pool::shared().register_assembler(resource_type_name, resource_type_code, assembler);
     
