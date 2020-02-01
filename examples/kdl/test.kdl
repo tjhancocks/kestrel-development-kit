@@ -5,3 +5,20 @@
 ` to the console.
 
 @out { "Hello, World" }
+
+
+declare Asteroid {
+
+	new (id = #128, name = "Small Metal") {
+
+		sprite = new {
+			sprites = import("asteroids/small-metal.png") as PNG;
+			size = 30 30;
+			tiles = 1 10;
+		};
+
+		mass = 100;
+
+	};
+
+}

@@ -1,4 +1,20 @@
 @define {
+	name = "Alpha";
+	code = "alph";
+
+	reference("link") {
+		type = "FooBar";
+		id_mapping = $id - 128;
+		valid_id_range = #0 #10;
+	};
+
+	field("name") {
+		required;
+		value(type = p_string, offset = 0);
+	};
+}
+
+@define {
 	` The name refers to the name that will be used within KDL.
 	name = "FooBar";
 
@@ -23,16 +39,20 @@
 	field("baz") {
 		deprecated("The baz field is deprecated.");
 		value(name = "baz", type = p_string, offset = 2);
-	}
+	};
 }
 
 
-declare FooBar {
-	new (id = #128) {
-		bar = 57005;
+declare Alpha {
+
+	new(id = #128) {
+		name = "Alpha-128";
+
+		` Produce a new FooBar resource with id #0.
+		link = new {
+			bar = alpha;
+			baz = "a";
+		};
 	}
 
-	new (id = #129) {
-		bar = gamma;
-	}
 }

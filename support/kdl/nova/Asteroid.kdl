@@ -30,8 +30,8 @@
 	` Asteroids use SpriteAnimation ID's #800 - #815.
 	reference("sprite") {
 		type = "SpriteAnimation";
-		id-mapping = $id - 128 + 800;
-		max-id = #815;
+		id_mapping = $id - 128 + 800;
+		valid_id_range = #800 #815;
 	};
 
 	` The strength of this asteroid type - this is equivalent to armour values
