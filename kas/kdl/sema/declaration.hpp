@@ -57,7 +57,7 @@ public:
     static void parse(kdl::sema *sema);
     
 private:
-    static kdk::resource parse_instance(kdl::sema *sema, const std::string type);
+    static kdk::resource parse_instance(kdl::sema *sema, const std::string type, bool ignore_attributes = false, int64_t default_id = 0, std::string default_name = "");
 };
 
 };

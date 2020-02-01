@@ -73,6 +73,22 @@ public:
          */
         kdk::assembler::reference set_id_range(int64_t lower, int64_t upper);
         
+        /**
+         * Returns the name of the reference, used to identify it in KDL.
+         */
+        std::string name() const;
+        
+        /**
+         * Returns the resource type code of the reference.
+         */
+        std::string type() const;
+        
+        /**
+         * Returns the list of operations that need to be performed in order to
+         * calculate the correct resource id for the relavant reference.
+         */
+        std::vector<std::tuple<char, std::string>> id_map_operations() const;
+        
     private:
         std::string m_name;
         std::string m_type;
@@ -275,6 +291,11 @@ public:
      * Find the specified field in the source resource.
      */
     std::shared_ptr<kdk::resource::field> find_field(std::string& name, const kdk::resource resource, bool required = false) const;
+    
+    /**
+     * Find the specified reference.
+     */
+    std::shared_ptr<kdk::assembler::reference> find_reference_definition(std::string& name) const;
     
 private:
     std::vector<kdk::assembler::field> m_fields;

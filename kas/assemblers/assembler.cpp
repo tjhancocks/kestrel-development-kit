@@ -201,6 +201,21 @@ kdk::assembler::reference kdk::assembler::reference::set_id_range(int64_t lower,
     return *this;
 }
 
+std::string kdk::assembler::reference::name() const
+{
+    return m_name;
+}
+
+std::string kdk::assembler::reference::type() const
+{
+    return m_type;
+}
+
+std::vector<std::tuple<char, std::string>> kdk::assembler::reference::id_map_operations() const
+{
+    return m_id_map_operations;
+}
+
 // MARK: - Fields
 
 kdk::assembler::field::field(const std::string& name)
@@ -371,4 +386,16 @@ std::shared_ptr<kdk::resource::field> kdk::assembler::find_field(std::string& na
         log::error("<missing>", 0, "Missing field '" + name + "' in resource.");
     }
     return field;
+}
+
+// MARK: - Reference Functions
+
+std::shared_ptr<kdk::assembler::reference> kdk::assembler::find_reference_definition(std::string& name) const
+{
+    for (auto ref : m_refs) {
+        if (ref.name() == name) {
+            return std::make_shared<kdk::assembler::reference>(ref);
+        }
+    }
+    return nullptr;
 }
