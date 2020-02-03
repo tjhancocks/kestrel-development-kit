@@ -20,22 +20,31 @@
 * SOFTWARE.
 */
 
-#include <memory>
-#include "assemblers/assembler.hpp"
+#include <vector>
+#include <string>
+#include "kdl/lexer.hpp"
+#include "kdl/sema.hpp"
 
-#if !defined(KDK_SPRITE_ANIMATION)
-#define KDK_SPRITE_ANIMATION
+#if !defined(KDL_DIRECTIVE_DEFINE)
+#define KDL_DIRECTIVE_DEFINE
 
-namespace kdk
+namespace kdl
 {
 
 /**
-* Construct a new `SpriteAnimation` type assembler, and return it to the caller. This
-* assembler is responsible for assembling SpriteAnimation, or 'spïn' resources.
-*/
-std::shared_ptr<kdk::assembler> sprite_animation_assembler();
+ * The `@define` directive is used to _define_ a new resource type for the assembler
+ * to recognise.
+ */
+struct define_directive
+{
+public:
+    
+    /**
+     * Parse a define directive.
+     */
+    static void parse(kdl::sema *sema);
+};
 
 };
 
 #endif
-

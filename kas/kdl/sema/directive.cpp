@@ -23,6 +23,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "kdl/sema/directive.hpp"
+#include "kdl/sema/define_directive.hpp"
 #include "diagnostic/log.hpp"
 #include "kdl/lexer.hpp"
 
@@ -51,27 +52,39 @@ void kdl::directive::parse(kdl::sema *sema)
     }
     sema->advance();
     
-    // Consume each of the arguments.
-    auto args = sema->consume(condition(kdl::lexer::token::type::rbrace).falsey());
-    
-    if (sema->expect(condition(kdl::lexer::token::type::rbrace).falsey())) {
-        auto tk = sema->peek();
-        log::error(tk.file(), tk.line(), "Expected '}' whilst finishing directive, but found '" + tk.text() + "' instead.");
-    }
-    sema->advance();
-    
-    // Prepare to execute the directive.
-    
     if (directive == "out") {
+        // Consume each of the arguments.
+        auto args = sema->consume(condition(kdl::lexer::token::type::rbrace).falsey());
+        
+        // The `@out` directive prints to the standard output.
         for (auto a : args) {
             std::cout << a.text() << std::endl;
         }
     }
+    else if (directive == "define") {
+        // Defines a new resource type for the assembler to use. This is a complex operation,
+        // so hand off to another function.
+        kdl::define_directive::parse(sema);
+    }
     else if (directive == "import") {
+        // Consume each of the arguments.
+        auto args = sema->consume(condition(kdl::lexer::token::type::rbrace).falsey());
+        
+        // The `@import` directive imports the contents of another file and inserts it
+        // into the current token stream.
         for (auto a : args) {
             auto lexer = kdl::lexer::open_file(a.text());
             auto tokens = lexer.analyze();
             sema->insert_tokens(tokens);
         }
     }
+    else {
+        log::error(sema->peek().file(), sema->peek().line(), "Unknown directive @" + directive);
+    }
+    
+    if (sema->expect(condition(kdl::lexer::token::type::rbrace).falsey())) {
+        auto tk = sema->peek();
+        log::error(tk.file(), tk.line(), "Expected '}' whilst finishing directive, but found '" + tk.text() + "' instead.");
+    }
+    sema->advance();
 }

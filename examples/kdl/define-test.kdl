@@ -1,0 +1,58 @@
+@define {
+	name = "Alpha";
+	code = "alph";
+
+	reference("link") {
+		type = "FooBar";
+		id_mapping = $id - 128;
+		valid_id_range = #0 #10;
+	};
+
+	field("name") {
+		required;
+		value(type = p_string, offset = 0);
+	};
+}
+
+@define {
+	` The name refers to the name that will be used within KDL.
+	name = "FooBar";
+
+	` The code refers to the 4 character resource type code that
+	` actually represents this type when encoded into a resource
+	` file.
+	code = "fööb";
+
+	` The field is a single value that is contained in the resource
+	` type. The field provides information that the assembler 
+	` needs to determine what values it should be seeing, and how
+	` they should be encoded.
+	field("bar") {
+		required;
+		value(name = "baz", type = integer, offset = 0, size = word) {
+			alpha = 10;
+			beta = 100;
+			gamma = 1000;
+		};
+	};
+
+	field("baz") {
+		deprecated("The baz field is deprecated.");
+		value(name = "baz", type = p_string, offset = 2);
+	};
+}
+
+
+declare Alpha {
+
+	new(id = #128) {
+		name = "Alpha-128";
+
+		` Produce a new FooBar resource with id #0.
+		link = new {
+			bar = alpha;
+			baz = "a";
+		};
+	}
+
+}

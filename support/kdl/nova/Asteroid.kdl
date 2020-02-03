@@ -1,0 +1,111 @@
+` Copyright (c) 2019 Tom Hancocks
+` 
+` Permission is hereby granted, free of charge, to any person obtaining a copy
+` of this software and associated documentation files (the "Software"), to deal
+` in the Software without restriction, including without limitation the rights
+` to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+` copies of the Software, and to permit persons to whom the Software is
+` furnished to do so, subject to the following conditions:
+` 
+` The above copyright notice and this permission notice shall be included in all
+` copies or substantial portions of the Software.
+` 
+` THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+` IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+` FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+` AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+` LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+` OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+` SOFTWARE.
+
+` The Asteroid resource type is used to define types of Asteroid that can be
+` found in game. You can define upto sixteen of them (#128 - #143).
+@define {
+
+	name = "Asteroid";
+	code = "röid";
+
+	` The SpriteAnimation resource that provides the Asteroid type with its
+	` sprite / appearance.
+	` Asteroids use SpriteAnimation ID's #800 - #815.
+	reference("sprite") {
+		type = "SpriteAnimation";
+		id_mapping = $id - 128 + 800;
+		valid_id_range = #800 #815;
+	};
+
+	` The strength of this asteroid type - this is equivalent to armour values
+	` for ships.
+	field("strength") {
+		required;
+		value(type = integer, size = word, offset = 0);
+	};
+
+	` The frame advance rate of this asteroid type. A value of 100 is 30 frames
+	` per second (quite fast) - lower numbers are slower.
+	field("spin-rate") {
+		required;
+		value(type = integer, size = word, offset = 2) {
+			fast = 100;
+			normal = 75;
+			slow = 50;
+		};
+	};
+
+	` Defines what resource boxes are ejected from this asteroid type when it
+	` is destroyed, and its yield. A yield of none (0) will cause asteroids to
+	` not eject resources of this type. A yield value of 1 or more will cause
+	` asteroids to eject approximately that number of resource boxes.
+	field("yield") {
+		required;
+		value(name = "type", type = reference, offset = 6) {
+			food = 0;
+			industrial = 1;
+			medical = 2;
+			luxury = 3;
+			metal = 4;
+			equipment = 5;
+		};
+		value(name = "quantity", type = integer, size = word, offset = 8) {
+			none = 0;
+		};
+	};
+
+	` The number of particles that are emitted when an asteroid is destroyed.
+	` This field is not required and will default to 10 white particles.
+	field("particles") {
+		value(name = "count", type = integer, size = word, offset = 10, default = 10);
+		value(name = "color", type = color, size = long, offset = 12, default = rgb(255 255 255));
+	};
+
+	` Asteroids can break up into some number of small sub-asteroids when
+	` destroyed. If both of these values are defined then the engine will
+	` randomly choose between them. Each field represents the type of asteroid
+	` that the engine should generate when the Asteroid is destroyed.
+	field("fragments") {
+		value(name = "1", type = reference, offset = 16, default = none) {
+			none = -1;
+		};
+		value(name = "2", type = reference, offset = 18, default = none) {
+			none = -1;
+		};
+		value(name = "count", type = integer, size = word, offset = 20, default = none) {
+			none = 0;
+		};
+	};
+
+	` The type of explosion to show (0 - 63) when an asteroid of this type is
+	` destroyed.
+	field("explosion") {
+		value(type = integer, size = word, offset = 22, default = none) {
+			none = -1;
+		};
+	};
+
+	` The mass of this asteroid type (used when weapons hit asteroids.)
+	field("mass") {
+		required;
+		value(type = integer, size = word, offset = 24);
+	};
+
+}

@@ -43,6 +43,61 @@ class assembler
 public:
     
     /**
+     * The Reference structures represents an explicit referencing of another resource
+     * type. For example, type 'Alpha' is linked to a resource of type 'Beta' with the
+     * defined id relationship.
+     */
+    struct reference
+    {
+    public:
+        /**
+         * Construct a new Reference structure for the specified field name.
+         */
+        reference(const std::string name);
+        
+        /**
+         * Set the referenced resource type. The resource type is "stringly typed" and
+         * not checked at this point. Instead the type is only checked when the reference
+         * is resolved.
+         */
+        kdk::assembler::reference set_type(const std::string type);
+        
+        /**
+         * Set the ID Mapping Operations.
+         */
+        kdk::assembler::reference set_id_mapping(const std::vector<std::tuple<char, std::string>> operations);
+        
+        /**
+         * Set the upper and lower bounds of the valid range of IDs that are valid for
+         * the reference.
+         */
+        kdk::assembler::reference set_id_range(int64_t lower, int64_t upper);
+        
+        /**
+         * Returns the name of the reference, used to identify it in KDL.
+         */
+        std::string name() const;
+        
+        /**
+         * Returns the resource type code of the reference.
+         */
+        std::string type() const;
+        
+        /**
+         * Returns the list of operations that need to be performed in order to
+         * calculate the correct resource id for the relavant reference.
+         */
+        std::vector<std::tuple<char, std::string>> id_map_operations() const;
+        
+    private:
+        std::string m_name;
+        std::string m_type;
+        int64_t m_lower_id;
+        int64_t m_upper_id;
+        std::vector<std::tuple<char, std::string>> m_id_map_operations;
+    };
+    
+    /**
      * The Field structure represents a field that will be parsed from a `kdk::resource`
      * and converted into raw binary data.
      */
@@ -152,7 +207,7 @@ public:
         /**
          * Indicate if the field is deprecated or not
          */
-        kdk::assembler::field set_deprecated(bool deprecated);
+        kdk::assembler::field set_deprecation_note(const std::string note);
         
         /**
          * Indicate if the field is required or not
@@ -191,6 +246,11 @@ public:
         bool is_deprecated() const;
         
         /**
+         * Returns the deprecation note of the field.
+         */
+        std::string deprecation_note() const;
+        
+        /**
          * Returns the name of the field.
          */
         std::string& name();
@@ -201,8 +261,9 @@ public:
         std::vector<kdk::assembler::field::value>& expected_values();
         
     private:
+        bool m_virtual { false };
         bool m_required { false };
-        bool m_deprecated { false };
+        std::string m_deprecation_note { "" };
         std::string m_name;
         std::vector<kdk::assembler::field::value> m_expected_values;
     };
@@ -217,6 +278,11 @@ public:
     rsrc::data assemble_resource(const kdk::resource resource);
     
     /**
+     * Add reference definition to the assembler.
+     */
+    void add_reference(const kdk::assembler::reference reference);
+    
+    /**
      * Add field definition to the assembler.
      */
     void add_field(const kdk::assembler::field field);
@@ -226,8 +292,14 @@ public:
      */
     std::shared_ptr<kdk::resource::field> find_field(std::string& name, const kdk::resource resource, bool required = false) const;
     
+    /**
+     * Find the specified reference.
+     */
+    std::shared_ptr<kdk::assembler::reference> find_reference_definition(std::string& name) const;
+    
 private:
     std::vector<kdk::assembler::field> m_fields;
+    std::vector<kdk::assembler::reference> m_refs;
     
     /**
      * Assemble the specified field in to the provided resource object.

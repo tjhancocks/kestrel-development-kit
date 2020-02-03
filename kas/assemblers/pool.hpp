@@ -21,19 +21,41 @@
 */
 
 #include <memory>
+#include <vector>
+#include <tuple>
 #include "assemblers/assembler.hpp"
 
-#if !defined(KDK_ASTEROID)
-#define KDK_ASTEROID
+#if !defined(KDK_ASSEMBLER_POOL)
+#define KDK_ASSEMBLER_POOL
 
 namespace kdk
 {
 
 /**
- * Construct a new `Asteroid` type assembler, and return it to the caller. This
- * assembler is responsible for assembling Asteroid, or 'röid' resources.
+ * The Assembler Pool is responsible for storing and keeping track of
+ * assemblers that may have been created in KDL, or KAS itself.
+ *
+ * When an assembler is requested that a pointer to the assembler will be
+ * returned for use.
  */
-std::shared_ptr<kdk::assembler> asteroid_assembler();
+class assembler_pool
+{
+public:
+    assembler_pool(const assembler_pool&) = delete;
+    assembler_pool& operator=(const assembler_pool &) = delete;
+    assembler_pool(assembler_pool &&) = delete;
+    assembler_pool & operator=(assembler_pool &&) = delete;
+    
+    static assembler_pool& shared();
+    
+    std::tuple<std::string, std::shared_ptr<kdk::assembler>> assembler_named(const std::string type_name, bool no_error = false) const;
+    void register_assembler(const std::string type_name, const std::string type_code, std::shared_ptr<kdk::assembler> assembler);
+    
+private:
+    std::vector<std::tuple<std::string, std::string, std::shared_ptr<kdk::assembler>>> m_assemblers;
+    assembler_pool();
+    
+};
 
 };
 

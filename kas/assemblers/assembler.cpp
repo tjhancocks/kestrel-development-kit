@@ -37,6 +37,11 @@ rsrc::data kdk::assembler::assemble_resource(const kdk::resource resource)
     return blob;
 }
 
+void kdk::assembler::add_reference(const kdk::assembler::reference reference)
+{
+    m_refs.push_back(reference);
+}
+
 void kdk::assembler::add_field(const kdk::assembler::field field)
 {
     m_fields.push_back(field);
@@ -54,7 +59,7 @@ void kdk::assembler::assemble(const kdk::resource resource, kdk::assembler::fiel
     
     // Is the field deprecated? If show show a warning.
     if (field.is_deprecated()) {
-        log::warning("<missing>", 0, "The field '" + field.name() + "' is deprecated.");
+        log::warning("<missing>", 0, field.deprecation_note());
     }
     
     // If the field was provided in the script, then handle it, otherwise try to fill it in with
@@ -169,6 +174,48 @@ void kdk::assembler::encode(rsrc::data& blob, const std::string value, uint64_t 
     }
 }
 
+// MARK: - References
+
+kdk::assembler::reference::reference(const std::string name)
+    : m_name(name)
+{
+    
+}
+
+kdk::assembler::reference kdk::assembler::reference::set_type(const std::string type)
+{
+    m_type = type;
+    return *this;
+}
+
+kdk::assembler::reference kdk::assembler::reference::set_id_mapping(const std::vector<std::tuple<char, std::string>> operations)
+{
+    m_id_map_operations = operations;
+    return *this;
+}
+
+kdk::assembler::reference kdk::assembler::reference::set_id_range(int64_t lower, int64_t upper)
+{
+    m_lower_id = lower;
+    m_upper_id = upper;
+    return *this;
+}
+
+std::string kdk::assembler::reference::name() const
+{
+    return m_name;
+}
+
+std::string kdk::assembler::reference::type() const
+{
+    return m_type;
+}
+
+std::vector<std::tuple<char, std::string>> kdk::assembler::reference::id_map_operations() const
+{
+    return m_id_map_operations;
+}
+
 // MARK: - Fields
 
 kdk::assembler::field::field(const std::string& name)
@@ -182,9 +229,9 @@ kdk::assembler::field kdk::assembler::field::named(const std::string &name)
     return kdk::assembler::field(name);
 }
 
-kdk::assembler::field kdk::assembler::field::set_deprecated(bool deprecated)
+kdk::assembler::field kdk::assembler::field::set_deprecation_note(const std::string note)
 {
-    m_deprecated = deprecated;
+    m_deprecation_note = note;
     return *this;
 }
 
@@ -231,7 +278,12 @@ bool kdk::assembler::field::is_required() const
 
 bool kdk::assembler::field::is_deprecated() const
 {
-    return m_deprecated;
+    return !m_deprecation_note.empty();
+}
+
+std::string kdk::assembler::field::deprecation_note() const
+{
+    return m_deprecation_note;
 }
 
 std::string& kdk::assembler::field::name()
@@ -293,7 +345,7 @@ bool kdk::assembler::field::value::type_allowed(kdk::resource::field::value_type
         }
         case kdk::resource::field::value_type::identifier: {
             if (!m_symbols.empty()) {
-                return m_type_mask & kdk::assembler::field::value::type::resource_reference;
+                return true;
             }
             return m_type_mask & (kdk::assembler::field::value::type::integer | kdk::assembler::field::value::type::bitmask);
         }
@@ -334,4 +386,16 @@ std::shared_ptr<kdk::resource::field> kdk::assembler::find_field(std::string& na
         log::error("<missing>", 0, "Missing field '" + name + "' in resource.");
     }
     return field;
+}
+
+// MARK: - Reference Functions
+
+std::shared_ptr<kdk::assembler::reference> kdk::assembler::find_reference_definition(std::string& name) const
+{
+    for (auto ref : m_refs) {
+        if (ref.name() == name) {
+            return std::make_shared<kdk::assembler::reference>(ref);
+        }
+    }
+    return nullptr;
 }

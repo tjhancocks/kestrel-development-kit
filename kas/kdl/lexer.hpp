@@ -52,7 +52,7 @@ public:
          */
         enum type
         {
-            unknown, identifier, resource_id, string, integer, percentage,
+            unknown, variable, identifier, resource_id, string, integer, percentage,
             lbrace, rbrace, lparen, rparen, langle, rangle, lbracket, rbracket,
             plus, minus, star, slash, pipe, ampersand, equals, colon, dot, comma,
             caret, directive, semi_colon

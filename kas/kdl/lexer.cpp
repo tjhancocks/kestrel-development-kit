@@ -143,6 +143,12 @@ std::vector<kdl::lexer::token> kdl::lexer::analyze()
             consume_while(number_set::contains);
             m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, m_slice, token::type::resource_id));
         }
+        else if (test_if(match<'$'>::yes)) {
+            // We're looking at the beginning of a variable
+            advance();
+            consume_while(identifier_set::contains);
+            m_tokens.push_back(kdl::lexer::token(m_path, m_line, 0, m_slice, token::type::variable));
+        }
         else if (test_if(number_set::contains)) {
             // We're looking at a number, slice it out of the source, and then check the following
             // character.
