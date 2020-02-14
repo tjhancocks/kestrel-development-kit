@@ -25,9 +25,21 @@ set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories("${PROJECT_SOURCE_DIR}/kas")
+# libGraphite - Submodule
+include_directories("${PROJECT_SOURCE_DIR}/submodules/Graphite")
+file(GLOB_RECURSE graphite_sources
+	submodules/Graphite/libGraphite/*.cpp
+)
+add_library(Graphite ${graphite_sources})
+
+# kas - main binary
+include_directories(
+	"${PROJECT_SOURCE_DIR}/kas"
+	"${PROJECT_SOURCE_DIR}/submodules/Graphite"
+)
 
 file(GLOB_RECURSE kas_sources
 	kas/*.cpp
 ) 
 add_executable(kas ${kas_sources})
+target_link_libraries(kas Graphite)

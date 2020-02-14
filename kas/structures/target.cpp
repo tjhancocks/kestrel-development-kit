@@ -21,7 +21,7 @@
 */
 
 #include "structures/target.hpp"
-#include "rsrc/file.hpp"
+#include "libGraphite/rsrc/file.hpp"
 #include "assemblers/assembler.hpp"
 #include "assemblers/pool.hpp"
 
@@ -37,14 +37,17 @@ kdk::target::target(std::string path)
 
 void kdk::target::add_resources(const std::vector<kdk::resource> resources)
 {
-    m_resources.insert(std::end(m_resources), std::begin(resources), std::end(resources));
+    m_resources.reserve(m_resources.size() + resources.size());
+    m_resources.insert(m_resources.end(),
+                       std::make_move_iterator(resources.begin()),
+                       std::make_move_iterator(resources.end()));
 }
 
 // MARK: - Build
 
 void kdk::target::build()
 {
-    auto rf = rsrc::file::create(m_path);
+    auto rf = std::make_shared<graphite::rsrc::file>();
     
     // Iterate through each of the resources and construct the data for each of them.
     // Currently this is done by manually testing the type and invoking the appropriate
@@ -54,10 +57,12 @@ void kdk::target::build()
         
         auto assembler = kdk::assembler_pool::shared().assembler_named(type);
         if (std::get<1>(assembler)) {
-            rf->add_resource(std::get<0>(assembler), resource.id(), resource.name(), std::get<1>(assembler)->assemble_resource(resource));
+            auto data = std::get<1>(assembler)->assemble_resource(resource);
+//            auto container = rf->type_container(std::get<0>(assembler));
+            rf->add_resource(std::get<0>(assembler), resource.id(), resource.name(), data);
         }
     }
     
     // The resource file should be assembled at this point and just needs writting to disk.
-    rf->write();
+    rf->write(m_path, graphite::rsrc::file::format::classic);
 }

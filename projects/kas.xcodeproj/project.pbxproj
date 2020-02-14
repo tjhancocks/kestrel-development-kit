@@ -7,13 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		800A135223F6F25D002C9837 /* libGraphite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 800A135123F6F25D002C9837 /* libGraphite.a */; };
 		8013C47623A925BB00AFA554 /* define_directive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8013C47423A925BB00AFA554 /* define_directive.cpp */; };
 		801619CD23AA047600D19B6C /* pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 801619CB23AA047600D19B6C /* pool.cpp */; };
 		80206E9A239E025D0035E672 /* assembler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80206E98239E025D0035E672 /* assembler.cpp */; };
 		80227081239B719500CE1CFE /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8022707F239B719500CE1CFE /* log.cpp */; };
-		8047D590239307C900D7CDA9 /* data.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D58E239307C900D7CDA9 /* data.cpp */; };
-		8047D593239386BE00D7CDA9 /* macroman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D592239386BE00D7CDA9 /* macroman.cpp */; };
-		8047D59A2394DCCB00D7CDA9 /* file.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8047D5982394DCCB00D7CDA9 /* file.cpp */; };
 		80678E05238D89DB00AE94AE /* sema.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678E03238D89DB00AE94AE /* sema.cpp */; };
 		80678E9923902ADF00AE94AE /* directive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678E9723902ADF00AE94AE /* directive.cpp */; };
 		80678EA12390D2E000AE94AE /* target.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80678E9F2390D2E000AE94AE /* target.cpp */; };
@@ -36,6 +34,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		800A135123F6F25D002C9837 /* libGraphite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libGraphite.a; path = ../../build/libGraphite.a; sourceTree = "<group>"; };
 		8013C47423A925BB00AFA554 /* define_directive.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = define_directive.cpp; sourceTree = "<group>"; };
 		8013C47523A925BB00AFA554 /* define_directive.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = define_directive.hpp; sourceTree = "<group>"; };
 		801619CB23AA047600D19B6C /* pool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pool.cpp; sourceTree = "<group>"; };
@@ -44,12 +43,33 @@
 		80206E99239E025D0035E672 /* assembler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = assembler.hpp; sourceTree = "<group>"; };
 		8022707F239B719500CE1CFE /* log.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = log.cpp; sourceTree = "<group>"; };
 		80227080239B719500CE1CFE /* log.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = log.hpp; sourceTree = "<group>"; };
-		8047D58E239307C900D7CDA9 /* data.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = data.cpp; sourceTree = "<group>"; };
-		8047D58F239307C900D7CDA9 /* data.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = data.hpp; sourceTree = "<group>"; };
-		8047D591239386BE00D7CDA9 /* macroman.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = macroman.hpp; sourceTree = "<group>"; };
-		8047D592239386BE00D7CDA9 /* macroman.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = macroman.cpp; sourceTree = "<group>"; };
-		8047D5982394DCCB00D7CDA9 /* file.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = file.cpp; sourceTree = "<group>"; };
-		8047D5992394DCCB00D7CDA9 /* file.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = file.hpp; sourceTree = "<group>"; };
+		80589DD823F51CC90084FB01 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		80589DD923F51CC90084FB01 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		80589DDA23F51CC90084FB01 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		80589DDE23F51CC90084FB01 /* macroman.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = macroman.hpp; sourceTree = "<group>"; };
+		80589DDF23F51CC90084FB01 /* macroman.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = macroman.cpp; sourceTree = "<group>"; };
+		80589DE123F51CC90084FB01 /* rez.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = rez.hpp; sourceTree = "<group>"; };
+		80589DE223F51CC90084FB01 /* type.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = type.hpp; sourceTree = "<group>"; };
+		80589DE323F51CC90084FB01 /* resource.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = resource.cpp; sourceTree = "<group>"; };
+		80589DE423F51CC90084FB01 /* extended.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = extended.cpp; sourceTree = "<group>"; };
+		80589DE523F51CC90084FB01 /* file.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = file.hpp; sourceTree = "<group>"; };
+		80589DE623F51CC90084FB01 /* classic.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = classic.hpp; sourceTree = "<group>"; };
+		80589DE723F51CC90084FB01 /* manager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = manager.cpp; sourceTree = "<group>"; };
+		80589DE823F51CC90084FB01 /* file.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = file.cpp; sourceTree = "<group>"; };
+		80589DE923F51CC90084FB01 /* classic.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = classic.cpp; sourceTree = "<group>"; };
+		80589DEA23F51CC90084FB01 /* manager.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = manager.hpp; sourceTree = "<group>"; };
+		80589DEB23F51CC90084FB01 /* rez.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = rez.cpp; sourceTree = "<group>"; };
+		80589DEC23F51CC90084FB01 /* type.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = type.cpp; sourceTree = "<group>"; };
+		80589DED23F51CC90084FB01 /* resource.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = resource.hpp; sourceTree = "<group>"; };
+		80589DEE23F51CC90084FB01 /* extended.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = extended.hpp; sourceTree = "<group>"; };
+		80589DF023F51CC90084FB01 /* writer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = writer.hpp; sourceTree = "<group>"; };
+		80589DF123F51CC90084FB01 /* reader.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = reader.hpp; sourceTree = "<group>"; };
+		80589DF223F51CC90084FB01 /* data.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = data.cpp; sourceTree = "<group>"; };
+		80589DF323F51CC90084FB01 /* reader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = reader.cpp; sourceTree = "<group>"; };
+		80589DF423F51CC90084FB01 /* data.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = data.hpp; sourceTree = "<group>"; };
+		80589DF523F51CC90084FB01 /* writer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = writer.cpp; sourceTree = "<group>"; };
+		80589DF623F51CC90084FB01 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		80589DF823F51CC90084FB01 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		80678E03238D89DB00AE94AE /* sema.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = sema.cpp; sourceTree = "<group>"; };
 		80678E04238D89DB00AE94AE /* sema.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = sema.hpp; sourceTree = "<group>"; };
 		80678E9723902ADF00AE94AE /* directive.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = directive.cpp; sourceTree = "<group>"; };
@@ -71,6 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				800A135223F6F25D002C9837 /* libGraphite.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,19 +107,6 @@
 			path = diagnostic;
 			sourceTree = "<group>";
 		};
-		8047D58D2393079B00D7CDA9 /* rsrc */ = {
-			isa = PBXGroup;
-			children = (
-				8047D591239386BE00D7CDA9 /* macroman.hpp */,
-				8047D592239386BE00D7CDA9 /* macroman.cpp */,
-				8047D58F239307C900D7CDA9 /* data.hpp */,
-				8047D58E239307C900D7CDA9 /* data.cpp */,
-				8047D5992394DCCB00D7CDA9 /* file.hpp */,
-				8047D5982394DCCB00D7CDA9 /* file.cpp */,
-			);
-			path = rsrc;
-			sourceTree = "<group>";
-		};
 		8047D5942394DB0500D7CDA9 /* assemblers */ = {
 			isa = PBXGroup;
 			children = (
@@ -108,6 +116,98 @@
 				801619CB23AA047600D19B6C /* pool.cpp */,
 			);
 			path = assemblers;
+			sourceTree = "<group>";
+		};
+		80589DB423F5056F0084FB01 /* submodules */ = {
+			isa = PBXGroup;
+			children = (
+				80589DD723F51CC90084FB01 /* Graphite */,
+			);
+			name = submodules;
+			path = ../submodules;
+			sourceTree = "<group>";
+		};
+		80589DD723F51CC90084FB01 /* Graphite */ = {
+			isa = PBXGroup;
+			children = (
+				80589DD823F51CC90084FB01 /* CMakeLists.txt */,
+				80589DD923F51CC90084FB01 /* LICENSE */,
+				80589DDA23F51CC90084FB01 /* README.md */,
+				800A135123F6F25D002C9837 /* libGraphite.a */,
+				80589DDB23F51CC90084FB01 /* libGraphite */,
+				80589DF623F51CC90084FB01 /* .gitignore */,
+				80589DF723F51CC90084FB01 /* GraphiteTest */,
+			);
+			path = Graphite;
+			sourceTree = "<group>";
+		};
+		80589DDB23F51CC90084FB01 /* libGraphite */ = {
+			isa = PBXGroup;
+			children = (
+				80589DDC23F51CC90084FB01 /* encoding */,
+				80589DE023F51CC90084FB01 /* rsrc */,
+				80589DEF23F51CC90084FB01 /* data */,
+			);
+			path = libGraphite;
+			sourceTree = "<group>";
+		};
+		80589DDC23F51CC90084FB01 /* encoding */ = {
+			isa = PBXGroup;
+			children = (
+				80589DDD23F51CC90084FB01 /* macroman */,
+			);
+			path = encoding;
+			sourceTree = "<group>";
+		};
+		80589DDD23F51CC90084FB01 /* macroman */ = {
+			isa = PBXGroup;
+			children = (
+				80589DDE23F51CC90084FB01 /* macroman.hpp */,
+				80589DDF23F51CC90084FB01 /* macroman.cpp */,
+			);
+			path = macroman;
+			sourceTree = "<group>";
+		};
+		80589DE023F51CC90084FB01 /* rsrc */ = {
+			isa = PBXGroup;
+			children = (
+				80589DE123F51CC90084FB01 /* rez.hpp */,
+				80589DE223F51CC90084FB01 /* type.hpp */,
+				80589DE323F51CC90084FB01 /* resource.cpp */,
+				80589DE423F51CC90084FB01 /* extended.cpp */,
+				80589DE523F51CC90084FB01 /* file.hpp */,
+				80589DE623F51CC90084FB01 /* classic.hpp */,
+				80589DE723F51CC90084FB01 /* manager.cpp */,
+				80589DE823F51CC90084FB01 /* file.cpp */,
+				80589DE923F51CC90084FB01 /* classic.cpp */,
+				80589DEA23F51CC90084FB01 /* manager.hpp */,
+				80589DEB23F51CC90084FB01 /* rez.cpp */,
+				80589DEC23F51CC90084FB01 /* type.cpp */,
+				80589DED23F51CC90084FB01 /* resource.hpp */,
+				80589DEE23F51CC90084FB01 /* extended.hpp */,
+			);
+			path = rsrc;
+			sourceTree = "<group>";
+		};
+		80589DEF23F51CC90084FB01 /* data */ = {
+			isa = PBXGroup;
+			children = (
+				80589DF023F51CC90084FB01 /* writer.hpp */,
+				80589DF123F51CC90084FB01 /* reader.hpp */,
+				80589DF223F51CC90084FB01 /* data.cpp */,
+				80589DF323F51CC90084FB01 /* reader.cpp */,
+				80589DF423F51CC90084FB01 /* data.hpp */,
+				80589DF523F51CC90084FB01 /* writer.cpp */,
+			);
+			path = data;
+			sourceTree = "<group>";
+		};
+		80589DF723F51CC90084FB01 /* GraphiteTest */ = {
+			isa = PBXGroup;
+			children = (
+				80589DF823F51CC90084FB01 /* main.cpp */,
+			);
+			path = GraphiteTest;
 			sourceTree = "<group>";
 		};
 		80678E9623902AD400AE94AE /* sema */ = {
@@ -138,6 +238,7 @@
 			isa = PBXGroup;
 			children = (
 				80940A03238A581300137EB1 /* Products */,
+				80589DB423F5056F0084FB01 /* submodules */,
 				809409FD238A57FB00137EB1 /* kas */,
 			);
 			sourceTree = "<group>";
@@ -148,7 +249,6 @@
 				80940A0A238A583300137EB1 /* main.cpp */,
 				8022707E239B717A00CE1CFE /* diagnostic */,
 				8047D5942394DB0500D7CDA9 /* assemblers */,
-				8047D58D2393079B00D7CDA9 /* rsrc */,
 				80678E9A2390310400AE94AE /* structures */,
 				80940A0F238A59BD00137EB1 /* kdl */,
 			);
@@ -237,10 +337,7 @@
 				80678EAA2392456B00AE94AE /* resource.cpp in Sources */,
 				801619CD23AA047600D19B6C /* pool.cpp in Sources */,
 				80678E9923902ADF00AE94AE /* directive.cpp in Sources */,
-				8047D590239307C900D7CDA9 /* data.cpp in Sources */,
 				80940A0B238A583300137EB1 /* main.cpp in Sources */,
-				8047D593239386BE00D7CDA9 /* macroman.cpp in Sources */,
-				8047D59A2394DCCB00D7CDA9 /* file.cpp in Sources */,
 				80678E05238D89DB00AE94AE /* sema.cpp in Sources */,
 				80227081239B719500CE1CFE /* log.cpp in Sources */,
 				80678EA42390D42600AE94AE /* declaration.cpp in Sources */,
@@ -315,11 +412,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = "../submodules/**";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = "-I../kas";
+				OTHER_CFLAGS = (
+					"-I../submodules/Graphite",
+					"-I../kas",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
@@ -370,10 +471,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = "../submodules/**";
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				OTHER_CFLAGS = "-I../kas";
+				OTHER_CFLAGS = (
+					"-I../submodules/Graphite",
+					"-I../kas",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 			};
