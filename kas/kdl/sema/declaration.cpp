@@ -71,7 +71,7 @@ void kdl::declaration::parse(kdl::sema *sema)
     });
     
     // Prepare to add the structure type and all instances into the target.
-    sema->target().add_resources(m_instances);
+    sema->target()->add_resources(m_instances);
 }
 
 kdk::resource kdl::declaration::parse_instance(kdl::sema *sema, const std::string type, bool ignore_attributes, int64_t default_id, std::string default_name)
@@ -212,7 +212,7 @@ kdk::resource kdl::declaration::parse_instance(kdl::sema *sema, const std::strin
             
             // Parse the nested instance, to produce a new resource instance. Add that directly to the target.
             auto instance = parse_instance(sema, reference->type(), true, reference_reference_id, resource_name);
-            sema->target().add_resources({ instance });
+            sema->target()->add_resources({ instance });
         }
         else {
             // We're simply handling a field within the resource.

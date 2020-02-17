@@ -1,0 +1,3 @@
+[submodule "submodules/Graphite"]
+	path = submodules/Graphite
+	url = https://github.com/TheDiamondProject/Graphite/

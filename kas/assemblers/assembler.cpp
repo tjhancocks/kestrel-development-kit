@@ -26,15 +26,15 @@
 
 // MARK: - Assembly
 
-rsrc::data kdk::assembler::assemble_resource(const kdk::resource resource)
+std::shared_ptr<graphite::data::data> kdk::assembler::assemble_resource(const kdk::resource resource)
 {
-    rsrc::data blob { };
+    auto writer = std::make_shared<graphite::data::writer>();
     
     for (auto field : m_fields) {
-        assemble(resource, field, blob);
+        assemble(resource, field, writer);
     }
     
-    return blob;
+    return writer->data();
 }
 
 void kdk::assembler::add_reference(const kdk::assembler::reference reference)
@@ -47,15 +47,15 @@ void kdk::assembler::add_field(const kdk::assembler::field field)
     m_fields.push_back(field);
 }
 
-void kdk::assembler::assemble(const kdk::resource resource, kdk::assembler::field field, rsrc::data& blob)
+void kdk::assembler::assemble(const kdk::resource resource, kdk::assembler::field field, std::shared_ptr<graphite::data::writer> writer)
 {
     // Find the field with in the resource
     auto resource_field = find_field(field.name(), resource, field.is_required());
     
     // Ensure the data object is large enough for this field.
-    blob.set_insertion_point(blob.size());
-    blob.pad_to_size(field.required_data_size());
-    blob.set_insertion_point(field.offset());
+    writer->set_position(writer->size());
+    writer->pad_to_size(field.required_data_size());
+    writer->set_position(field.offset());
     
     // Is the field deprecated? If show show a warning.
     if (field.is_deprecated()) {
@@ -81,29 +81,29 @@ void kdk::assembler::assemble(const kdk::resource resource, kdk::assembler::fiel
             }
             
             // Seek to the appropriate location in the data for encoding.
-            blob.set_insertion_point(expected_value.offset());
+            writer->set_position(expected_value.offset());
             
             // Handle the value appropriately and encode it into the data.
             switch (std::get<1>(value)) {
                 case kdk::resource::field::value_type::integer:
                 case kdk::resource::field::value_type::percentage: {
-                    encode(blob, std::get<0>(value), expected_value.size());
+                    encode(writer, std::get<0>(value), expected_value.size());
                     break;
                 }
                     
                 case kdk::resource::field::value_type::resource_id: {
-                    blob.write_signed_word(static_cast<int16_t>(std::stoi(std::get<0>(value))));
+                    writer->write_signed_short(static_cast<int16_t>(std::stoi(std::get<0>(value))));
                     break;
                 }
                     
                 case kdk::resource::field::value_type::string: {
                     if (expected_value.type_mask() & kdk::assembler::field::value::type::p_string) {
                         // C String
-                        blob.write_cstr(std::get<0>(value), expected_value.size());
+                        writer->write_cstr(std::get<0>(value), expected_value.size());
                     }
                     else {
                         // Pascal String
-                        blob.write_pstr(std::get<0>(value));
+                        writer->write_pstr(std::get<0>(value));
                     }
                     break;
                 }
@@ -111,7 +111,7 @@ void kdk::assembler::assemble(const kdk::resource resource, kdk::assembler::fiel
                 case kdk::resource::field::value_type::identifier: {
                     for (auto symbol : expected_value.symbols()) {
                         if (std::get<0>(value) == std::get<0>(symbol)) {
-                            encode(blob, std::get<1>(symbol), expected_value.size());
+                            encode(writer, std::get<1>(symbol), expected_value.size());
                             goto SYMBOL_FOUND;
                         }
                     }
@@ -128,7 +128,7 @@ void kdk::assembler::assemble(const kdk::resource resource, kdk::assembler::fiel
                     
                 case kdk::resource::field::value_type::color: {
                     auto rgb = static_cast<uint32_t>(std::stoi(std::get<0>(value)));
-                    blob.write_long(rgb);
+                    writer->write_long(rgb);
                     break;
                 }
             }
@@ -137,37 +137,37 @@ void kdk::assembler::assemble(const kdk::resource resource, kdk::assembler::fiel
     else {
         // No field was specified in the resource, so write the default values.
         for (auto expected : field.expected_values()) {
-            expected.write_default_value(blob);
+            expected.write_default_value(writer);
         }
     }
     
 }
 
-void kdk::assembler::encode(rsrc::data& blob, const std::string value, uint64_t width, bool is_signed)
+void kdk::assembler::encode(std::shared_ptr<graphite::data::writer> writer, const std::string value, uint64_t width, bool is_signed)
 {
     if (width == 1 && is_signed) {
-        blob.write_signed_byte(static_cast<int8_t>(std::stol(value)));
+        writer->write_signed_byte(static_cast<int8_t>(std::stol(value)));
     }
     else if (width == 1) {
-        blob.write_byte(static_cast<uint8_t>(std::stoul(value)));
+        writer->write_byte(static_cast<uint8_t>(std::stoul(value)));
     }
     else if (width == 2 && is_signed) {
-        blob.write_signed_word(static_cast<int16_t>(std::stol(value)));
+        writer->write_signed_short(static_cast<int16_t>(std::stol(value)));
     }
     else if (width == 2) {
-        blob.write_word(static_cast<uint16_t>(std::stoul(value)));
+        writer->write_short(static_cast<uint16_t>(std::stoul(value)));
     }
     else if (width == 4 && is_signed) {
-        blob.write_signed_long(static_cast<int32_t>(std::stol(value)));
+        writer->write_signed_long(static_cast<int32_t>(std::stol(value)));
     }
     else if (width == 4) {
-        blob.write_long(static_cast<uint32_t>(std::stoul(value)));
+        writer->write_long(static_cast<uint32_t>(std::stoul(value)));
     }
     else if (width == 8 && is_signed) {
-        blob.write_signed_quad(static_cast<int64_t>(std::stoll(value)));
+        writer->write_signed_quad(static_cast<int64_t>(std::stoll(value)));
     }
     else if (width == 8) {
-        blob.write_quad(static_cast<uint64_t>(std::stoull(value)));
+        writer->write_quad(static_cast<uint64_t>(std::stoull(value)));
     }
     else {
         throw std::runtime_error("Illegal integer width");
@@ -315,7 +315,7 @@ kdk::assembler::field::value kdk::assembler::field::value::set_symbols(const std
     return *this;
 }
 
-kdk::assembler::field::value kdk::assembler::field::value::set_default_value(const std::function<void(rsrc::data&)> default_value)
+kdk::assembler::field::value kdk::assembler::field::value::set_default_value(const std::function<void(std::shared_ptr<graphite::data::writer>)> default_value)
 {
     m_default_value = default_value;
     return *this;
@@ -369,11 +369,11 @@ kdk::assembler::field::value::type kdk::assembler::field::value::type_mask() con
     return m_type_mask;
 }
 
-void kdk::assembler::field::value::write_default_value(rsrc::data& data) const
+void kdk::assembler::field::value::write_default_value(std::shared_ptr<graphite::data::writer> writer) const
 {
     if (m_default_value) {
-        data.set_insertion_point(m_offset);
-        m_default_value(data);
+        writer->set_position(m_offset);
+        m_default_value(writer);
     }
 }
 

@@ -68,7 +68,7 @@ public:
     /**
      * Construct a new `kdl::sema` instance using the specified token stream.
      */
-    sema(kdk::target target, const std::vector<kdl::lexer::token> tokens);
+    sema(std::shared_ptr<kdk::target> target, const std::vector<kdl::lexer::token> tokens);
     
     /**
      * Run/perform semantic analysis on the token stream.
@@ -121,7 +121,7 @@ public:
     /**
      * Returns a reference to the current target.
      */
-    kdk::target& target();
+    std::shared_ptr<kdk::target> target();
     
     /**
      * Insert new tokens into the token stream at the current location.
@@ -131,7 +131,7 @@ public:
 private:
     long m_ptr { 0 };
     std::vector<kdl::lexer::token> m_tokens;
-    kdk::target m_target { "" };
+    std::shared_ptr<kdk::target> m_target;
 };
 
 

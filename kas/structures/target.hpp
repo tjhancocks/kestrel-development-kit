@@ -23,8 +23,6 @@
 #include <string>
 #include <vector>
 #include "structures/resource.hpp"
-#include "rsrc/data.hpp"
-
 
 #if !defined(KDK_TARGET)
 #define KDK_TARGET
@@ -63,7 +61,6 @@ public:
     void build();
     
 private:
-    rsrc::data m_data;
     std::string m_path;
     std::vector<kdk::resource> m_resources;
 };

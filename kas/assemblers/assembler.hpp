@@ -23,7 +23,7 @@
 #include <type_traits>
 #include <memory>
 #include <tuple>
-#include "rsrc/data.hpp"
+#include "libGraphite/data/writer.hpp"
 #include "structures/resource.hpp"
 
 #if !defined(KDK_ASSEMBLER)
@@ -151,7 +151,7 @@ public:
              * Specify a lambda that can be called so a default value can be written into the
              * data object.
              */
-            kdk::assembler::field::value set_default_value(const std::function<void(rsrc::data&)> default_value);
+            kdk::assembler::field::value set_default_value(const std::function<void(std::shared_ptr<graphite::data::writer>)> default_value);
             
             /**
              * Returns the size of the value when encoded
@@ -176,7 +176,7 @@ public:
             /**
              * Write the default value into the data.
              */
-            void write_default_value(rsrc::data& data) const;
+            void write_default_value(std::shared_ptr<graphite::data::writer> writer) const;
             
             /**
              * Returns a vector of symbol tuples for the value.
@@ -189,7 +189,7 @@ public:
             std::vector<std::tuple<std::string, std::string>> m_symbols;
             uint64_t m_size;
             uint64_t m_offset;
-            std::function<void(rsrc::data&)> m_default_value;
+            std::function<void(std::shared_ptr<graphite::data::writer>)> m_default_value;
         };
         
     public:
@@ -275,7 +275,7 @@ public:
      *
      * This method should be implemented by the subclass.
      */
-    rsrc::data assemble_resource(const kdk::resource resource);
+    std::shared_ptr<graphite::data::data> assemble_resource(const kdk::resource resource);
     
     /**
      * Add reference definition to the assembler.
@@ -304,13 +304,13 @@ private:
     /**
      * Assemble the specified field in to the provided resource object.
      */
-    void assemble(const kdk::resource resource, kdk::assembler::field field, rsrc::data& blob);
+    void assemble(const kdk::resource resource, kdk::assembler::field field, std::shared_ptr<graphite::data::writer> writer);
     
     /**
      * Write the specified value as an integer to the data at the current
      * offset.
      */
-    void encode(rsrc::data& blob, const std::string value, uint64_t width, bool is_signed = true);
+    void encode(std::shared_ptr<graphite::data::writer> writer, const std::string value, uint64_t width, bool is_signed = true);
 };
 
 };
