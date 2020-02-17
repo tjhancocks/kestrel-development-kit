@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include "structures/resource.hpp"
+#include "libGraphite/rsrc/file.hpp"
 
 #if !defined(KDK_TARGET)
 #define KDK_TARGET
@@ -58,7 +59,7 @@ public:
      * to the target, converting them into data objects and assembling the resource
      * file.
      */
-    void build();
+    void build(graphite::rsrc::file::format = graphite::rsrc::file::format::classic);
     
 private:
     std::string m_path;

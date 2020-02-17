@@ -25,6 +25,7 @@
 #include <algorithm>
 #include "kdl/lexer.hpp"
 #include "kdl/sema.hpp"
+#include "libGraphite/rsrc/file.hpp"
 
 // MARK: - Command Line Helpers
 
@@ -63,6 +64,7 @@ int main(int argc, const char **argv)
     // Step through all of the arguments and determine where the _first_ input file is located.
     std::string scenario_path { "" };
     std::string output_file { "plugin.kdat" };
+    graphite::rsrc::file::format format { graphite::rsrc::file::format::classic };
     std::vector<std::string> input_files;
 
     for (auto i = 1; i < argc; ++i) {
@@ -78,7 +80,20 @@ int main(int argc, const char **argv)
             scenario_path = std::string(argv[++i]);
         }
         else if (option == "--format" && i < argc - 1) {
-            std::string format { argv[++i] };
+            std::string format_name { argv[++i] };
+            if (format_name == "classic") {
+                format = graphite::rsrc::file::format::classic;
+            }
+            else if (format_name == "extended") {
+                format = graphite::rsrc::file::format::extended;
+            }
+            else if (format_name == "rez") {
+                format = graphite::rsrc::file::format::rez;
+            }
+            else {
+                std::cout << "kas: \x1b[31merror: \x1b[0minvalid output format: " << format_name << std::endl;
+                return 3;
+            }
         }
         else if (option == "-o" && i < argc - 1) {
             output_file = std::string(argv[++i]);
@@ -99,7 +114,7 @@ int main(int argc, const char **argv)
         sema.run();
     }
 
-    target->build();
+    target->build(format);
 
     return 0;
 }
