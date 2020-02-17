@@ -28,7 +28,7 @@
 
 // MARK: - Constructor
 
-kdl::sema::sema(kdk::target target, const std::vector<kdl::lexer::token> tokens)
+kdl::sema::sema(std::shared_ptr<kdk::target> target, const std::vector<kdl::lexer::token> tokens)
     : m_target(target), m_tokens(tokens), m_ptr(0)
 {
     
@@ -36,7 +36,7 @@ kdl::sema::sema(kdk::target target, const std::vector<kdl::lexer::token> tokens)
 
 // MARK: - Accessors
 
-kdk::target& kdl::sema::target()
+std::shared_ptr<kdk::target> kdl::sema::target()
 {
     return m_target;
 }

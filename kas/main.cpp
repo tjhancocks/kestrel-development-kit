@@ -46,42 +46,60 @@ const char *get_option(const char **begin, const char **end, const std::string& 
 
 int main(int argc, const char **argv)
 {
-    
-    // Check if any arguments have been supplied.
+    // Check if any arguments have been supplied. If none have been supplied then display an error
+    // page.
     if (option_exists(argv, argv + argc, "--help") || option_exists(argv, argv + argc, "-h")) {
-        std::cout   << "The Kestrel Assembler -- Version 0.1" << std::endl
-                    << "    kas [options] -f input_file" << std::endl << std::endl
+        std::cout   << "The Kestrel Assembler -- Version 0.2" << std::endl
+                    << "    kas [options] input_file ..." << std::endl << std::endl
+                    << "Multiple files added to the build will be included into the same output file." << std::endl << std::endl
                     << "Options" << std::endl
-                    << "  -f,               The KDL source file to assemble." << std::endl
-                    << "  -o                The destination KDAT file for the assembled data file to be written to." << std::endl
+                    << "  --scenario        The scenario definition files to assemble against." << std::endl
+                    << "  --format          The output data format to be assembled. Should be 'classic', 'extended' or 'rez'." << std::endl
+                    << "  -o                The destination file for the assembled data to be written to." << std::endl
                     << "  -h, --help        Display this help message." << std::endl;
         return 0;
     }
-    
-    std::string input_file { "" };
-    if (option_exists(argv, argv + argc, "-f")) {
-        input_file = get_option(argv, argv + argc, "-f");
+
+    // Step through all of the arguments and determine where the _first_ input file is located.
+    std::string scenario_path { "" };
+    std::string output_file { "plugin.kdat" };
+    std::vector<std::string> input_files;
+
+    for (auto i = 1; i < argc; ++i) {
+        // If the argument starts with a '-' then skip it. If the argument depends on additional arguments, then
+        // skip those as well.
+        if (argv[i][0] != '-') {
+            input_files.push_back(argv[i]);
+            continue;
+        }
+
+        std::string option { argv[i] };
+        if (option == "--scenario" && i < argc - 1) {
+            scenario_path = std::string(argv[++i]);
+        }
+        else if (option == "--format" && i < argc - 1) {
+            std::string format { argv[++i] };
+        }
+        else if (option == "-o" && i < argc - 1) {
+            output_file = std::string(argv[++i]);
+        }
+        else {
+            std::cout << "kas: \x1b[31merror: \x1b[0mbad argument supplied: " << option << std::endl;
+            return 2;
+        }
     }
-    
-    std::string output_file { "kestrel-plugin.kdat" };
-    if (option_exists(argv, argv + argc, "-o")) {
-        output_file = get_option(argv, argv + argc, "-o");
+
+    // Setup a new target.
+    auto target = std::make_shared<kdk::target>(output_file);
+
+    // Iterate through each of the input files.
+    for (auto file : input_files) {
+        auto lexer = kdl::lexer::open_file(file);
+        auto sema = kdl::sema(target, lexer.analyze());
+        sema.run();
     }
-    
-    
-    if (argc <= 1 || input_file.empty()) {
-        std::cout << "kas: \x1b[31merror: \x1b[0mno input file" << std::endl;
-        return 1;
-    }   
-    
-    // Perform the workflow (lexical analysis, semantic analysis...)
-    auto lexer = kdl::lexer::open_file(input_file);
-    auto sema = kdl::sema(kdk::target(output_file), lexer.analyze());
-    sema.run();
-    
-    // The semantic analysis should have resulted in a completed target structure, which
-    // can now be assembled.
-    sema.target().build();
-    
+
+    target->build();
+
     return 0;
 }
