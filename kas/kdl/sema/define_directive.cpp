@@ -22,6 +22,8 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <functional>
+#include <memory>
 #include "kdl/sema/define_directive.hpp"
 #include "diagnostic/log.hpp"
 #include "assemblers/assembler.hpp"
@@ -122,6 +124,61 @@ static inline std::string parse_field_name(kdl::sema *sema)
     return field_name;
 }
 
+static inline std::tuple<std::string, kdk::resource::field::value_type> parse_value_default(kdl::sema *sema, kdk::assembler::field::value::type value_type)
+{
+    auto file = sema->peek().file();
+    auto line = sema->peek().line();
+
+    std::tuple<std::string, kdk::resource::field::value_type> default_value;
+
+    switch (value_type) {
+        case kdk::assembler::field::value::type::resource_reference: {
+            if (sema->expect(kdl::condition(kdl::lexer::token::type::resource_id).truthy())) {
+                default_value = std::make_tuple(sema->read().text(), kdk::resource::field::value_type::resource_id);
+            }
+            else if (sema->expect(kdl::condition(kdl::lexer::token::type::identifier).truthy())) {
+                default_value = std::make_tuple(sema->read().text(), kdk::resource::field::value_type::identifier);
+            }
+            else {
+                log::error(file, line, "The default value for a resource reference for should be a resource id.");
+            }
+            break;
+        }
+
+        case kdk::assembler::field::value::type::integer: {
+            if (sema->expect(kdl::condition(kdl::lexer::token::type::integer).truthy())) {
+                default_value = std::make_tuple(sema->read().text(), kdk::resource::field::value_type::integer);
+            }
+            else if (sema->expect(kdl::condition(kdl::lexer::token::type::identifier).truthy())) {
+                default_value = std::make_tuple(sema->read().text(), kdk::resource::field::value_type::identifier);
+            }
+            else {
+                log::error(file, line, "The default value for a resource reference for should be a resource id.");
+            }
+            break;
+        }
+
+        case kdk::assembler::field::value::type::c_string: {
+            if (sema->expect(kdl::condition(kdl::lexer::token::type::string).truthy())) {
+                default_value = std::make_tuple(sema->read().text(), kdk::resource::field::value_type::string);
+            }
+            else if (sema->expect(kdl::condition(kdl::lexer::token::type::identifier).truthy())) {
+                default_value = std::make_tuple(sema->read().text(), kdk::resource::field::value_type::identifier);
+            }
+            else {
+                log::error(file, line, "The default value for a resource reference for should be a resource id.");
+            }
+            break;
+        }
+
+        default: {
+            log::error(file, line, "Unrecognised value type for default value.");
+        }
+    }
+
+    return default_value;
+}
+
 static inline kdk::assembler::field::value parse_field_value(kdl::sema *sema)
 {
     auto file = sema->peek().file();
@@ -136,7 +193,8 @@ static inline kdk::assembler::field::value parse_field_value(kdl::sema *sema)
     uint64_t value_length { 0 };
     std::string value_name;
     uint64_t value_offset { 0 };
-    
+    std::tuple<std::string, kdk::resource::field::value_type> default_value_function;
+
     bool length_required = false;
     bool size_required = false;
     
@@ -197,6 +255,9 @@ static inline kdk::assembler::field::value parse_field_value(kdl::sema *sema)
                     break;
             }
         }
+        else if (attribute == "default") {
+            default_value_function = parse_value_default(sema, value_type);
+        }
         else {
             // Unrecognised attribute.
             log::error(sema->peek().file(), sema->peek().line(), "Unrecognised value attribute '" + attribute + "' encountered.");
@@ -221,8 +282,10 @@ static inline kdk::assembler::field::value parse_field_value(kdl::sema *sema)
     if (length_required && value_length == 0) {
         log::error(file, line, "Expected the 'length' attribute to be specified on type definition field value.");
     }
-    
-    return kdk::assembler::field::value(value_name, value_type, value_offset, length_required ? value_length : value_size);
+
+    auto value = kdk::assembler::field::value(value_name, value_type, value_offset, length_required ? value_length : value_size);
+    value.set_default_value(default_value_function);
+    return value;
 }
 
 static inline void parse_symbol_list(kdl::sema *sema, kdk::assembler::field::value& value)
@@ -242,7 +305,7 @@ static inline void parse_symbol_list(kdl::sema *sema, kdk::assembler::field::val
         
         // Get the value of the symbol. These are _always_ integers.
         if (sema->expect({ kdl::condition(kdl::lexer::token::type::integer).falsey() })) {
-            log::error(sema->peek().file(), sema->peek().line(), "Symbol value should be an integer.");
+            log::error(sema->peek().file(), sema->peek().line(), "Symbol value should be an integer: " + sema->peek().text());
         }
         auto symbol_value = sema->read().text();
         

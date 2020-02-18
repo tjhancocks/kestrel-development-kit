@@ -82,68 +82,72 @@ void kdk::assembler::assemble(const kdk::resource resource, kdk::assembler::fiel
             
             // Seek to the appropriate location in the data for encoding.
             writer->set_position(expected_value.offset());
-            
-            // Handle the value appropriately and encode it into the data.
-            switch (std::get<1>(value)) {
-                case kdk::resource::field::value_type::integer:
-                case kdk::resource::field::value_type::percentage: {
-                    encode(writer, std::get<0>(value), expected_value.size());
-                    break;
-                }
-                    
-                case kdk::resource::field::value_type::resource_id: {
-                    writer->write_signed_short(static_cast<int16_t>(std::stoi(std::get<0>(value))));
-                    break;
-                }
-                    
-                case kdk::resource::field::value_type::string: {
-                    if (expected_value.type_mask() & kdk::assembler::field::value::type::p_string) {
-                        // C String
-                        writer->write_cstr(std::get<0>(value), expected_value.size());
-                    }
-                    else {
-                        // Pascal String
-                        writer->write_pstr(std::get<0>(value));
-                    }
-                    break;
-                }
-                    
-                case kdk::resource::field::value_type::identifier: {
-                    for (auto symbol : expected_value.symbols()) {
-                        if (std::get<0>(value) == std::get<0>(symbol)) {
-                            encode(writer, std::get<1>(symbol), expected_value.size());
-                            goto SYMBOL_FOUND;
-                        }
-                    }
-                    
-                    log::error("<missing>", 0, "The symbol '" + std::get<0>(value) + "' was not recognised.");
-                SYMBOL_FOUND:
-                    break;
-                }
-                    
-                case kdk::resource::field::value_type::file_reference: {
-                    // TODO
-                    break;
-                }
-                    
-                case kdk::resource::field::value_type::color: {
-                    auto rgb = static_cast<uint32_t>(std::stoi(std::get<0>(value)));
-                    writer->write_long(rgb);
-                    break;
-                }
-            }
+            encode_value(writer, expected_value, value);
         }
     }
     else {
         // No field was specified in the resource, so write the default values.
         for (auto expected : field.expected_values()) {
-            expected.write_default_value(writer);
+            expected.write_default_value(writer, *this);
         }
     }
     
 }
 
-void kdk::assembler::encode(std::shared_ptr<graphite::data::writer> writer, const std::string value, uint64_t width, bool is_signed)
+void kdk::assembler::encode_value(std::shared_ptr<graphite::data::writer> writer, kdk::assembler::field::value expected_value, std::tuple<std::string, kdk::resource::field::value_type> value)
+{
+    // Handle the value appropriately and encode it into the data.
+    switch (std::get<1>(value)) {
+        case kdk::resource::field::value_type::integer:
+        case kdk::resource::field::value_type::percentage: {
+            encode_integer(writer, std::get<0>(value), expected_value.size());
+            break;
+        }
+
+        case kdk::resource::field::value_type::resource_id: {
+            writer->write_signed_short(static_cast<int16_t>(std::stoi(std::get<0>(value))));
+            break;
+        }
+
+        case kdk::resource::field::value_type::string: {
+            if (expected_value.type_mask() & kdk::assembler::field::value::type::p_string) {
+                // C String
+                writer->write_cstr(std::get<0>(value), expected_value.size());
+            }
+            else {
+                // Pascal String
+                writer->write_pstr(std::get<0>(value));
+            }
+            break;
+        }
+
+        case kdk::resource::field::value_type::identifier: {
+            for (auto symbol : expected_value.symbols()) {
+                if (std::get<0>(value) == std::get<0>(symbol)) {
+                    encode_integer(writer, std::get<1>(symbol), expected_value.size());
+                    goto SYMBOL_FOUND;
+                }
+            }
+
+            log::error("<missing>", 0, "The symbol '" + std::get<0>(value) + "' was not recognised.");
+            SYMBOL_FOUND:
+            break;
+        }
+
+        case kdk::resource::field::value_type::file_reference: {
+            // TODO
+            break;
+        }
+
+        case kdk::resource::field::value_type::color: {
+            auto rgb = static_cast<uint32_t>(std::stoi(std::get<0>(value)));
+            writer->write_long(rgb);
+            break;
+        }
+    }
+}
+
+void kdk::assembler::encode_integer(std::shared_ptr<graphite::data::writer> writer, const std::string value, uint64_t width, bool is_signed)
 {
     if (width == 1 && is_signed) {
         writer->write_signed_byte(static_cast<int8_t>(std::stol(value)));
@@ -315,9 +319,9 @@ kdk::assembler::field::value kdk::assembler::field::value::set_symbols(const std
     return *this;
 }
 
-kdk::assembler::field::value kdk::assembler::field::value::set_default_value(const std::function<void(std::shared_ptr<graphite::data::writer>)> default_value)
+kdk::assembler::field::value kdk::assembler::field::value::set_default_value(const std::tuple<std::string, kdk::resource::field::value_type> default_value)
 {
-    m_default_value = default_value;
+    m_default_value = std::make_shared<std::tuple<std::string, kdk::resource::field::value_type>>(default_value);
     return *this;
 }
 
@@ -369,11 +373,11 @@ kdk::assembler::field::value::type kdk::assembler::field::value::type_mask() con
     return m_type_mask;
 }
 
-void kdk::assembler::field::value::write_default_value(std::shared_ptr<graphite::data::writer> writer) const
+void kdk::assembler::field::value::write_default_value(std::shared_ptr<graphite::data::writer> writer, kdk::assembler& assembler) const
 {
     if (m_default_value) {
         writer->set_position(m_offset);
-        m_default_value(writer);
+        assembler.encode_value(writer, *this, *m_default_value);
     }
 }
 

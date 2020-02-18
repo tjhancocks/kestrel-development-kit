@@ -151,7 +151,7 @@ public:
              * Specify a lambda that can be called so a default value can be written into the
              * data object.
              */
-            kdk::assembler::field::value set_default_value(const std::function<void(std::shared_ptr<graphite::data::writer>)> default_value);
+            kdk::assembler::field::value set_default_value(const std::tuple<std::string, kdk::resource::field::value_type> default_value);
             
             /**
              * Returns the size of the value when encoded
@@ -172,11 +172,11 @@ public:
              * Returns the type mask of the value.
              */
             kdk::assembler::field::value::type type_mask() const;
-            
+
             /**
              * Write the default value into the data.
              */
-            void write_default_value(std::shared_ptr<graphite::data::writer> writer) const;
+            void write_default_value(std::shared_ptr<graphite::data::writer> writer, kdk::assembler& assembler) const;
             
             /**
              * Returns a vector of symbol tuples for the value.
@@ -189,7 +189,7 @@ public:
             std::vector<std::tuple<std::string, std::string>> m_symbols;
             uint64_t m_size;
             uint64_t m_offset;
-            std::function<void(std::shared_ptr<graphite::data::writer>)> m_default_value;
+            std::shared_ptr<std::tuple<std::string, kdk::resource::field::value_type>> m_default_value;
         };
         
     public:
@@ -305,12 +305,17 @@ private:
      * Assemble the specified field in to the provided resource object.
      */
     void assemble(const kdk::resource resource, kdk::assembler::field field, std::shared_ptr<graphite::data::writer> writer);
-    
+
+    /**
+     * Encode an unknown value type into the resource data at the current offset.
+     */
+    void encode_value(std::shared_ptr<graphite::data::writer> writer, kdk::assembler::field::value expected_value, std::tuple<std::string, kdk::resource::field::value_type> value);
+
     /**
      * Write the specified value as an integer to the data at the current
      * offset.
      */
-    void encode(std::shared_ptr<graphite::data::writer> writer, const std::string value, uint64_t width, bool is_signed = true);
+    void encode_integer(std::shared_ptr<graphite::data::writer> writer, const std::string value, uint64_t width, bool is_signed = true);
 };
 
 };
