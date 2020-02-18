@@ -21,7 +21,6 @@
 */
 
 #include "structures/target.hpp"
-#include "libGraphite/rsrc/file.hpp"
 #include "assemblers/assembler.hpp"
 #include "assemblers/pool.hpp"
 
@@ -45,7 +44,7 @@ void kdk::target::add_resources(const std::vector<kdk::resource> resources)
 
 // MARK: - Build
 
-void kdk::target::build()
+void kdk::target::build(graphite::rsrc::file::format format)
 {
     auto rf = std::make_shared<graphite::rsrc::file>();
     
@@ -58,11 +57,10 @@ void kdk::target::build()
         auto assembler = kdk::assembler_pool::shared().assembler_named(type);
         if (std::get<1>(assembler)) {
             auto data = std::get<1>(assembler)->assemble_resource(resource);
-//            auto container = rf->type_container(std::get<0>(assembler));
             rf->add_resource(std::get<0>(assembler), resource.id(), resource.name(), data);
         }
     }
     
     // The resource file should be assembled at this point and just needs writting to disk.
-    rf->write(m_path, graphite::rsrc::file::format::classic);
+    rf->write(m_path, format);
 }
